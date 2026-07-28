@@ -2695,9 +2695,8 @@ buildbuildables()
 	{
 		if (level.script == "zm_transit")
 		{
-			level.buildables_available = array("turbine", "riotshield_zm", "turret", "electric_trap", "jetgun_zm");
+			level.buildables_available = array("riotshield_zm", "turret", "electric_trap", "jetgun_zm");
 
-			buildbuildable("turbine");
 			buildbuildable("electric_trap");
 			buildbuildable("turret");
 			buildbuildable("riotshield_zm");
