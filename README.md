@@ -123,6 +123,7 @@
 	* [Nuke](#nuke)
 	* [Carpenter](#carpenter)
 	* [Fire Sale](#fire-sale)
+	* [Free Perk](#free-perk)
 	* [Zombie Blood](#zombie-blood)
 	* [Meat Stink](#meat-stink)
 * [Persistent Upgrades](#persistent-upgrades)
@@ -136,7 +137,6 @@
 	* [Head Chopper](#head-chopper)
 	* [Acidgat Kit](#acidgat-kit)
 	* [Maxis Drone](#maxis-drone)
-* [Bank](#bank)
 * [Weapon Locker](#weapon-locker)
 * [NAV Table](#nav-table)
 * [Maps](#maps)
@@ -957,15 +957,21 @@
 
 ### Max Ammo
 * Sets heat weapons to 0% heat
+* Fills the magazine as well as the reserve ammo, so no reload is needed
 
 ### Nuke
 * Kills all zombies instantly
 
 ### Carpenter
-* Removed
+* Added on Nuketown, Mob of the Dead, and Origins
+* Restores full health to a carried shield
 
 ### Fire Sale
 * Added on Tranzit and Die Rise
+
+### Free Perk
+* Added as a random drop in Survival on all maps (normally only drops from leapers, ghosts, and denizens)
+* Drops about a quarter as often as the other powerups
 
 ### Zombie Blood
 * Added view model and zombie eye fx from Turned
@@ -1097,15 +1103,6 @@
 * Rotated buildable table model 90 degrees
 * Can no longer switch weapons or sprint while deploying
 * Switches back to correct weapon after deploying
-
-## Bank
-* Deposited points resets each game
-* Gain 20% interest on deposited points at the end of each round
-* Decreased points limit from 250,000 to 100,000
-* No longer costs 100 points to withdraw
-* Players can deposit and withdraw less than 1000 points
-* Account balance displayed on HUD
-* Disabled trading points
 
 ## Weapon Locker
 * Placed weapon resets each game

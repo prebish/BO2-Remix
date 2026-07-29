@@ -46,6 +46,15 @@ init()
 	level._effect["powerup_grabbed_wave_caution"] = loadfx("misc/fx_zombie_powerup_red_wave");
 	init_powerups();
 
+	// Stock hardwires the perk bottle to func_should_never_drop - it is registered only so a
+	// leaper, ghost or denizen kill can spawn one directly. Survival gets a real drop check
+	// instead, paired with the include in _zm_reimagined::powerup_changes. A failed check deals
+	// the next powerup in the shuffle, so this changes the mix and not how much drops.
+	if (is_gametype_active("zstandard") && isDefined(level.zombie_powerups["free_perk"]))
+	{
+		level.zombie_powerups["free_perk"].func_should_drop_with_regular_powerups = ::func_should_drop_free_perk;
+	}
+
 	if (!level.enable_magic)
 	{
 		return;
@@ -392,6 +401,7 @@ powerup_grab(powerup_team)
 								level thread start_carpenter(self.origin);
 							}
 
+							level thread carpenter_restore_shields(players[i]);
 							players[i] thread powerup_vo("carpenter");
 							break;
 
@@ -652,6 +662,19 @@ full_ammo_powerup(drop_item, player)
 				else
 				{
 					players[i] givemaxammo(primary_weapons[x]);
+
+					// givemaxammo only refills the reserve, so stock alone still leaves the player
+					// needing a reload before any of it is usable. Fill the magazine as well.
+					players[i] setweaponammoclip(primary_weapons[x], weaponClipSize(primary_weapons[x]));
+
+					// Akimbo weapons carry the second magazine under their own weapon name, so the
+					// off hand stays empty unless it is filled separately.
+					dw_name = weaponDualWieldWeaponName(primary_weapons[x]);
+
+					if (dw_name != "none")
+					{
+						players[i] setweaponammoclip(dw_name, weaponClipSize(dw_name));
+					}
 				}
 			}
 
@@ -1173,6 +1196,48 @@ half_points_powerup(drop_item, player)
 	level.zombie_vars[team]["zombie_powerup_point_halfer_time"] = time;
 }
 
+// Carpenter boards the windows back up, so it repairs a carried shield too. Reaches the whole
+// team the same way full_ammo_powerup does, rather than only the player who grabbed it.
+carpenter_restore_shields(player)
+{
+	players = get_players(player.team);
+
+	if (isdefined(level._get_game_module_players))
+	{
+		players = [[level._get_game_module_players]](player);
+	}
+
+	for (i = 0; i < players.size; i++)
+	{
+		if (players[i] maps\mp\zombies\_zm_laststand::player_is_in_laststand())
+		{
+			continue;
+		}
+
+		if (is_true(players[i].is_zombie))
+		{
+			continue;
+		}
+
+		// Both are undefined on a map with no shield. Going through the player's own reset
+		// function rather than zeroing the counter here means Alcatraz and Origins get their own
+		// shield handled without naming any of the three variants.
+		if (!isDefined(level.riotshield_name) || !isDefined(players[i].player_shield_reset_health))
+		{
+			continue;
+		}
+
+		// Carrying it, not deployed - a shield placed on a wall is a separate entity with its own
+		// health that this does not touch.
+		if (!players[i] hasweapon(level.riotshield_name))
+		{
+			continue;
+		}
+
+		players[i] [[players[i].player_shield_reset_health]]();
+	}
+}
+
 start_fire_sale(item)
 {
 	level thread maps\mp\zombies\_zm_audio_announcer::leaderdialog("fire_sale", getotherteam(item.power_up_grab_player.pers["team"]));
@@ -1195,6 +1260,13 @@ start_fire_sale(item)
 
 	level.zombie_vars["zombie_powerup_fire_sale_on"] = 0;
 	level notify("fire_sale_off");
+}
+
+// Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle
+// as common as Max Ammo. A quarter chance leaves it about a quarter as common as the rest.
+func_should_drop_free_perk()
+{
+	return randomint(4) == 0;
 }
 
 func_should_drop_fire_sale()

@@ -576,7 +576,6 @@ on_player_spawned()
 
 			self thread give_additional_perks();
 
-			self thread bank_gain_interest_after_rounds();
 			self thread weapon_locker_give_ammo_after_rounds();
 
 			self thread alt_weapon_name_hud();
@@ -784,9 +783,6 @@ post_init()
 	level.disable_free_perks_before_power = undefined;
 	level.custom_random_perk_weights = undefined;
 	level.should_respawn_func = ::should_respawn;
-
-
-	disable_bank_teller();
 
 	zone_changes();
 
@@ -2001,6 +1997,23 @@ powerup_changes()
 	{
 		include_powerup("fire_sale");
 	}
+
+	// Carpenter repairs a carried shield now, so it belongs on the maps that have one. Transit
+	// already carries it in its own include list; these three never did. Server side only is
+	// enough - carpenter registers no clientfield, unlike fire_sale above.
+	if (getDvar("mapname") == "zm_nuked" || getDvar("mapname") == "zm_prison" || getDvar("mapname") == "zm_tomb")
+	{
+		include_powerup("carpenter");
+	}
+
+	// Leapers, ghosts and denizens are the only things that ever hand out a perk bottle, and
+	// Survival has none of them, so let it into the regular drop rotation there instead. The
+	// other half of this is in scripts\zm\replaced\_zm_powerups::init, which has to wait until
+	// the powerup is registered before it can loosen its drop check.
+	if (is_gametype_active("zstandard"))
+	{
+		include_powerup("free_perk");
+	}
 }
 
 weapon_changes()
@@ -2665,22 +2678,6 @@ disable_navcards()
 	level._no_navcards = 1;
 }
 
-disable_bank_teller()
-{
-	level notify("stop_bank_teller");
-	bank_teller_dmg_trig = getent("bank_teller_tazer_trig", "targetname");
-
-	if (IsDefined(bank_teller_dmg_trig))
-	{
-		bank_teller_transfer_trig = getent(bank_teller_dmg_trig.target, "targetname");
-		bank_teller_transfer_trig delete();
-		bank_teller_dmg_trig delete();
-	}
-}
-
-
-
-
 
 onuseplantobject_mtower(player)
 {
@@ -2945,28 +2942,6 @@ give_additional_perks()
 		{
 			self UnsetPerk("specialty_stalker");
 			self Unsetperk("specialty_sprintrecovery");
-		}
-	}
-}
-
-bank_gain_interest_after_rounds()
-{
-	self endon("disconnect");
-
-	while (1)
-	{
-		level waittill("end_of_round");
-
-		if (isDefined(self.account_value))
-		{
-			self.account_value *= 1.2;
-
-			if (self.account_value > level.bank_account_max)
-			{
-				self.account_value = level.bank_account_max;
-			}
-
-			self notify("update_account_value");
 		}
 	}
 }
