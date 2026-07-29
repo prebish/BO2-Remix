@@ -139,12 +139,6 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_perks::has_perk_paused, scripts\zm\replaced\_zm_perks::has_perk_paused);
 	replaceFunc(maps\mp\zombies\_zm_perks::perk_pause, scripts\zm\replaced\_zm_perks::perk_pause);
 	replaceFunc(maps\mp\zombies\_zm_perks::perk_unpause, scripts\zm\replaced\_zm_perks::perk_unpause);
-	replaceFunc(maps\mp\zombies\_zm_buildables::buildable_place_think, scripts\zm\replaced\_zm_buildables::buildable_place_think);
-	replaceFunc(maps\mp\zombies\_zm_buildables::player_can_build, scripts\zm\replaced\_zm_buildables::player_can_build);
-	replaceFunc(maps\mp\zombies\_zm_buildables::buildable_use_hold_think, scripts\zm\replaced\_zm_buildables::buildable_use_hold_think);
-	replaceFunc(maps\mp\zombies\_zm_buildables::player_build, scripts\zm\replaced\_zm_buildables::player_build);
-	replaceFunc(maps\mp\zombies\_zm_buildables::buildablestub_update_prompt, scripts\zm\replaced\_zm_buildables::buildablestub_update_prompt);
-	replaceFunc(maps\mp\zombies\_zm_buildables::player_progress_bar, scripts\zm\replaced\_zm_buildables::player_progress_bar);
 	replaceFunc(maps\mp\zombies\_zm_power::standard_powered_items, scripts\zm\replaced\_zm_power::standard_powered_items);
 	replaceFunc(maps\mp\zombies\_zm_powerups::init, scripts\zm\replaced\_zm_powerups::init);
 	replaceFunc(maps\mp\zombies\_zm_powerups::powerup_drop, scripts\zm\replaced\_zm_powerups::powerup_drop);
@@ -724,7 +718,6 @@ on_player_disconnect()
 	self waittill("disconnect");
 
 	objective_state(self.obj_ind, "invisible");
-	objective_clearentity(self.obj_ind, self);
 	objective_setgamemodeflags(self.obj_ind, 0);
 	objective_position(self.obj_ind, (0, 0, 0));
 }
@@ -792,7 +785,6 @@ post_init()
 	level.custom_random_perk_weights = undefined;
 	level.should_respawn_func = ::should_respawn;
 
-	disable_carpenter();
 
 	disable_bank_teller();
 
@@ -802,7 +794,6 @@ post_init()
 
 	level thread wallbuy_cost_changes();
 
-	level thread buildbuildables();
 	level thread buildcraftables();
 }
 
@@ -2669,11 +2660,6 @@ disable_navcards()
 	level._no_navcards = 1;
 }
 
-disable_carpenter()
-{
-	arrayremovevalue(level.zombie_powerup_array, "carpenter");
-}
-
 disable_bank_teller()
 {
 	level notify("stop_bank_teller");
@@ -2687,210 +2673,9 @@ disable_bank_teller()
 	}
 }
 
-buildbuildables()
-{
-	wait 1; // need a wait or else some buildables dont build
 
-	if (is_classic())
-	{
-		if (level.script == "zm_transit")
-		{
-			level.buildables_available = array("riotshield_zm", "turret", "electric_trap", "jetgun_zm");
 
-			buildbuildable("electric_trap");
-			buildbuildable("turret");
-			buildbuildable("riotshield_zm");
-			buildbuildable("jetgun_zm");
-			buildbuildable("powerswitch", 1);
-			buildbuildable("pap", 1);
-			buildbuildable("sq_common", 1);
-			buildbuildable("dinerhatch", 1, 0);
 
-			// power switch is not showing up from forced build
-			show_powerswitch();
-		}
-		else if (level.script == "zm_highrise")
-		{
-			level.buildables_available = array("springpad_zm", "slipgun_zm");
-
-			buildbuildable("slipgun_zm");
-			buildbuildable("springpad_zm");
-			buildbuildable("sq_common", 1);
-		}
-		else if (level.script == "zm_buried")
-		{
-			flag_wait("initial_blackscreen_passed"); // wait for buildables to randomize
-			wait 1;
-
-			level.buildables_available = array("subwoofer_zm", "springpad_zm", "headchopper_zm");
-
-			removebuildable("keys_zm");
-			removebuildable("booze");
-			removebuildable("candy");
-			removebuildable("sloth");
-			buildbuildable("turbine");
-			buildbuildable("subwoofer_zm");
-			buildbuildable("springpad_zm");
-			buildbuildable("headchopper_zm");
-			buildbuildable("sq_common", 1);
-			buildbuildable("buried_sq_bt_m_tower", 0, 1, 1, ::onuseplantobject_mtower);
-			buildbuildable("buried_sq_bt_r_tower", 0, 1, 1, ::onuseplantobject_rtower);
-		}
-	}
-	else
-	{
-		if (level.script == "zm_highrise")
-		{
-			buildbuildable("springpad_zm", 1);
-			buildbuildable("slipgun_zm", 1);
-		}
-		else if (level.script == "zm_buried" && level.scr_zm_map_start_location == "street")
-		{
-			flag_wait("initial_blackscreen_passed"); // wait for buildables to be built
-			wait 1;
-
-			updatebuildables();
-			removebuildable("turbine", "buried");
-		}
-	}
-}
-
-buildbuildable(buildable, craft = 0, remove_pieces = 1, solo_pool = 0, onuse)
-{
-	player = get_players()[0];
-
-	foreach (stub in level.buildable_stubs)
-	{
-		if (!isDefined(buildable) || stub.equipname == buildable)
-		{
-			if (isDefined(buildable) || stub.persistent != 3)
-			{
-				stub.cost = stub get_equipment_cost();
-				stub.trigger_func = scripts\zm\replaced\_zm_buildables_pooled::pooled_buildable_place_think;
-
-				if (isDefined(onuse))
-				{
-					stub.buildablestruct.onuseplantobject = onuse;
-				}
-
-				if (craft)
-				{
-					stub.original_prompt_and_visibility_func = stub.prompt_and_visibility_func;
-					stub.prompt_and_visibility_func = scripts\zm\replaced\_zm_buildables_pooled::pooledbuildabletrigger_update_prompt;
-
-					stub maps\mp\zombies\_zm_buildables::buildablestub_finish_build(player);
-					stub maps\mp\zombies\_zm_buildables::buildablestub_remove();
-
-					if (isdefined(stub.model))
-					{
-						stub.model notsolid();
-						stub.model show();
-					}
-				}
-				else
-				{
-					if (level.script == "zm_buried")
-					{
-						if (solo_pool)
-						{
-							stub.solo_pool = 1;
-							scripts\zm\replaced\_zm_buildables_pooled::add_buildable_to_pool(stub, stub.equipname);
-						}
-					}
-					else
-					{
-						scripts\zm\replaced\_zm_buildables_pooled::add_buildable_to_pool(stub, level.script);
-					}
-				}
-
-				if (remove_pieces)
-				{
-					foreach (piece in stub.buildablezone.pieces)
-					{
-						piece maps\mp\zombies\_zm_buildables::piece_unspawn();
-					}
-				}
-
-				return;
-			}
-		}
-	}
-}
-
-get_equipment_cost()
-{
-	if (self.equipname == "turbine")
-	{
-		return 500;
-	}
-	else if (self.equipname == "jetgun_zm")
-	{
-		return 10000;
-	}
-	else if (self.equipname == "slipgun_zm")
-	{
-		return 10000;
-	}
-	else if (self.equipname == "packasplat")
-	{
-		return 2500;
-	}
-	else
-	{
-		return 1000;
-	}
-}
-
-// adds updated hintstring and functionality
-updatebuildables()
-{
-	foreach (stub in level._unitriggers.trigger_stubs)
-	{
-		if (IsDefined(stub.equipname) && stub.equipname != "chalk")
-		{
-			stub.cost = stub get_equipment_cost();
-			stub.trigger_func = scripts\zm\replaced\_zm_buildables_pooled::pooled_buildable_place_think;
-			stub.prompt_and_visibility_func = scripts\zm\replaced\_zm_buildables_pooled::pooledbuildabletrigger_update_prompt;
-		}
-	}
-}
-
-removebuildable(buildable, poolname)
-{
-	if (isDefined(poolname))
-	{
-		foreach (stub in level.buildablepools[poolname].stubs)
-		{
-			if (IsDefined(stub.equipname) && stub.equipname == buildable)
-			{
-				stub.model hide();
-				maps\mp\zombies\_zm_unitrigger::unregister_unitrigger(stub);
-				return;
-			}
-		}
-	}
-	else
-	{
-		foreach (stub in level.buildable_stubs)
-		{
-			if (!isDefined(buildable) || stub.equipname == buildable)
-			{
-				if (isDefined(buildable) || stub.persistent != 3)
-				{
-					stub maps\mp\zombies\_zm_buildables::buildablestub_remove();
-
-					foreach (piece in stub.buildablezone.pieces)
-					{
-						piece maps\mp\zombies\_zm_buildables::piece_unspawn();
-					}
-
-					maps\mp\zombies\_zm_unitrigger::unregister_unitrigger(stub);
-					return;
-				}
-			}
-		}
-	}
-}
 
 onuseplantobject_mtower(player)
 {
