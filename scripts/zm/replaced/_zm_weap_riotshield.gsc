@@ -13,6 +13,38 @@
 #include maps\mp\animscripts\zm_death;
 #include maps\mp\zombies\_zm_audio;
 
+// The shield's own aliases live in Tranzit's sound bank. A map that borrows the shield without
+// that bank loaded gets silence, so it can point these at something it does have loaded.
+riotshield_impact_alias()
+{
+	if (isDefined(level.riotshield_impact_alias))
+	{
+		return level.riotshield_impact_alias;
+	}
+
+	return "fly_riotshield_zm_impact_zombies";
+}
+
+riotshield_destroy_alias()
+{
+	if (isDefined(level.riotshield_destroy_alias))
+	{
+		return level.riotshield_destroy_alias;
+	}
+
+	return "wpn_riotshield_zm_destroy";
+}
+
+riotshield_forcehit_alias()
+{
+	if (isDefined(level.riotshield_forcehit_alias))
+	{
+		return level.riotshield_forcehit_alias;
+	}
+
+	return "fly_riotshield_forcehit";
+}
+
 player_damage_shield(idamage, bheld)
 {
 	damagemax = level.zombie_vars["riotshield_hit_points"];
@@ -30,13 +62,13 @@ player_damage_shield(idamage, bheld)
 		{
 			self playrumbleonentity("damage_heavy");
 			earthquake(1.0, 0.75, self.origin, 100);
-			self playsound("wpn_riotshield_zm_destroy");
+			self playsound(riotshield_destroy_alias());
 			self thread player_take_riotshield();
 		}
 		else
 		{
 			shield_origin = self.shield_ent.origin;
-			playsoundatposition("fly_riotshield_zm_impact_zombies", shield_origin);
+			playsoundatposition(riotshield_impact_alias(), shield_origin);
 
 			if (is_true(self.shield_ent.destroy_begun))
 			{
@@ -53,12 +85,12 @@ player_damage_shield(idamage, bheld)
 		{
 			self playrumbleonentity("damage_light");
 			earthquake(0.5, 0.5, self.origin, 100);
-			self playsound("fly_riotshield_zm_impact_zombies");
+			self playsound(riotshield_impact_alias());
 		}
 		else
 		{
 			shield_origin = self.shield_ent.origin;
-			playsoundatposition("fly_riotshield_zm_impact_zombies", shield_origin);
+			playsoundatposition(riotshield_impact_alias(), shield_origin);
 		}
 
 		self player_set_shield_health(self.shielddamagetaken, damagemax);
@@ -70,7 +102,7 @@ player_wait_and_take_riotshield()
 	shield_origin = self.shield_ent.origin;
 	level thread maps\mp\zombies\_zm_equipment::equipment_disappear_fx(shield_origin, level._riotshield_dissapear_fx);
 	wait 1;
-	playsoundatposition("wpn_riotshield_zm_destroy", shield_origin);
+	playsoundatposition(riotshield_destroy_alias(), shield_origin);
 	self thread player_take_riotshield();
 }
 
@@ -145,7 +177,7 @@ riotshield_knockdown_zombie(player, gib)
 	}
 
 	self dodamage(level.zombie_vars["riotshield_knockdown_damage"], player.origin, player, player, 0, "MOD_MELEE", 0, level.riotshield_name);
-	self playsound("fly_riotshield_forcehit");
+	self playsound(riotshield_forcehit_alias());
 
 	if (self.health < 1)
 	{

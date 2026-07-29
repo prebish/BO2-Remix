@@ -1124,6 +1124,8 @@
 * All quests play a song on completion after ending the current round
 
 ### Nuketown
+* Replaced the Backyard Mystery Box location with a buildable bench
+* Added Zombie Shield, built at the Backyard bench from 2 parts that spawn around the map
 * Hellhounds spawn mid round starting at round 25 (4% chance to spawn)
 * Initial perk is no longer always Quick Revive in solo
 * Initial perk no longer always drops in the starting area in solo

@@ -1,5 +1,11 @@
 >game,T6
 
+// Zombie Shield impact/deploy fx. Only common_mp carries these, and the Zombie Shield is on
+// Nuketown now, which otherwise logs "Could not load fx impacts/fx_riotshield_viewmodel".
+fx,impacts/fx_riotshield_viewmodel
+fx,weapon/riotshield/fx_riotshield_depoly_lights
+fx,weapon/riotshield/fx_riotshield_depoly_dust
+
 xmodel,t6_wpn_knife_base_view
 xmodel,t6_wpn_knife_base_world
 xmodel,t6_wpn_knife_melee

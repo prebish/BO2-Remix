@@ -207,6 +207,9 @@ if %ERRORLEVEL% neq 0 pause & exit
 
 "%OAT_BASE%\Linker.exe" ^
 --load "%CD%\zone_source\dependencies\camo_materials.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit_patch.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit.ff" ^
+--load "%OAT_GAME%\zone\all\so_zclassic_zm_transit.ff" ^
 --load "%OAT_GAME%\zone\all\zm_nuked_patch.ff" ^
 --load "%OAT_GAME%\zone\all\zm_nuked.ff" ^
 --base-folder "%OAT_BASE%" ^

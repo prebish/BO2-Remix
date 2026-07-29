@@ -2059,6 +2059,11 @@ weapon_changes()
 		add_zombie_weapon("titus6_zm", "titus6_upgraded_zm", &"WEAPON_TITUS6_EXPLOSIVE", 1000, "", "", undefined, 1);
 		precacheitem("titus6_explosive_dart_zm");
 		precacheitem("titus6_explosive_dart_upgraded_zm");
+
+		include_weapon("riotshield_zm", 0);
+		add_zombie_weapon("riotshield_zm", undefined, &"ZOMBIE_WEAPON_RIOTSHIELD", 2000, "riot", "", undefined);
+		include_equipment("riotshield_zm");
+		register_equipment_for_level("riotshield_zm");
 	}
 
 	if (level.script == "zm_prison")

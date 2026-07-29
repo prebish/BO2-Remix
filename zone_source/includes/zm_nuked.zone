@@ -7,3 +7,16 @@ image,,~-gzombie_eye
 material,mc/mtl_nazi_hellhound_eyes
 material,mc/mtl_zombie_wolf
 material,mc/mtl_zombie_wolf_fur
+
+// Zombie Shield bench. Everything here comes from the Tranzit zones, which build.bat loads
+// alongside the Nuketown ones for this step.
+weapon,riotshield_zm
+material,riotshield_zm_icon
+script,maps/mp/zombies/_zm_riotshield.gsc
+script,maps/mp/zombies/_zm_weap_riotshield.gsc
+script,clientscripts/mp/zombies/_zm_weap_riotshield.csc
+xmodel,t6_wpn_zmb_shield_dolly
+xmodel,t6_wpn_zmb_shield_door
+material,zm_hud_icon_dolly
+material,zm_hud_icon_cardoor
+xmodel,p6_zm_work_bench
