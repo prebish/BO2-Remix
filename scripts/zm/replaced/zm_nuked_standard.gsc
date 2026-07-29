@@ -15,8 +15,7 @@ main()
 	level.enemy_location_override_func = ::enemy_location_override;
 	nuked_treasure_chest_init();
 	scripts\zm\zm_nuked\zm_nuked_reimagined::buildables_init();
-	// testing
-level.zombie_vars["zombie_score_start_1p"] = 3000;
+	// level thread scripts\zm\zm_nuked\zm_nuked_reimagined::starting_points_init(5000);
 	flag_wait("initial_blackscreen_passed");
 	flag_set("power_on");
 }

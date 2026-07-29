@@ -21,6 +21,9 @@ main()
 	replaceFunc(maps\mp\zm_nuked_perks::perks_from_the_sky, scripts\zm\replaced\zm_nuked_perks::perks_from_the_sky);
 	replaceFunc(maps\mp\zm_nuked_perks::bring_perk_landing_damage, scripts\zm\replaced\zm_nuked_perks::bring_perk_landing_damage);
 
+	replaceFunc(maps\mp\zombies\_zm_buildables::sndbuildableusealias, ::snd_buildable_use_alias);
+	replaceFunc(maps\mp\zombies\_zm_buildables::sndbuildablecompletealias, ::snd_buildable_complete_alias);
+
 	// _zm_buildables::init calls this, and its client counterpart calls the .csc half at the
 	// matching point in _zm.csc - both sit between the core registerclientfield calls, so the
 	// "buildable" field gets registered in the same window on both sides.
@@ -125,6 +128,48 @@ buildables_init()
 	level thread watch_players_for_piece_icon();
 }
 
+// Called from scripts\zm\replaced\zm_nuked_standard::main. The starting score is stamped onto
+// the player at spawn out of their persistent stats, so a level variable set during map init
+// gets overwritten - the points have to be handed out after the player is in the world.
+starting_points_init(points)
+{
+	level.nuked_starting_points = points;
+
+	players = get_players();
+
+	foreach (player in players)
+	{
+		player thread give_starting_points();
+	}
+
+	for (;;)
+	{
+		level waittill("connected", player);
+		player thread give_starting_points();
+	}
+}
+
+give_starting_points()
+{
+	self endon("disconnect");
+
+	self waittill("spawned_player");
+
+	// Opening round only, once each. Anyone who bleeds out later, or drops into a game already
+	// running, keeps the round-scaled points the stock code gives them instead.
+	if (level.round_number > 1 || isDefined(self.nuked_starting_points_given))
+	{
+		return;
+	}
+
+	self.nuked_starting_points_given = 1;
+
+	if (self.score < level.nuked_starting_points)
+	{
+		self maps\mp\zombies\_zm_score::add_to_player_score(level.nuked_starting_points - self.score);
+	}
+}
+
 watch_players_for_piece_icon()
 {
 	players = get_players();
@@ -142,6 +187,20 @@ watch_players_for_piece_icon()
 	}
 }
 
+// Every buildable sound alias ships in the sound banks of the maps that have benches, so on
+// Nuketown the stock names resolve to nothing and the whole bench is silent. These stand in
+// with aliases from the mod's own bank, which is loaded on every map. Both are only swapped in
+// from zm_nuked_reimagined::main, so the maps with the real audio keep it.
+snd_buildable_use_alias(name)
+{
+	return "zmb_perks_packa_ticktock";
+}
+
+snd_buildable_complete_alias(name)
+{
+	return "zmb_perks_packa_ready";
+}
+
 // Stands in for the stock carried-part icon, which can't work on Nuketown - see the note in
 // include_buildables. Polling the carried piece rather than hooking pickup/drop means build,
 // swap, going down and bleeding out are all covered without a hook for each.
@@ -151,13 +210,16 @@ piece_icon_watcher()
 
 	self waittill("spawned_player");
 
+	// Measured in from the bottom right so it holds its place beside the weapon readout at any
+	// resolution, rather than drifting with the screen width the way a centred element does.
+	// x walks it left of the ammo counter and y lines it up with the weapon name above it.
 	hud_icon = newclienthudelem(self);
-	hud_icon.horzalign = "center";
+	hud_icon.horzalign = "right";
 	hud_icon.vertalign = "bottom";
-	hud_icon.alignx = "center";
+	hud_icon.alignx = "right";
 	hud_icon.aligny = "bottom";
-	hud_icon.x = 0;
-	hud_icon.y = 0;
+	hud_icon.x = -175;
+	hud_icon.y = -45;
 	hud_icon.foreground = 1;
 	hud_icon.hidewheninmenu = 1;
 	hud_icon.alpha = 0;
@@ -185,7 +247,7 @@ piece_icon_watcher()
 			}
 			else
 			{
-				hud_icon setShader(carried, 48, 48);
+				hud_icon setShader(carried, 32, 32);
 				hud_icon.alpha = 1;
 			}
 		}
@@ -220,16 +282,23 @@ spawn_buildable_bench()
 	shield.targetname = "buildable_riotshield";
 
 	// Only read for its keys and then deleted - the trigger players use is the unitrigger box
-	// that setup_unitrigger_buildable_internal builds out of script_length/width/height.
-	trigger = spawn("script_origin", origin);
+	// that setup_unitrigger_buildable_internal builds out of script_length/width/height. That
+	// box sits on this point and the stub sets require_look_at, so the player has to aim at it
+	// to get the prompt. It has to stay at working height however far the bench itself is sunk,
+	// which is why it is offset from the worktop and not from the bench's base: 44 up clears
+	// the bench, and the 13 on top of that is where Transit puts the same trigger.
+	trigger = spawn("script_origin", origin + (0, 0, 44 + 13));
 	trigger.angles = angles;
 	trigger.script_angles = angles;
 	trigger.targetname = "riotshield_zm_buildable_trigger";
 	trigger.target = "buildable_riotshield";
 	trigger.zombie_weapon_upgrade = "riotshield_zm";
-	trigger.script_length = 40;
-	trigger.script_width = 88;
-	trigger.script_height = 72;
+
+	// Transit's shield bench sets none of these and runs on the stock defaults, so use the same
+	// numbers rather than hand-picked ones.
+	trigger.script_length = 32;
+	trigger.script_width = 100;
+	trigger.script_height = 64;
 }
 
 // Drops a point onto the floor beneath it, so placements don't depend on hand-measured
@@ -300,7 +369,9 @@ riotshieldbuildable()
 
 onpickup_common(player)
 {
-	player playSound("zmb_buildable_pickup");
+	// The powerup grab sound, for the same reason the two alias functions above exist - there
+	// is no buildable pickup sound in Nuketown's bank to play.
+	player playSound("zmb_tombstone_grab");
 
 	self.piece_owner = player;
 }
