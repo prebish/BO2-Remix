@@ -49,6 +49,17 @@ init()
 
 perk_changes()
 {
+	// Client half of the Nuketown perk bottle pool - must stay identical to the .gsc version, see
+	// the note there. Perks with no machine, reachable only through the perk bottle.
+	if (getdvar("mapname") == "zm_nuked")
+	{
+		level.zombiemode_using_divetonuke_perk = 1;
+		clientscripts\mp\zombies\_zm_perk_divetonuke::enable_divetonuke_perk_for_level();
+		level.zombiemode_using_deadshot_perk = 1;
+		level.zombiemode_using_marathon_perk = 1;
+		level.zombiemode_using_additionalprimaryweapon_perk = 1;
+	}
+
 	if (!is_gametype_active("zclassic"))
 	{
 		return;

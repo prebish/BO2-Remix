@@ -20,3 +20,26 @@ xmodel,t6_wpn_zmb_shield_door
 material,zm_hud_icon_dolly
 material,zm_hud_icon_cardoor
 xmodel,p6_zm_work_bench
+// The Carpenter powerup pickup model. Nuketown never had Carpenter, so its own zone has no copy
+// and the powerup drew as an untextured slab once we added it to the drop pool.
+xmodel,zombie_carpenter
+
+// Perk bottle pool. Nuketown places no machine for any of these four, but enabling a perk
+// precaches its machine models, bottle and shader regardless, so the assets still have to be
+// here. Sourced from the Alcatraz, Die Rise and Transit zones that build.bat loads for this step.
+weapon,zombie_perk_bottle_nuke
+weapon,zombie_perk_bottle_deadshot
+weapon,zombie_perk_bottle_marathon
+weapon,zombie_perk_bottle_additionalprimaryweapon
+material,specialty_divetonuke_zombies
+material,specialty_ads_zombies
+material,specialty_marathon_zombies
+material,specialty_additionalprimaryweapon_zombies
+xmodel,p6_zm_al_vending_nuke_on
+xmodel,p6_zm_al_vending_ads_on
+xmodel,zombie_vending_marathon
+xmodel,zombie_vending_marathon_on
+xmodel,zombie_vending_three_gun
+xmodel,zombie_vending_three_gun_on
+fx,maps/zombie/fx_zmb_cola_staminup_on
+fx,misc/fx_zombie_cola_arsenal_on

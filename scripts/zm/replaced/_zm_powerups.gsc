@@ -55,6 +55,14 @@ init()
 		level.zombie_powerups["free_perk"].func_should_drop_with_regular_powerups = ::func_should_drop_free_perk;
 	}
 
+	// Carpenter's stock check wants five stripped window barriers before it will drop, and
+	// Nuketown has no windows at all - its only zbarriers are the mystery box lids - so that
+	// check can never pass there. Swap in one that watches for a shield instead.
+	if (getDvar("mapname") == "zm_nuked" && isDefined(level.zombie_powerups["carpenter"]))
+	{
+		level.zombie_powerups["carpenter"].func_should_drop_with_regular_powerups = ::func_should_drop_carpenter_nuked;
+	}
+
 	if (!level.enable_magic)
 	{
 		return;
@@ -1260,6 +1268,29 @@ start_fire_sale(item)
 
 	level.zombie_vars["zombie_powerup_fire_sale_on"] = 0;
 	level notify("fire_sale_off");
+}
+
+// Repairing a shield is the only thing Carpenter can do on a map with no windows, so hold it back
+// until somebody is actually carrying one rather than letting it drop as a powerup that does
+// nothing. A failed check deals the next powerup instead, so nothing is lost by waiting.
+func_should_drop_carpenter_nuked()
+{
+	if (!isDefined(level.riotshield_name))
+	{
+		return false;
+	}
+
+	players = get_players();
+
+	foreach (player in players)
+	{
+		if (player hasweapon(level.riotshield_name))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle

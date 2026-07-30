@@ -2288,3 +2288,64 @@ perk_unpause(perk)
 {
 	// disabled
 }
+
+// Stock builds its candidates out of the perk machines standing in the map, so a perk with no
+// machine can never come out of a perk bottle. A map that sets level.free_perk_pool names the
+// perks it wants reachable that way instead; leaving it undefined keeps the stock machine scan,
+// so every other map is untouched. Filtering below is stock, only the source of the list changes.
+give_random_perk()
+{
+	random_perk = undefined;
+	candidates = level.free_perk_pool;
+
+	if (!isDefined(candidates))
+	{
+		candidates = [];
+		vending_triggers = getentarray("zombie_vending", "targetname");
+
+		for (i = 0; i < vending_triggers.size; i++)
+		{
+			candidates[candidates.size] = vending_triggers[i].script_noteworthy;
+		}
+	}
+
+	perks = [];
+
+	for (i = 0; i < candidates.size; i++)
+	{
+		perk = candidates[i];
+
+		if (!isDefined(perk))
+		{
+			continue;
+		}
+
+		if (isdefined(self.perk_purchased) && self.perk_purchased == perk)
+		{
+			continue;
+		}
+
+		if (perk == "specialty_weapupgrade")
+		{
+			continue;
+		}
+
+		if (!self hasperk(perk) && !self has_perk_paused(perk))
+		{
+			perks[perks.size] = perk;
+		}
+	}
+
+	if (perks.size > 0)
+	{
+		perks = array_randomize(perks);
+		random_perk = perks[0];
+		self give_perk(random_perk);
+	}
+	else
+	{
+		self playsoundtoplayer(level.zmb_laugh_alias, self);
+	}
+
+	return random_perk;
+}

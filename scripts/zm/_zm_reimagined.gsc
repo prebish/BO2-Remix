@@ -124,6 +124,7 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_perks::vending_weapon_upgrade, scripts\zm\replaced\_zm_perks::vending_weapon_upgrade);
 	replaceFunc(maps\mp\zombies\_zm_perks::turnonpapsounds, scripts\zm\replaced\_zm_perks::turnonpapsounds);
 	replaceFunc(maps\mp\zombies\_zm_perks::give_perk, scripts\zm\replaced\_zm_perks::give_perk);
+	replaceFunc(maps\mp\zombies\_zm_perks::give_random_perk, scripts\zm\replaced\_zm_perks::give_random_perk);
 	replaceFunc(maps\mp\zombies\_zm_perks::perk_think, scripts\zm\replaced\_zm_perks::perk_think);
 	replaceFunc(maps\mp\zombies\_zm_perks::perk_set_max_health_if_jugg, scripts\zm\replaced\_zm_perks::perk_set_max_health_if_jugg);
 	replaceFunc(maps\mp\zombies\_zm_perks::initialize_custom_perk_arrays, scripts\zm\replaced\_zm_perks::initialize_custom_perk_arrays);
@@ -1948,6 +1949,27 @@ is_held_melee_weapon_offhand_melee(weaponname)
 
 perk_changes()
 {
+	// Nuketown is Survival only, so it never reaches the Classic block below. These four have no
+	// machine on the map and are not meant to - the perk bottle is the only way to get them, and
+	// enabling a perk is what makes it grantable, not the machine. Keep this identical to the
+	// .csc half: these flags gate registerclientfield calls on both sides, and any difference
+	// drops the client on connect.
+	if (getdvar("mapname") == "zm_nuked")
+	{
+		level.zombiemode_using_divetonuke_perk = 1;
+		maps\mp\zombies\_zm_perk_divetonuke::enable_divetonuke_perk_for_level();
+		level.zombiemode_using_deadshot_perk = 1;
+		level.zombiemode_using_marathon_perk = 1;
+		level.zombiemode_using_additionalprimaryweapon_perk = 1;
+
+		// What a perk bottle is allowed to hand out here, read by the replaced give_random_perk.
+		// The first four are the map's own sky machines, listed so bottles still give those; the
+		// last four exist only through a bottle. Stamin-Up is specialty_movefaster and not
+		// specialty_longersprint because swap_marathon_perk renames it, and PHD Flopper goes by
+		// specialty_flakjacket.
+		level.free_perk_pool = array("specialty_quickrevive", "specialty_fastreload", "specialty_rof", "specialty_armorvest", "specialty_flakjacket", "specialty_deadshot", "specialty_movefaster", "specialty_additionalprimaryweapon");
+	}
+
 	if (!is_gametype_active("zclassic"))
 	{
 		return;

@@ -965,6 +965,7 @@
 ### Carpenter
 * Added on Nuketown, Mob of the Dead, and Origins
 * Restores full health to a carried shield
+* Nuketown has no windows to board, so it drops there only while a player is carrying a shield
 
 ### Fire Sale
 * Added on Tranzit and Die Rise
@@ -972,6 +973,8 @@
 ### Free Perk
 * Added as a random drop in Survival on all maps (normally only drops from leapers, ghosts, and denizens)
 * Drops about a quarter as often as the other powerups
+* Can give perks that have no machine on the map, instead of only perks with a machine
+* Nuketown: can also give Deadshot Daiquiri, Stamin-Up, and Mule Kick
 
 ### Zombie Blood
 * Added view model and zombie eye fx from Turned
@@ -1121,6 +1124,9 @@
 * All quests play a song on completion after ending the current round
 
 ### Nuketown
+* Added PHD Flopper machine, dropped from the sky like the others
+* Perk machines drop every 3 rounds instead of every 5, so all 6 are down by round 16
+* Perk bottles can give Deadshot Daiquiri, Stamin-Up, and Mule Kick, none of which have a machine on the map
 * Replaced the Backyard Mystery Box location with a buildable bench
 * Added Zombie Shield, built at the Backyard bench from 2 parts that spawn around the map
 * Hellhounds spawn mid round starting at round 25 (4% chance to spawn)

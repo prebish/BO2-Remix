@@ -50,6 +50,15 @@ init_nuked_perks()
 	level.nuked_perks[4].script_noteworthy = "specialty_weapupgrade";
 	level.nuked_perks[4].turn_on_notify = "Pack_A_Punch_on";
 
+	// PHD Flopper. Nuketown ships no machine for it, so this is the only place it is declared -
+	// perk_changes enables the perk itself, and enable_divetonuke_perk_for_level is what hands
+	// perk_machine_spawn_init the setup function that gives this machine its own keys instead of
+	// the Speed Cola ones the switch falls back to.
+	level.nuked_perks[5] = spawnstruct();
+	level.nuked_perks[5].model = "p6_zm_al_vending_nuke_on";
+	level.nuked_perks[5].script_noteworthy = "specialty_flakjacket";
+	level.nuked_perks[5].turn_on_notify = "divetonuke_on";
+
 	level.override_perk_targetname = "zm_perk_machine_override";
 	random_perk_structs = [];
 	perk_structs = getstructarray("zm_random_machine", "script_noteworthy");
@@ -62,7 +71,9 @@ init_nuked_perks()
 
 	level.random_perk_structs = array_randomize(random_perk_structs);
 
-	for (i = 0; i < 5; i++)
+	// Driven off the list above rather than a fixed 5, so adding a perk needs no change here.
+	// There are 10 candidate spots in the map, so there is room to keep going.
+	for (i = 0; i < level.nuked_perks.size; i++)
 	{
 		level.random_perk_structs[i].targetname = "zm_perk_machine_override";
 		level.random_perk_structs[i].model = level.nuked_perks[i].model;
@@ -111,6 +122,20 @@ perks_from_the_sky()
 	machines[4] = getent(machine_triggers[4].target, "targetname");
 	move_perk(machines[4], top_height, 5.0, 0.001);
 	machine_triggers[4] trigger_off();
+
+	// divetonuke_perk_machine_setup is what names the PHD machine, so it only exists once the perk
+	// is enabled. Checked rather than assumed - a missing entry here would leave the arrays holding
+	// an undefined machine for bring_random_perk to pick.
+	phd_machine = getent("vending_divetonuke", "targetname");
+
+	if (isdefined(phd_machine))
+	{
+		machines[5] = phd_machine;
+		machine_triggers[5] = getent("vending_divetonuke", "target");
+		move_perk(machines[5], top_height, 5.0, 0.001);
+		machine_triggers[5] trigger_off();
+	}
+
 	flag_wait("initial_blackscreen_passed");
 
 	if (is_encounter())
@@ -128,19 +153,23 @@ bring_random_perks(machines, machine_triggers)
 	wait(randomintrange(10, 20));
 	bring_random_perk(machines, machine_triggers);
 
-	wait_for_round_range(5, 6);
+	wait_for_round_range(3, 4);
 	wait(randomintrange(30, 60));
 	bring_random_perk(machines, machine_triggers);
 
-	wait_for_round_range(10, 11);
+	wait_for_round_range(6, 7);
+	wait(randomintrange(30, 60));
+	bring_random_perk(machines, machine_triggers);
+
+	wait_for_round_range(9, 10);
+	wait(randomintrange(30, 60));
+	bring_random_perk(machines, machine_triggers);
+
+	wait_for_round_range(12, 13);
 	wait(randomintrange(30, 60));
 	bring_random_perk(machines, machine_triggers);
 
 	wait_for_round_range(15, 16);
-	wait(randomintrange(60, 120));
-	bring_random_perk(machines, machine_triggers);
-
-	wait_for_round_range(20, 21);
 	wait(randomintrange(60, 120));
 	bring_random_perk(machines, machine_triggers);
 }
@@ -149,11 +178,14 @@ grief_bring_random_perks(machines, machine_triggers)
 {
 	level waittill("restart_round_start");
 
-	grief_bring_random_perk(machines, machine_triggers);
-	grief_bring_random_perk(machines, machine_triggers);
-	grief_bring_random_perk(machines, machine_triggers);
-	grief_bring_random_perk(machines, machine_triggers);
-	grief_bring_random_perk(machines, machine_triggers);
+	// One call per machine, PHD Flopper included - Grief brings them all down at once, so a fixed
+	// count would leave the sixth stranded in the sky.
+	count = machines.size;
+
+	for (i = 0; i < count; i++)
+	{
+		grief_bring_random_perk(machines, machine_triggers);
+	}
 }
 
 grief_bring_random_perk(machines, machine_triggers)
