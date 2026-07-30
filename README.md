@@ -378,7 +378,7 @@
 * Upgraded: decreased amount of primary camo
 
 #### Executioner
-* Replaces Python
+* Added alongside the Python, which is back in the box
 * Upgraded: changed attachment from None to Fast Mag
 
 #### Five-seven Dual Wield
@@ -417,10 +417,10 @@
 * Upgraded: changed weapon name from "94000" to "9400"
 
 #### FAL OSW
-* Replaces FAL
+* Added alongside the FAL, which is back in the box
 
 #### M27
-* Replaces Galil
+* Added alongside the Galil, which is back in the box
 
 #### M8A1
 * Added on Buried
@@ -508,7 +508,7 @@
 * Upgraded: changed attachment from None to Fore Grip
 
 #### Mk 48
-* Replaces RPD (also added on Buried)
+* Added alongside the RPD, which is back in the box (also added on Buried)
 
 #### QBB LSW
 * Added on Mob of the Dead
@@ -533,7 +533,7 @@
 * Upgraded: fixed first raise anim
 
 #### XPR-50
-* Replaces Barrett M82A1
+* Added alongside the Barrett M82A1, which is back in the box
 
 ### Shotguns
 * Increased penetration

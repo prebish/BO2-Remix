@@ -2397,6 +2397,27 @@ weapon_changes()
 	{
 		level.zombie_lethal_grenade_player_init = "sticky_grenade_zm";
 	}
+
+	restore_legacy_box_weapons();
+}
+
+// The mod takes these five out of the box in favour of their Black Ops 2 stand-ins - M27 for the
+// Galil, Mk 48 for the RPD and so on. This puts them back without touching the replacements, so
+// the box holds both. Done here rather than by deleting the is_in_box lines above so the upstream
+// blocks stay intact - several of them also set weapon vox and costs that are still wanted.
+// Every map that shipped one gets it back, since the guards above are what limit each gun to the
+// maps that natively carry it.
+restore_legacy_box_weapons()
+{
+	weapons = array("galil_zm", "rpd_zm", "fnfal_zm", "python_zm", "barretm82_zm");
+
+	foreach (weapon in weapons)
+	{
+		if (isDefined(level.zombie_weapons[weapon]))
+		{
+			level.zombie_weapons[weapon].is_in_box = 1;
+		}
+	}
 }
 
 player_give_willy_pete()
