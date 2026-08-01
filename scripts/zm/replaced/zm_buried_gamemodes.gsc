@@ -85,7 +85,6 @@ buildbuildable(buildable)
 				stub.model notsolid();
 				stub.model show();
 
-				stub.buildablezone scripts\zm\replaced\_zm_buildables::buildable_adjust_model_origin();
 
 				return;
 			}

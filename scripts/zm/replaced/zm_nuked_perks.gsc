@@ -59,6 +59,13 @@ init_nuked_perks()
 	level.nuked_perks[5].script_noteworthy = "specialty_flakjacket";
 	level.nuked_perks[5].turn_on_notify = "divetonuke_on";
 
+	// Deadshot Daiquiri. Simpler than PHD above - perk_machine_spawn_init has a case for it, so it
+	// needs no custom-perk hook, and perk_changes already enables it here for the perk bottle pool.
+	level.nuked_perks[6] = spawnstruct();
+	level.nuked_perks[6].model = "p6_zm_al_vending_ads_on";
+	level.nuked_perks[6].script_noteworthy = "specialty_deadshot";
+	level.nuked_perks[6].turn_on_notify = "deadshot_on";
+
 	level.override_perk_targetname = "zm_perk_machine_override";
 	random_perk_structs = [];
 	perk_structs = getstructarray("zm_random_machine", "script_noteworthy");
@@ -136,6 +143,18 @@ perks_from_the_sky()
 		machine_triggers[5] trigger_off();
 	}
 
+	// Deadshot names its machine and its trigger differently - vending_deadshot_model for the model,
+	// vending_deadshot for what the trigger points at - so this pair does not read like the others.
+	deadshot_machine = getent("vending_deadshot_model", "targetname");
+
+	if (isdefined(deadshot_machine))
+	{
+		machines[6] = deadshot_machine;
+		machine_triggers[6] = getent("vending_deadshot", "target");
+		move_perk(machines[6], top_height, 5.0, 0.001);
+		machine_triggers[6] trigger_off();
+	}
+
 	flag_wait("initial_blackscreen_passed");
 
 	if (is_encounter())
@@ -170,6 +189,10 @@ bring_random_perks(machines, machine_triggers)
 	bring_random_perk(machines, machine_triggers);
 
 	wait_for_round_range(15, 16);
+	wait(randomintrange(60, 120));
+	bring_random_perk(machines, machine_triggers);
+
+	wait_for_round_range(18, 19);
 	wait(randomintrange(60, 120));
 	bring_random_perk(machines, machine_triggers);
 }

@@ -47,12 +47,17 @@ init()
 	init_powerups();
 
 	// Stock hardwires the perk bottle to func_should_never_drop - it is registered only so a
-	// leaper, ghost or denizen kill can spawn one directly. Survival gets a real drop check
-	// instead, paired with the include in _zm_reimagined::powerup_changes. A failed check deals
-	// the next powerup in the shuffle, so this changes the mix and not how much drops.
-	if (is_gametype_active("zstandard") && isDefined(level.zombie_powerups["free_perk"]))
+	// leaper, ghost or denizen kill can spawn one directly. Survival and Classic get a real drop
+	// check instead, paired with the include in _zm_reimagined::powerup_changes. A failed check
+	// deals the next powerup in the shuffle, so this changes the mix and not how much drops.
+	if (isDefined(level.zombie_powerups["free_perk"]) && (is_gametype_active("zstandard") || is_classic()))
 	{
 		level.zombie_powerups["free_perk"].func_should_drop_with_regular_powerups = ::func_should_drop_free_perk;
+
+		if (is_classic())
+		{
+			level thread watch_for_free_perk_unlock();
+		}
 	}
 
 	// Carpenter's stock check wants five stripped window barriers before it will drop, and
@@ -1293,11 +1298,46 @@ func_should_drop_carpenter_nuked()
 	return false;
 }
 
-// Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle
-// as common as Max Ammo. A quarter chance leaves it about a quarter as common as the rest.
+// Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle as
+// common as Max Ammo. Half leaves it half as common as any other single powerup, which on Nuketown's
+// seven-powerup pool works out at roughly one bottle per fourteen drops.
+//
+// This is the rarity dial and the only number worth touching: 2 is half as common as the others,
+// 3 a third, 4 a quarter, 1 exactly as common.
 func_should_drop_free_perk()
 {
-	return randomint(4) == 0;
+	if (is_classic() && !is_true(level.free_perk_unlocked))
+	{
+		return false;
+	}
+
+	return randomint(2) == 0;
+}
+
+// Classic keeps the perk bottle out of the rotation until somebody is properly perked up. The test
+// is four perks held at once, not four bought over the course of a game - perks_active has entries
+// removed when a perk is lost, so a player who buys three, goes down and buys two more has never
+// qualified. Once it has happened the bottle stays in the rotation for the rest of the match.
+//
+// Polled rather than hung off the perk_acquired notify so that players joining partway through, and
+// perks gained any other way, are all covered without a hook for each.
+watch_for_free_perk_unlock()
+{
+	while (!is_true(level.free_perk_unlocked))
+	{
+		players = get_players();
+
+		foreach (player in players)
+		{
+			if (isDefined(player.perks_active) && player.perks_active.size >= 4)
+			{
+				level.free_perk_unlocked = 1;
+				break;
+			}
+		}
+
+		wait 1;
+	}
 }
 
 func_should_drop_fire_sale()

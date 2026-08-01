@@ -10,8 +10,7 @@ blundergat_upgrade_station()
 {
 	t_upgrade = getent("blundergat_upgrade", "targetname");
 	t_upgrade.equipname = "packasplat";
-	t_upgrade.cost = t_upgrade scripts\zm\_zm_reimagined::get_equipment_cost();
-	t_upgrade sethintstring(&"ZM_PRISON_CONVERT_START", t_upgrade.cost);
+	t_upgrade sethintstring(&"ZM_PRISON_CONVERT_START");
 	t_upgrade usetriggerrequirelookat();
 	waittill_crafted("packasplat");
 	m_converter = t_upgrade.m_upgrade_machine;
@@ -30,7 +29,7 @@ blundergat_upgrade_station()
 
 	while (true)
 	{
-		t_upgrade thread blundergat_change_hintstring(&"ZM_PRISON_CONVERT_START", t_upgrade.cost);
+		t_upgrade thread blundergat_change_hintstring(&"ZM_PRISON_CONVERT_START");
 
 		t_upgrade waittill("trigger", player);
 
@@ -44,18 +43,10 @@ blundergat_upgrade_station()
 			}
 		}
 
-		if (player.score < t_upgrade.cost)
-		{
-			self play_sound_on_ent("no_purchase");
-			player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "no_money_weapon");
-			continue;
-		}
-
 		str_valid_weapon = player getcurrentweapon();
 
 		if (str_valid_weapon == "blundergat_zm" || str_valid_weapon == "blundergat_upgraded_zm")
 		{
-			player maps\mp\zombies\_zm_score::minus_to_player_score(t_upgrade.cost);
 			t_upgrade play_sound_on_ent("purchase");
 
 			player thread maps\mp\zombies\_zm_perks::do_knuckle_crack();

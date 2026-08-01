@@ -791,7 +791,6 @@ post_init()
 
 	level thread wallbuy_cost_changes();
 
-	level thread buildcraftables();
 }
 
 add_objectives()
@@ -2029,10 +2028,12 @@ powerup_changes()
 	}
 
 	// Leapers, ghosts and denizens are the only things that ever hand out a perk bottle, and
-	// Survival has none of them, so let it into the regular drop rotation there instead. The
-	// other half of this is in scripts\zm\replaced\_zm_powerups::init, which has to wait until
-	// the powerup is registered before it can loosen its drop check.
-	if (is_gametype_active("zstandard"))
+	// Survival has none of them, so let it into the regular drop rotation there instead. Classic
+	// gets it too, but held back until a player has four perks at once - see
+	// scripts\zm\replaced\_zm_powerups::func_should_drop_free_perk. The other half of this is in
+	// _zm_powerups::init, which has to wait until the powerup is registered before it can loosen
+	// its drop check.
+	if (is_gametype_active("zstandard") || is_classic())
 	{
 		include_powerup("free_perk");
 	}
@@ -2773,149 +2774,6 @@ unregister_tower_unitriggers()
 }
 
 // MOTD\Origins style buildables
-buildcraftables()
-{
-	flag_wait("initial_blackscreen_passed");
-
-	if (is_true(level.zombiemode_using_afterlife))
-	{
-		flag_wait("afterlife_start_over");
-	}
-
-	if (is_classic())
-	{
-		if (level.script == "zm_prison")
-		{
-			buildcraftable("alcatraz_shield_zm");
-			buildcraftable("packasplat");
-		}
-		else if (level.script == "zm_tomb")
-		{
-			buildcraftable("tomb_shield_zm");
-			buildcraftable("equip_dieseldrone_zm");
-			takecraftableparts("gramophone");
-		}
-	}
-}
-
-takecraftableparts(buildable)
-{
-	player = get_players()[0];
-
-	foreach (stub in level.zombie_include_craftables)
-	{
-		if (stub.name == buildable)
-		{
-			foreach (piece in stub.a_piecestubs)
-			{
-				piecespawn = piece.piecespawn;
-
-				if (isDefined(piecespawn))
-				{
-					player player_take_piece(piecespawn);
-				}
-			}
-
-			return;
-		}
-	}
-}
-
-buildcraftable(buildable)
-{
-	player = get_players()[0];
-
-	foreach (stub in level.a_uts_craftables)
-	{
-		if (stub.craftablestub.name == buildable)
-		{
-			foreach (piece in stub.craftablespawn.a_piecespawns)
-			{
-				piecespawn = get_craftable_piece(stub.craftablestub.name, piece.piecename);
-
-				if (isDefined(piecespawn))
-				{
-					player player_take_piece(piecespawn);
-				}
-			}
-
-			return;
-		}
-	}
-}
-
-get_craftable_piece(str_craftable, str_piece)
-{
-	foreach (uts_craftable in level.a_uts_craftables)
-	{
-		if (uts_craftable.craftablestub.name == str_craftable)
-		{
-			foreach (piecespawn in uts_craftable.craftablespawn.a_piecespawns)
-			{
-				if (piecespawn.piecename == str_piece)
-				{
-					return piecespawn;
-				}
-			}
-		}
-	}
-
-	return undefined;
-}
-
-player_take_piece(piecespawn)
-{
-	piecestub = piecespawn.piecestub;
-	damage = piecespawn.damage;
-
-	if (isDefined(piecestub.onpickup))
-	{
-		piecespawn [[piecestub.onpickup]](self);
-	}
-
-	if (isDefined(piecestub.is_shared) && piecestub.is_shared)
-	{
-		if (isDefined(piecestub.client_field_id))
-		{
-			level setclientfield(piecestub.client_field_id, 1);
-		}
-	}
-	else
-	{
-		if (isDefined(piecestub.client_field_state))
-		{
-			self setclientfieldtoplayer("craftable", piecestub.client_field_state);
-		}
-	}
-
-	piecespawn piece_unspawn();
-	piecespawn notify("pickup");
-
-	if (isDefined(piecestub.is_shared) && piecestub.is_shared)
-	{
-		piecespawn.in_shared_inventory = 1;
-	}
-
-	self adddstat("buildables", piecespawn.craftablename, "pieces_pickedup", 1);
-}
-
-piece_unspawn()
-{
-	if (isDefined(self.model))
-	{
-		self.model delete();
-	}
-
-	self.model = undefined;
-
-	if (isDefined(self.unitrigger))
-	{
-		thread maps\mp\zombies\_zm_unitrigger::unregister_unitrigger(self.unitrigger);
-	}
-
-	self.unitrigger = undefined;
-}
-
 remove_buildable_pieces(buildable_name)
 {
 	foreach (buildable in level.zombie_include_buildables)

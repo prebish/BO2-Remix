@@ -79,6 +79,8 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_equip_turret::startturretdeploy, scripts\zm\replaced\_zm_equip_turret::startturretdeploy);
 	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate);
 	replaceFunc(maps\mp\zombies\_zm_weapon_locker::wl_set_stored_weapondata, scripts\zm\replaced\_zm_weapon_locker::wl_set_stored_weapondata);
+	replaceFunc(maps\mp\zombies\_zm_banking::bank_deposit_unitrigger, scripts\zm\replaced\_zm_banking::bank_deposit_unitrigger);
+	replaceFunc(maps\mp\zombies\_zm_banking::bank_withdraw_unitrigger, scripts\zm\replaced\_zm_banking::bank_withdraw_unitrigger);
 
 	include_powerups();
 	electric_door_changes();
@@ -97,7 +99,6 @@ init()
 	player_initial_spawn_override();
 	player_respawn_override();
 	zombie_spawn_location_changes();
-	buildable_table_models();
 	busdepot_remove_lava_collision();
 	cornfield_add_collision();
 	path_exploit_fixes();
@@ -550,49 +551,6 @@ zombie_spawn_location_changes()
 			}
 		}
 	}
-}
-
-buildable_table_models()
-{
-	// power switch
-	model = spawn("script_model", (12143, 8495, -752));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-	model = spawn("script_model", (12143, 8495, -722));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-	model = spawn("script_model", (12143, 8495, -692));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-	model = spawn("script_model", (12192, 8495, -752));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-	model = spawn("script_model", (12192, 8495, -722));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-	model = spawn("script_model", (12192, 8495, -692));
-	model.angles = (0, 90, 0);
-	model setmodel("p6_monsoon_crate_01_shell_small");
-
-	// pack-a-punch
-	model = spawn("script_model", (2266, -213, -304));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_1");
-	model = spawn("script_model", (2266, -213, -274));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_1");
-	model = spawn("script_model", (2266, -213, -244));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_1");
-	model = spawn("script_model", (2219, -213, -304));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_2");
-	model = spawn("script_model", (2219, -213, -274));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_2");
-	model = spawn("script_model", (2219, -213, -244));
-	model.angles = (0, 0, 0);
-	model setmodel("p_rus_crate_metal_2");
 }
 
 busdepot_remove_lava_collision()

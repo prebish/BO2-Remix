@@ -50,6 +50,8 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_weap_slipgun::slipgun_zombie_death_response, scripts\zm\replaced\_zm_weap_slipgun::slipgun_zombie_death_response);
 	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate);
 	replaceFunc(maps\mp\zombies\_zm_weapon_locker::wl_set_stored_weapondata, scripts\zm\replaced\_zm_weapon_locker::wl_set_stored_weapondata);
+	replaceFunc(maps\mp\zombies\_zm_banking::bank_deposit_unitrigger, scripts\zm\replaced\_zm_banking::bank_deposit_unitrigger);
+	replaceFunc(maps\mp\zombies\_zm_banking::bank_withdraw_unitrigger, scripts\zm\replaced\_zm_banking::bank_withdraw_unitrigger);
 
 	level._effect["screecher_vortex"] = loadfx("maps/zombie/fx_zmb_screecher_vortex");
 

@@ -46,7 +46,6 @@ main()
 	init_barriers();
 	disable_zones();
 	activate_electric_switch();
-	level thread swap_buildable_tables();
 	level thread scripts\zm\locs\loc_common::init();
 }
 
@@ -132,10 +131,3 @@ activate_electric_switch()
 	master_switch rotateroll(-90, 0.3);
 }
 
-swap_buildable_tables()
-{
-	flag_wait("start_zombie_round_logic");
-	wait 0.5;
-
-	scripts\zm\replaced\_zm_buildables_pooled::swap_buildable_fields(level.buildable_stubs[0], level.buildable_stubs[1]);
-}

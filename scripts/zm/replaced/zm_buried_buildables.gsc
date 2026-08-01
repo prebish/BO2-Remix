@@ -207,19 +207,19 @@ init_buildables(buildablesenabledlist)
 subwooferbuildable()
 {
 	stub = maps\mp\zombies\_zm_buildables::buildable_trigger_think("subwoofer_zm_buildable_trigger", "subwoofer_zm", "equip_subwoofer_zm", &"ZM_BURIED_GRAB_SUBWOOFER", 1, 1);
-	maps\mp\zombies\_zm_buildables_pooled::add_buildable_to_pool(stub, "buried");
+
 }
 
 springpadbuildable()
 {
 	stub = maps\mp\zombies\_zm_buildables::buildable_trigger_think("springpad_zm_buildable_trigger", "springpad_zm", "equip_springpad_zm", &"ZM_BURIED_GRAB_SPRINGPAD", 1, 1);
-	maps\mp\zombies\_zm_buildables_pooled::add_buildable_to_pool(stub, "buried");
+
 }
 
 headchopperbuildable()
 {
 	stub = maps\mp\zombies\_zm_buildables::buildable_trigger_think("headchopper_buildable_trigger", "headchopper_zm", "equip_headchopper_zm", &"ZM_BURIED_GRAB_HEADCHOPPER", 1, 1);
-	maps\mp\zombies\_zm_buildables_pooled::add_buildable_to_pool(stub, "buried");
+
 }
 
 watch_cell_open_close(door)

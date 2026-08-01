@@ -1429,7 +1429,7 @@ REFERENCE           ZM_PRISON_CRAFT_PACKASPLAT
 LANG_ENGLISH        "Hold ^3[{+activate}]^7 to craft Acidgat Kit"
 
 REFERENCE           ZM_PRISON_CONVERT_START
-LANG_ENGLISH        "Hold ^3[{+activate}]^7 to convert Blundergat into Acidgat [Cost: &&1]"
+LANG_ENGLISH        "Hold ^3[{+activate}]^7 to convert Blundergat into Acidgat"
 
 REFERENCE           ZM_PRISON_CONVERT_PICKUP
 LANG_ENGLISH        "Hold ^3[{+activate}]^7 to take Acidgat"

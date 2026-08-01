@@ -1,5 +1,9 @@
 # Call of Duty: Black Ops 2 Zombies - Reimagined
 
+> This is **Reimagined-Lite**, a fork. Everything below describes Reimagined by Jbleezy, amended
+> where this fork differs. For the fork's own changes and what has and has not been tested, see
+> [FORK.md](FORK.md).
+
 ## Created by: Jbleezy
 
 [YouTube](https://youtube.com/ItsJbirdJustin)
@@ -137,6 +141,7 @@
 	* [Head Chopper](#head-chopper)
 	* [Acidgat Kit](#acidgat-kit)
 	* [Maxis Drone](#maxis-drone)
+* [Bank](#bank)
 * [Weapon Locker](#weapon-locker)
 * [NAV Table](#nav-table)
 * [Maps](#maps)
@@ -622,7 +627,6 @@
 * Weapon plays an alarm sound when overheated and continuing to fire
 * Pulls in powerups more frequently
 * Pulls in powerups twice as fast
-* Buildable table model no longer shows while player has weapon
 * Added heat percentage on HUD
 * Changed weapon name from "Thrustodyne Aeronautics Model 23" to "Jet Gun"
 * Fixed spin dial, spin anim, and spin sounds being inaccurate
@@ -637,10 +641,6 @@
 * Removed player damage
 * Upgraded: increases slippery spot duration by 50%
 * Upgraded: increases chain explosion radius by 50%
-* Buildable table model disappears immediately after weapon is taken from it
-* Added teddy bear to buildable table after weapon is taken from it
-* Teddy bear standing up means weapon is not available from Mystery Box
-* Teddy bear lying down means weapon is available from Mystery Box
 
 #### Paralyzer
 * Kills on any round
@@ -971,10 +971,11 @@
 * Added on Tranzit and Die Rise
 
 ### Free Perk
-* Added as a random drop in Survival on all maps (normally only drops from leapers, ghosts, and denizens)
-* Drops about a quarter as often as the other powerups
+* Added as a random drop in Survival and Classic on all maps (normally only drops from leapers, ghosts, and denizens)
+* In Classic, does not start dropping until a player has 4 perks at once
+* Drops about half as often as the other powerups
 * Can give perks that have no machine on the map, instead of only perks with a machine
-* Nuketown: can also give Deadshot Daiquiri, Stamin-Up, and Mule Kick
+* Nuketown: can also give Stamin-Up and Mule Kick
 
 ### Zombie Blood
 * Added view model and zombie eye fx from Turned
@@ -1012,24 +1013,6 @@
 * Removed
 
 ## Buildables
-* Added purchase cost
-* Parts automatically picked up
-* Can be built at any buildable table on all maps
-* Zombies no longer attack (except Zombie Shield)
-* Can no longer be destroyed by 2 grenades
-* Can be destroyed by taking 1500 damage
-* Can no longer be picked up after being destroyed
-* Added weapon name on HUD to all buildables
-* Increased move speed while holding from 100% to 110% (except Zombie Shield)
-* Can no longer melee while holding (except Zombie Shield)
-* Removed dive anim
-* Added held world model
-* Adjusted buildable table model positions to make them all touch the buildable table
-* Changed crafting hint string from "Building..." to "Crafting..."
-* Changed purchase hint string from "for" to "to take" on all maps
-* Changed pick up hint string from "for" to "to pick up" on all maps
-* Fixed being able to see view model while holding (except Zombie Shield)
-* Fixed not being destroyed correctly when placed at a bad spot
 
 ### Turbine
 * Rotated held model 90 degrees
@@ -1037,7 +1020,6 @@
 ### Zombie Shield
 * Added shield health bar on HUD
 * Awards points for kills and damage
-* Can be repaired at buildable table (same cost as purchase cost)
 * Zombies that are on fire no longer explode on death
 * Can be destroyed by player damage when deployed
 * Destroyed sound plays when player is holding
@@ -1100,12 +1082,16 @@
 * Kills on any round in 1-4 shots (normally does 12000 damage max)
 * Decreased active time from 90 seconds to 60 seconds
 * Decreased cooldown time from 60 seconds to 30 seconds
-* Added hint strings for purchased, can only be one, and cooling down
 * Added HUD message for how to activate
 * Buildable table model sits on top of the stand
 * Rotated buildable table model 90 degrees
 * Can no longer switch weapons or sprint while deploying
 * Switches back to correct weapon after deploying
+
+## Bank
+* No longer costs 100 points to withdraw
+* No longer costs 100 points to trade points with the teller
+* Account balance displayed while at the deposit or withdraw trigger
 
 ## Weapon Locker
 * Placed weapon resets each game
@@ -1113,7 +1099,6 @@
 * Placed weapon displayed on HUD
 
 ## NAV Table
-* Automatically crafted
 * Costs 100,000 points
 * Ends the game
 
@@ -1124,9 +1109,9 @@
 * All quests play a song on completion after ending the current round
 
 ### Nuketown
-* Added PHD Flopper machine, dropped from the sky like the others
-* Perk machines drop every 3 rounds instead of every 5, so all 6 are down by round 16
-* Perk bottles can give Deadshot Daiquiri, Stamin-Up, and Mule Kick, none of which have a machine on the map
+* Added PHD Flopper and Deadshot Daiquiri machines, dropped from the sky like the others
+* Perk machines drop every 3 rounds instead of every 5, so all 7 are down by round 19
+* Perk bottles can give Stamin-Up and Mule Kick, neither of which has a machine on the map
 * Replaced the Backyard Mystery Box location with a buildable bench
 * Added Zombie Shield, built at the Backyard bench from 2 parts that spawn around the map
 * Hellhounds spawn mid round starting at round 25 (4% chance to spawn)
@@ -1151,7 +1136,6 @@
 * Added Who's Who machine at Power Station
 * Added Mystery Box at Tunnel
 * Added Mystery Box at Cornfield
-* Power switch, Pack-a-Punch, and Diner hatch automatically crafted
 * Any door that requires a Turbine to open is automatically open whenever the power is on
 * Increased bus speed by 100%
 * Added bus depart timer on HUD when player is on bus
@@ -1297,7 +1281,6 @@
 * Added Tombstone Soda machine at General Store
 * Removed Turbine, key, booze, and candy
 * Power automatically on
-* Noose and Guillotine parts automatically picked up
 * Remington 870 MCS wallbuy chalk automatically drawn in the Center Tunnels zone
 * Moved MSMC wallbuy to its location on Borough
 * Moved buildable wallbuy in Courthouse to AN-94 wallbuy location on Borough
