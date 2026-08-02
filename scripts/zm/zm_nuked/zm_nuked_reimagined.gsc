@@ -128,48 +128,6 @@ buildables_init()
 	level thread watch_players_for_piece_icon();
 }
 
-// Called from scripts\zm\replaced\zm_nuked_standard::main. The starting score is stamped onto
-// the player at spawn out of their persistent stats, so a level variable set during map init
-// gets overwritten - the points have to be handed out after the player is in the world.
-starting_points_init(points)
-{
-	level.nuked_starting_points = points;
-
-	players = get_players();
-
-	foreach (player in players)
-	{
-		player thread give_starting_points();
-	}
-
-	for (;;)
-	{
-		level waittill("connected", player);
-		player thread give_starting_points();
-	}
-}
-
-give_starting_points()
-{
-	self endon("disconnect");
-
-	self waittill("spawned_player");
-
-	// Opening round only, once each. Anyone who bleeds out later, or drops into a game already
-	// running, keeps the round-scaled points the stock code gives them instead.
-	if (level.round_number > 1 || isDefined(self.nuked_starting_points_given))
-	{
-		return;
-	}
-
-	self.nuked_starting_points_given = 1;
-
-	if (self.score < level.nuked_starting_points)
-	{
-		self maps\mp\zombies\_zm_score::add_to_player_score(level.nuked_starting_points - self.score);
-	}
-}
-
 watch_players_for_piece_icon()
 {
 	players = get_players();

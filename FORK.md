@@ -57,16 +57,18 @@ not the deleted banking script, so it survived the revert and is documented in `
 
 | Change | Commits | Status |
 |---|---|---|
-| New Fire Sale music track | `ae23bf7c`, `daf7c4ee` | ❓ |
-| Zombie Shield health 1500 → 2500 | `631df6ae` | ❓ |
-| Legacy guns back in the Mystery Box alongside their replacements: Galil, RPD, FAL, Python, Barrett M82A1. Wallbuy-only guns (MP5, AK74u, M14, M16A1, M1911) deliberately not added | `132ae227` | ❓ |
-| Max Ammo fills the magazine as well as the reserve, including akimbo off-hands. Grief and the encounter modes unchanged | `26ba1991` | ❓ |
-| Carpenter restores a carried shield to full health, team-wide. Added to Nuketown, Mob of the Dead and Origins | `26ba1991`, `7ac44cb8` | ⚠️ |
+| New Fire Sale music track | `ae23bf7c`, `daf7c4ee` | ✅ |
+| Zombie Shield health 1500 → 2500 | `631df6ae` | ✅ |
+| Legacy guns back in the Mystery Box alongside their replacements: Galil, RPD, FAL, Python, Barrett M82A1. Wallbuy-only guns (MP5, AK74u, M14, M16A1, M1911) deliberately not added | `132ae227` | ✅ |
+| Max Ammo fills the magazine as well as the reserve, including akimbo off-hands. Grief and the encounter modes unchanged | `26ba1991` | ✅ |
+| Carpenter restores a carried shield to full health, team-wide. Added to Nuketown, Mob of the Dead and Origins | `26ba1991`, `7ac44cb8` | ✅ |
 | Free Perk powerup drops in Survival on all maps, half as often as other powerups | `26ba1991`, working tree | ✅ |
-| Free Perk also drops in Classic, but held out of the rotation until a player holds 4 perks at once. Latches on once reached | working tree | ❓ |
-| Perk bottles can give perks with no machine on the map (`give_random_perk` reads `level.free_perk_pool`) | `7ac44cb8` | ⚠️ |
+| Free Perk also drops in Classic, but held out of the rotation until a player holds 4 perks at once. Latches on once reached | working tree | ✅ |
+| Perk bottles can give perks with no machine on the map (`give_random_perk` reads `level.free_perk_pool`) | `7ac44cb8` | ✅ |
 | Bank balance shown at the deposit and withdraw triggers, and the withdraw prompt corrected to read 1000 | working tree | ✅ |
 | Mod metadata renamed to Reimagined-Lite | `7de294c9` | ✅ |
+| **RULES options tab** exposing seven fork settings: Starting Points, Free Perk Drop, Free Perk Rarity, Zombie Shield Health, Carpenter Repairs Shield, Max Ammo Fills Magazine, Legacy Box Guns | working tree | ✅ |
+| HD crosshair — a third-party replacement `side_small.iwi` dropped into `images/`, which `build.bat` packs into `mod.iwd`. Overrides the stock crosshair while the mod is loaded, and reverts by deleting the one file | working tree | ✅ |
 
 ## Nuketown
 
@@ -78,7 +80,7 @@ not the deleted banking script, so it survived the revert and is documented in `
 | Substitute sounds for part pickup, bench build loop and completion, because Nuketown's soundbank has none of the buildable or shield aliases | `23f69405` | ✅ |
 | PHD Flopper machine added, dropped from the sky like the others | `7ac44cb8` | ✅ |
 | Perk machines drop every 3 rounds instead of every 5; 7 machines, all down by round 19 | `7ac44cb8`, working tree | ✅ |
-| Perk bottles can also give Stamin-Up and Mule Kick, neither of which has a machine. Deadshot now has one | `7ac44cb8`, working tree | ⚠️ |
+| Perk bottles can also give Stamin-Up and Mule Kick, neither of which has a machine. Deadshot now has one | `7ac44cb8`, working tree | ✅ |
 | Carpenter drops only while a player carries a shield, since the map has no windows to board | `7ac44cb8` | ✅ |
 | Deadshot Daiquiri machine added as a seventh sky drop, arriving rounds 18-19 | working tree | ✅ |
 
@@ -86,37 +88,24 @@ not the deleted banking script, so it survived the revert and is documented in `
 
 ## Still to test
 
-Everything marked ❓ or ⚠️ above. In rough order of how likely it is to be wrong:
+Everything marked ❓ or ⚠️ above. One item remains:
 
-1. **Crafting on Mob of the Dead and Origins** — was tested and **broken**: parts could be collected
-   but nothing could be built or placed. Fixed by deleting the leftover craftable table overrides
-   (see the removed-features table). Needs a full retest: build the shield end to end, plus the Acid
-   Gat Kit on Mob, and the Maxis Drone and gramophone on Origins. Taking a finished item off the
-   table is the specific step that was failing, so watch that as much as the build itself.
-2. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by the same deleted cost
-   function and fixed the same way, but found by reading the diff rather than by playing, so it has
-   never been seen working. The prompt should read cleanly with no cost, and the station should
-   still work on a second use.
-3. **Free Perk in Classic, gated on 4 perks** — new and untested. Confirm no bottle appears before
-   somebody holds four perks at once, and that they start appearing afterwards.
-4. **Which perk a bottle actually grants** — a bottle was collected on Nuketown, but not which perk
-   came out. Stamin-Up and Mule Kick are the two with no machine, and Mule Kick's third weapon slot
-   is the most likely to misbehave.
-5. **Buildables on Buried and Die Rise** — the pooled randomisation was removed, so the Subwoofer,
-   Trample Steam and Head Chopper on Buried, and the Sweatshop table on Die Rise, now use fixed
-   locations. Confirm each still builds and that no table is left empty.
-6. **Legacy guns in the box** — quick to confirm, just needs box spins.
-7. **Max Ammo filling the magazine** — including an akimbo weapon, which is the part with separate
-   handling.
-8. **Carpenter restoring a carried shield** — team-wide, on Nuketown, Mob of the Dead and Origins.
-   Take shield damage first, then grab a Carpenter.
-9. **Tranzit power switch and Pack-a-Punch areas** — the decorative crate stacks were removed with
-   the buildables system. Purely a look check, but worth one glance for a floating or missing table.
-10. **Zombie Shield 2500 health, Fire Sale track, perk shader removal** — cosmetic or incidental.
+1. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by a deleted cost function and
+   fixed the same way the crafting tables were, but found by reading the diff rather than by
+   playing, so it has never been seen working. The prompt should read cleanly with no cost, and the
+   station should still work on a second use. This is the step immediately after crafting the Acid
+   Gat Kit, which has been confirmed.
 
-Confirmed so far: Nuketown end to end, including both new perk machines and a perk bottle drop; the
-bank on Buried; building the Turbine from parts on Buried; and Origins no longer handing out
-craftable parts at spawn.
+Confirmed: all seven RULES settings, and the HD crosshair. The Free Perk gate in Classic, held back
+until a player holds four perks at once. Perk bottles granting Stamin-Up and Mule Kick on Nuketown,
+which were the two perks with no machine on the map. Crafting end to end on Mob of the Dead and
+Origins, including taking the finished item off the table and using the gramophone — the failure
+that prompted the craftables rewrite is gone.
+Buildables on Buried and Die Rise after the pooling removal. Legacy guns in the Mystery Box. Max
+Ammo filling the magazine. Carpenter repairing a carried shield. The Tranzit power switch and
+Pack-a-Punch areas after the crate models were removed. Zombie Shield health, the Fire Sale track
+and the perk shader removal. Nuketown end to end, including both new perk machines and a perk
+bottle drop. The bank on Buried, and building the Turbine from parts there.
 
 ## Known issues
 
@@ -154,10 +143,16 @@ Drone, Acidgat Kit, Buried's buildable table hint strings, Borough's church tabl
 place. The per-map buildable and craftable scripts survived the deletions, so these plausibly still
 work, but each was not checked against surviving code one by one.
 
-### Disabled code
+### Starting points, formerly disabled code
 
-`replaced/zm_nuked_standard.gsc` has a commented-out call to `starting_points_init(5000)`, which set
-Nuketown's starting points. Left in place deliberately, not active.
+`replaced/zm_nuked_standard.gsc` used to carry a commented-out call to `starting_points_init(5000)`,
+a Nuketown-only prototype. That is now the Starting Points setting on the RULES tab, generalised to
+every map and moved into `_zm_reimagined.gsc`; the Nuketown copy and the commented call are gone.
+
+The one behavioural difference worth knowing: the setting is applied as "set the score to this
+figure", not "add this much", so the 0 choice removes the stock starting points instead of doing
+nothing. 500 deliberately means "leave it alone" rather than "force 500", because the stock starting
+score is not always exactly 500 — persistent upgrades and some gametypes move it.
 
 ---
 
@@ -168,6 +163,20 @@ Nuketown's starting points. Left in place deliberately, not active.
   `zone_source/includes/zm_nuked.zone` and loading the source map's fastfile in `build.bat`. The
   linker catches missing models and materials; it does **not** catch missing sound aliases, which
   play as silence, or a missing powerup pickup model, which draws as a black slab.
+* **Fork settings live in three places at once.** A new option on the RULES tab needs a selector in
+  `ui/t6/options.lua`, a default in `CoD.InitArchiveDvars` in `ui_mp/t6/main.lua`, and a label in
+  `english/localizedstrings/reimagined.str`. Miss the label and the row renders blank rather than
+  erroring. Defaults are also seeded server-side in `_zm_reimagined::init_dvars` so dedicated
+  servers and players who never open the menu still get sane values, and every read goes through
+  `mod_setting`, which falls back to a passed default rather than trusting init order — `getDvarInt`
+  on an unset dvar returns 0, which is a meaningful value for several of these settings.
+* **Gate behaviour, never registration.** A setting that skipped `include_powerup` or a
+  `registerclientfield` call would desync host and client and drop joiners with
+  `EXE_CLIENT_FIELD_MISMATCH`. The Free Perk toggle works by returning false from
+  `func_should_drop_free_perk`, leaving the powerup registered exactly as before.
+* **These settings are read wherever the game logic runs.** In co-op that is the host, so a client's
+  RULES tab has no effect on the match. They are also read at map load, so changing one mid-game
+  does nothing until the next one.
 * **Perk and powerup enable flags must match between `.gsc` and `.csc`.** They gate
   `registerclientfield` calls on both sides, and a mismatch drops the client on connect with
   `EXE_CLIENT_FIELD_MISMATCH` rather than misbehaving visibly.

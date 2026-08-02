@@ -153,6 +153,12 @@ Remove-Item mod.iwd
 > ⚠ **`.csc` files sit in `scripts/` right next to `.gsc` files but need a full build.** Same
 > folder, totally different cost. Check the extension.
 
+**Images are the one row with an exception.** Most of `images/` is listed in `zone_source/` and gets
+baked into `mod.ff`, which is why the table says full. But an image that is **not** named in any
+`.zone` file — a straight replacement of a stock game texture, like the HD crosshair's
+`side_small.iwi` — only travels in `mod.iwd`, so the fast rebuild picks it up. If you are unsure,
+`grep -r "yourimage" zone_source/` decides it: a hit means full build.
+
 When in doubt, run the full build. It's only 30 seconds.
 
 ---

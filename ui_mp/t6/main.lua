@@ -215,6 +215,34 @@ CoD.InitArchiveDvars = function()
 	if UIExpression.DvarString(nil, "character_dialog") == "" then
 		Engine.Exec(nil, "seta character_dialog 1")
 	end
+
+	if UIExpression.DvarString(nil, "zmr_starting_points") == "" then
+		Engine.Exec(nil, "seta zmr_starting_points 500")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_legacy_box_guns") == "" then
+		Engine.Exec(nil, "seta zmr_legacy_box_guns 1")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_max_ammo_magazine") == "" then
+		Engine.Exec(nil, "seta zmr_max_ammo_magazine 1")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_carpenter_shield") == "" then
+		Engine.Exec(nil, "seta zmr_carpenter_shield 1")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_free_perk") == "" then
+		Engine.Exec(nil, "seta zmr_free_perk 1")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_free_perk_rarity") == "" then
+		Engine.Exec(nil, "seta zmr_free_perk_rarity 2")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_shield_health") == "" then
+		Engine.Exec(nil, "seta zmr_shield_health 1")
+	end
 end
 
 CoD.SetDvars = function()

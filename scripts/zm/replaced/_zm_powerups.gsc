@@ -414,7 +414,11 @@ powerup_grab(powerup_team)
 								level thread start_carpenter(self.origin);
 							}
 
-							level thread carpenter_restore_shields(players[i]);
+							if (scripts\zm\_zm_reimagined::mod_setting("zmr_carpenter_shield", 1))
+							{
+								level thread carpenter_restore_shields(players[i]);
+							}
+
 							players[i] thread powerup_vo("carpenter");
 							break;
 
@@ -676,17 +680,20 @@ full_ammo_powerup(drop_item, player)
 				{
 					players[i] givemaxammo(primary_weapons[x]);
 
-					// givemaxammo only refills the reserve, so stock alone still leaves the player
-					// needing a reload before any of it is usable. Fill the magazine as well.
-					players[i] setweaponammoclip(primary_weapons[x], weaponClipSize(primary_weapons[x]));
-
-					// Akimbo weapons carry the second magazine under their own weapon name, so the
-					// off hand stays empty unless it is filled separately.
-					dw_name = weaponDualWieldWeaponName(primary_weapons[x]);
-
-					if (dw_name != "none")
+					if (scripts\zm\_zm_reimagined::mod_setting("zmr_max_ammo_magazine", 1))
 					{
-						players[i] setweaponammoclip(dw_name, weaponClipSize(dw_name));
+						// givemaxammo only refills the reserve, so stock alone still leaves the player
+						// needing a reload before any of it is usable. Fill the magazine as well.
+						players[i] setweaponammoclip(primary_weapons[x], weaponClipSize(primary_weapons[x]));
+
+						// Akimbo weapons carry the second magazine under their own weapon name, so the
+						// off hand stays empty unless it is filled separately.
+						dw_name = weaponDualWieldWeaponName(primary_weapons[x]);
+
+						if (dw_name != "none")
+						{
+							players[i] setweaponammoclip(dw_name, weaponClipSize(dw_name));
+						}
 					}
 				}
 			}
@@ -1299,19 +1306,34 @@ func_should_drop_carpenter_nuked()
 }
 
 // Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle as
-// common as Max Ammo. Half leaves it half as common as any other single powerup, which on Nuketown's
-// seven-powerup pool works out at roughly one bottle per fourteen drops.
+// common as Max Ammo. The rarity setting is that divisor: 2 leaves it half as common as any other
+// single powerup, which on Nuketown's seven-powerup pool works out at roughly one bottle per
+// fourteen drops, and 4 halves it again.
 //
-// This is the rarity dial and the only number worth touching: 2 is half as common as the others,
-// 3 a third, 4 a quarter, 1 exactly as common.
+// A failed check deals the next powerup instead of dropping nothing, so turning this off changes
+// the mix rather than the amount that drops.
 func_should_drop_free_perk()
 {
+	if (!scripts\zm\_zm_reimagined::mod_setting("zmr_free_perk", 1))
+	{
+		return false;
+	}
+
 	if (is_classic() && !is_true(level.free_perk_unlocked))
 	{
 		return false;
 	}
 
-	return randomint(2) == 0;
+	rarity = scripts\zm\_zm_reimagined::mod_setting("zmr_free_perk_rarity", 2);
+
+	// randomint(0) errors and randomint(1) would make it as common as everything else, so anything
+	// under 2 is treated as the default rather than trusted.
+	if (rarity < 2)
+	{
+		rarity = 2;
+	}
+
+	return randomint(rarity) == 0;
 }
 
 // Classic keeps the perk bottle out of the rotation until somebody is properly perked up. The test

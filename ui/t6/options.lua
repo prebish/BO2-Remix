@@ -619,6 +619,55 @@ CoD.OptionsSettings.CreateModTab = function(ModTab, LocalClientIndex)
 	return ModTabContainer
 end
 
+-- Gameplay settings, as opposed to the MOD tab's per-player HUD settings. These are read by the
+-- game logic rather than the client, so in co-op it is the host's values that apply to everyone,
+-- and they are read at map load - changing one mid-match does nothing until the next game.
+CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
+	local RulesTabContainer = LUI.UIContainer.new()
+	local RulesTabButtonList = CoD.Options.CreateButtonList()
+	RulesTab.buttonList = RulesTabButtonList
+	RulesTabContainer.buttonList = RulesTabButtonList
+	RulesTabContainer:addElement(RulesTabButtonList)
+
+	local StartingPointsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_STARTING_POINTS_CAPS"), "zmr_starting_points")
+	StartingPointsSelector:addChoice(LocalClientIndex, "0", 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartingPointsSelector:addChoice(LocalClientIndex, "500", 500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartingPointsSelector:addChoice(LocalClientIndex, "1000", 1000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartingPointsSelector:addChoice(LocalClientIndex, "5000", 5000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	local FreePerkSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FREE_PERK_CAPS"), "zmr_free_perk")
+	FreePerkSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	local FreePerkRaritySelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FREE_PERK_RARITY_CAPS"), "zmr_free_perk_rarity")
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NORMAL_CAPS"), 2, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_RARE_CAPS"), 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	local ShieldHealthSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_SHIELD_HEALTH_CAPS"), "zmr_shield_health")
+	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_REBALANCED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	local CarpenterShieldSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_CARPENTER_SHIELD_CAPS"), "zmr_carpenter_shield")
+	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	local MaxAmmoMagazineSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_MAX_AMMO_MAGAZINE_CAPS"), "zmr_max_ammo_magazine")
+	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	local LegacyBoxGunsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_LEGACY_BOX_GUNS_CAPS"), "zmr_legacy_box_guns")
+	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	return RulesTabContainer
+end
+
 LUI.createMenu.OptionsSettingsMenu = function(LocalClientIndex)
 	local OptionsSettingsWidget = nil
 	local InGame = UIExpression.IsInGame() == 1
@@ -665,6 +714,7 @@ LUI.createMenu.OptionsSettingsMenu = function(LocalClientIndex)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_VOICECHAT_CAPS", CoD.OptionsSettings.CreateVoiceChatTab)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_GAME_CAPS", CoD.OptionsSettings.CreateGameTab)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_MOD_CAPS", CoD.OptionsSettings.CreateModTab)
+	SettingsTabs:addTab(LocalClientIndex, "MENU_RULES_CAPS", CoD.OptionsSettings.CreateRulesTab)
 	if CoD.OptionsSettings.CurrentTabIndex then
 		SettingsTabs:loadTab(LocalClientIndex, CoD.OptionsSettings.CurrentTabIndex)
 	else

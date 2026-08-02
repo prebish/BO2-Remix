@@ -21,6 +21,7 @@
 ## Table of Contents
 * [General](#general)
 * [Settings](#settings)
+	* [Rules](#rules)
 * [HUD](#hud)
 * [Players](#players)
 * [Zombies](#zombies)
@@ -196,7 +197,21 @@
 * Added option to enable or disable depth of field
 * Added option to enable or disable character dialog
 
+### Rules
+A second options tab holding the gameplay settings, separate from the display settings above. These
+are read by the game rather than by each client, so in co-op the host's settings apply to everyone,
+and they take effect on the next game rather than immediately.
+
+* Starting points: 0, 500 (default), 1000 or 5000
+* Free perk drop: enable or disable the perk bottle powerup
+* Free perk rarity: Normal (default) or Rare
+* Zombie Shield health: Default (1500) or Rebalanced (2500)
+* Carpenter repairs shield: enable or disable
+* Max Ammo fills magazine: enable or disable
+* Legacy box guns: enable or disable the returning Mystery Box weapons
+
 ## HUD
+* Replaced the crosshair with a higher resolution version
 * Enemy counter displayed on top left of screen
 * Timer displayed on top right of screen
 * Health bar displayed on bottom left of screen

@@ -261,6 +261,8 @@ init()
 
 	level thread disable_story_vo();
 
+	level thread starting_points_init();
+
 	if (is_encounter())
 	{
 		scripts\zm\zencounter\zencounter_reimagined::init();
@@ -774,7 +776,13 @@ post_init()
 		level.zombie_weapons_upgraded["slipgun_upgraded_zm"] = "slipgun_zm";
 	}
 
-	level.zombie_vars["riotshield_hit_points"] = 2500;
+	// Left at the stock value when the setting is on Default, rather than set to 1500 here, so the
+	// per-map value each map picks for itself still applies.
+	if (mod_setting("zmr_shield_health", 1))
+	{
+		level.zombie_vars["riotshield_hit_points"] = 2500;
+	}
+
 	level.zombie_vars["slipgun_reslip_rate"] = 0;
 	level.zombie_vars["zombie_perk_divetonuke_min_damage"] = 1000;
 	level.zombie_vars["zombie_perk_divetonuke_max_damage"] = 5000;
@@ -835,6 +843,99 @@ init_dvars()
 	setDvar("ui_round_number", 1);
 	makedvarserverinfo("ui_round_number");
 	level.scr_zm_ui_round_number = getDvarInt("ui_round_number");
+
+	// Fork settings, exposed on the RULES tab of the options menu. Seeded here as well as in
+	// ui_mp\t6\main.lua so a dedicated server, or anyone who has never opened the menu, still gets
+	// sane values. These are read on whichever machine runs the game logic, so in co-op it is the
+	// host's settings that apply to everyone.
+	init_mod_setting("zmr_starting_points", 500);
+	init_mod_setting("zmr_legacy_box_guns", 1);
+	init_mod_setting("zmr_max_ammo_magazine", 1);
+	init_mod_setting("zmr_carpenter_shield", 1);
+	init_mod_setting("zmr_free_perk", 1);
+	init_mod_setting("zmr_free_perk_rarity", 2);
+	init_mod_setting("zmr_shield_health", 1);
+}
+
+// The starting score is stamped onto the player at spawn out of their persistent stats, so a level
+// variable set during map init gets overwritten - the points have to be handed out after the player
+// is already in the world.
+//
+// 500 means "leave it alone" rather than "force 500", because the stock starting score is not
+// always exactly 500 - persistent upgrades and some gametypes move it - and the default setting
+// should not quietly flatten that.
+starting_points_init()
+{
+	points = mod_setting("zmr_starting_points", 500);
+
+	if (points == 500)
+	{
+		return;
+	}
+
+	level.mod_starting_points = points;
+
+	players = get_players();
+
+	foreach (player in players)
+	{
+		player thread give_starting_points();
+	}
+
+	for (;;)
+	{
+		level waittill("connected", player);
+		player thread give_starting_points();
+	}
+}
+
+give_starting_points()
+{
+	self endon("disconnect");
+
+	self waittill("spawned_player");
+
+	// Opening round only, once each. Anyone who bleeds out later, or drops into a game already
+	// running, keeps the round-scaled points the stock code gives them instead.
+	if (level.round_number > 1 || isDefined(self.mod_starting_points_given))
+	{
+		return;
+	}
+
+	self.mod_starting_points_given = 1;
+
+	// Set to the chosen figure in either direction, so the 0 setting actually takes the stock
+	// starting points away instead of doing nothing.
+	if (self.score > level.mod_starting_points)
+	{
+		self maps\mp\zombies\_zm_score::minus_to_player_score(self.score - level.mod_starting_points);
+	}
+	else if (self.score < level.mod_starting_points)
+	{
+		self maps\mp\zombies\_zm_score::add_to_player_score(level.mod_starting_points - self.score);
+	}
+}
+
+init_mod_setting(name, default_value)
+{
+	if (getDvar(name) == "")
+	{
+		setDvar(name, default_value);
+	}
+}
+
+// Read a fork setting. Falls back to the passed default rather than trusting init_dvars to have
+// run first - some of these are read from _zm_powerups, whose init ordering against
+// _zm_reimagined::main is not guaranteed, and getDvarInt on an unset dvar returns 0, which is a
+// meaningful value for several of these settings.
+mod_setting(name, default_value)
+{
+	if (getDvar(name) == "")
+	{
+		return default_value;
+	}
+
+	return getDvarInt(name);
 }
 
 set_dvars()
@@ -2399,7 +2500,10 @@ weapon_changes()
 		level.zombie_lethal_grenade_player_init = "sticky_grenade_zm";
 	}
 
-	restore_legacy_box_weapons();
+	if (mod_setting("zmr_legacy_box_guns", 1))
+	{
+		restore_legacy_box_weapons();
+	}
 }
 
 // The mod takes these five out of the box in favour of their Black Ops 2 stand-ins - M27 for the
