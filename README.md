@@ -209,6 +209,8 @@ and they take effect on the next game rather than immediately.
 * Carpenter repairs shield: enable or disable
 * Max Ammo fills magazine: enable or disable
 * Legacy box guns: enable or disable the returning Mystery Box weapons
+* Fire sale music: Randomized (default) draws a different track each Fire Sale, Default keeps the
+  stock one
 
 ## HUD
 * Replaced the crosshair with a higher resolution version

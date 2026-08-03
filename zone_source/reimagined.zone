@@ -29,6 +29,10 @@ image,waypoint_revive
 image,waypoint_kill_hellcatraz
 image,offscreenobjectivepointer
 
+image,gamefonts_pc_720
+image,devfonts
+image,distfont
+
 material,menu_zm_weapons_ray_gun
 material,menu_zm_weapons_raygun_mark2
 material,menu_zm_weapons_slipgun

@@ -665,6 +665,15 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
+	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	-- DEFAULT hands the track back to stock, which picks between the Richtofen and Maxis songs off
+	-- whichever announcer the game is running. RANDOMIZED draws from the fork's track list in
+	-- _zm_powerups::init instead.
+	local FiresaleMusicSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FIRESALE_MUSIC_CAPS"), "zmr_firesale_music")
+	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_RANDOMIZED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
 	return RulesTabContainer
 end
 

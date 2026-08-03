@@ -74,6 +74,23 @@ init()
 	}
 
 	thread watch_for_drop();
+
+	// The fire sale rotation, one alias per track. Each name needs a matching row in
+	// soundbank/mod.all.aliases.csv pointing at a FLAC in sound/mus/zombie/firesale - adding a
+	// song is those two edits plus a name on this list.
+	//
+	// The FLAC has to be mono 48kHz 16-bit *and* encoded in 1024 sample blocks, which is not what
+	// ffmpeg does by default - its 4608 sample blocks stream back as audible glitching. Encode
+	// with -ac 1 -ar 48000 -sample_fmt s16 -c:a flac -frame_size 1024.
+	//
+	// FIRE SALE MUSIC on DEFAULT leaves the list unset, which is what pick_firesale_music reads as
+	// "hand the track back to stock". Read here rather than per fire sale so the setting behaves
+	// like the rest of the RULES tab and takes effect on the next game, not mid-match.
+	if (scripts\zm\_zm_reimagined::mod_setting("zmr_firesale_music", 1))
+	{
+		level.firesale_music = array("mus_fire_sale_rich", "mus_fire_sale_hiphop", "mus_fire_sale_4_minutes", "mus_fire_sale_number_one");
+	}
+
 	thread setup_firesale_audio();
 	thread setup_bonfiresale_audio();
 	level.use_new_carpenter_func = ::start_carpenter_new;
@@ -1270,6 +1287,12 @@ start_fire_sale(item)
 
 	level notify("powerup fire sale");
 	level endon("powerup fire sale");
+
+	// Pick the track before the flag below goes up: the intercom threads poll that flag and then
+	// read the choice off level, so it has to be there by the time they wake. Grabbing a second
+	// fire sale while one is running takes the early out above and leaves the song alone.
+	level.firesale_music_playing = pick_firesale_music();
+
 	level.zombie_vars["zombie_powerup_fire_sale_on"] = 1;
 	level thread toggle_fire_sale_on();
 
@@ -1280,6 +1303,143 @@ start_fire_sale(item)
 
 	level.zombie_vars["zombie_powerup_fire_sale_on"] = 0;
 	level notify("fire_sale_off");
+}
+
+// Byte for byte what stock does. It is here only so that the call to play_firesale_audio below
+// binds to this script's copy: replacing play_firesale_audio on its own achieves nothing, because
+// the only thing that calls it is stock's setup_firesale_audio, and a stock script calling its own
+// function resolves to the stock one. Every link in the chain from init down to playloopsound has
+// to live in this file or the rotation is unreachable.
+setup_firesale_audio()
+{
+	wait 2;
+
+	intercom = getentarray("intercom", "targetname");
+
+	while (true)
+	{
+		while (level.zombie_vars["zombie_powerup_fire_sale_on"] == 0)
+		{
+			wait 0.2;
+		}
+
+		foreach (speaker in intercom)
+		{
+			speaker thread play_firesale_audio();
+		}
+
+		while (level.zombie_vars["zombie_powerup_fire_sale_on"] == 1)
+		{
+			wait 0.1;
+		}
+
+		level notify("firesale_over");
+	}
+}
+
+// Stock ships this as a copy-paste of the function above - same flag, same intercoms, same track,
+// so a fire sale starts the music on every speaker twice and a bonfire sale starts none. Kept as it
+// is rather than fixed, since the pair of them is what the mix has always been balanced against.
+setup_bonfiresale_audio()
+{
+	wait 2;
+
+	intercom = getentarray("intercom", "targetname");
+
+	while (true)
+	{
+		while (level.zombie_vars["zombie_powerup_fire_sale_on"] == 0)
+		{
+			wait 0.2;
+		}
+
+		foreach (speaker in intercom)
+		{
+			speaker thread play_bonfiresale_audio();
+		}
+
+		while (level.zombie_vars["zombie_powerup_fire_sale_on"] == 1)
+		{
+			wait 0.1;
+		}
+
+		level notify("firesale_over");
+	}
+}
+
+// Draws the next fire sale track, with the one that just played held out of the draw. Straight
+// random over three tracks repeats a third of the time, and a repeat back to back reads as the
+// rotation being broken rather than as luck.
+//
+// An empty list is the DEFAULT setting: returning undefined leaves play_firesale_audio on the stock
+// alias, so DEFAULT is stock behaviour exactly - announcer and all - rather than an imitation of it.
+pick_firesale_music()
+{
+	if (!isDefined(level.firesale_music) || level.firesale_music.size == 0)
+	{
+		return undefined;
+	}
+
+	choices = [];
+
+	foreach (track in level.firesale_music)
+	{
+		if (isDefined(level.firesale_music_playing) && track == level.firesale_music_playing)
+		{
+			continue;
+		}
+
+		choices[choices.size] = track;
+	}
+
+	// Only one track on the list, so it has to repeat.
+	if (choices.size == 0)
+	{
+		return level.firesale_music[0];
+	}
+
+	return random(choices);
+}
+
+// Stock runs this on every intercom on the map and hardwires the alias, which is why the rotation
+// cannot live in the sound aliases: several rows sharing one name would have each speaker roll its
+// own track and play them over the top of each other. start_fire_sale draws once instead and every
+// intercom reads that one choice.
+play_firesale_audio()
+{
+	if (is_true(level.sndfiresalemusoff))
+	{
+		return;
+	}
+
+	if (isDefined(level.firesale_music_playing))
+	{
+		alias = level.firesale_music_playing;
+	}
+	else if (is_true(level.sndannouncerisrich))
+	{
+		// No draw to read, either because FIRE SALE MUSIC is on DEFAULT or because something
+		// turned the fire sale on without going through start_fire_sale. Both stock alias names,
+		// and mus_fire_sale_rich has to stay defined in mod.all.aliases.csv - dropping that row
+		// once left every Richtofen game with a silent fire sale.
+		alias = "mus_fire_sale_rich";
+	}
+	else
+	{
+		alias = "mus_fire_sale";
+	}
+
+	self playloopsound(alias);
+	level waittill("firesale_over");
+	self stoploopsound();
+}
+
+// Stock's copy of play_firesale_audio, threaded onto the same intercoms off the same flag by
+// setup_bonfiresale_audio. Left in place so the sound stack is unchanged, but pointed at the same
+// draw - if it kept the hardcoded alias it would start over the top of the chosen track.
+play_bonfiresale_audio()
+{
+	self play_firesale_audio();
 }
 
 // Repairing a shield is the only thing Carpenter can do on a map with no windows, so hold it back

@@ -855,6 +855,7 @@ init_dvars()
 	init_mod_setting("zmr_free_perk", 1);
 	init_mod_setting("zmr_free_perk_rarity", 2);
 	init_mod_setting("zmr_shield_health", 1);
+	init_mod_setting("zmr_firesale_music", 1);
 }
 
 // The starting score is stamped onto the player at spawn out of their persistent stats, so a level

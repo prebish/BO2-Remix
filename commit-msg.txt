@@ -1,40 +1,55 @@
-add RULES options tab and HD crosshair
+add fire sale music rotation and HD texture set
 
-Expose the fork's gameplay changes as in-game settings, so they can be
-turned off without rebuilding.
+Fire Sale draws a random track each time instead of always playing the same
+one, and the mod now ships HD replacements for the reticles, equipment icons
+and font atlases.
 
-RULES tab:
-- New options tab beside MOD, holding gameplay settings rather than the
-  per-player display settings MOD already has
-- Starting Points (0 / 500 / 1000 / 5000), Free Perk Drop, Free Perk
-  Rarity (Normal / Rare), Zombie Shield Health (Default / Rebalanced),
-  Carpenter Repairs Shield, Max Ammo Fills Magazine, Legacy Box Guns
-- Every default reproduces existing behaviour
+Fire Sale music:
+- Four tracks: the stock song, a hip hop remix, a cut of 4 Minutes and a cut
+  of We Are Number One
+- The track that just played is held out of the next draw, so the same song
+  never plays twice running. Straight random over four repeats a quarter of
+  the time, which reads as the rotation being broken rather than as chance
+- New RULES setting, FIRE SALE MUSIC: Randomized (default) or Default
+- Default returns undefined rather than forcing a track, which leaves
+  play_firesale_audio on the stock aliases and so reproduces stock behaviour
+  exactly, announcer branch included
+- Read once in init like the rest of the RULES tab, so it takes effect on the
+  next game rather than mid-match
+- Files renamed off the vanilla asset name: firesale_vanilla,
+  firesale_hiphop, firesale_4_minutes, firesale_number_one
 
-Implementation notes:
-- Settings gate behaviour only, never registration. A toggle that skipped
-  include_powerup or a registerclientfield call would desync host and
-  client and drop joiners with EXE_CLIENT_FIELD_MISMATCH
-- Reads go through mod_setting(), which falls back to a passed default
-  rather than trusting init order, since getDvarInt on an unset dvar
-  returns 0 and 0 is meaningful for several of these
-- Defaults are seeded both client side in InitArchiveDvars and server
-  side in init_dvars, so dedicated servers and players who never open the
-  menu still get sane values
+Why the draw happens once in start_fire_sale:
+- Stock threads the music onto every "intercom" entity separately, so several
+  alias rows sharing one name would have each speaker roll its own track and
+  play them over the top of each other. The draw is made once when the fire
+  sale starts and every intercom reads that one choice off level
+- setup_firesale_audio is replaced as well as play_firesale_audio. Replacing
+  the latter alone does nothing: its only caller is the stock copy of the
+  former, and a stock script calling its own function binds to the stock
+  copy. The chain from init down to playloopsound has to be file-local
+- mus_fire_sale_rich has to stay defined in mod.all.aliases.csv. Dropping
+  that row left every Richtofen game with a silent fire sale, because the
+  base game does not supply the alias
 
-Starting points:
-- Generalised from the commented-out Nuketown prototype to every map and
-  moved into _zm_reimagined.gsc
-- Applied as "set the score to this figure" so the 0 choice removes the
-  stock starting points; 500 means "leave it alone", because the stock
-  starting score is not always exactly 500
+Audio format, none of which the toolchain checks:
+- Mono, 48kHz, 16-bit FLAC in 1024 sample blocks
+- ffmpeg defaults to 4608 sample blocks, which links, packs and then plays
+  back as audible glitching. Encode with -frame_size 1024
+- Levelled to within 1.4 LU of each other measured by EBU R128 rather than
+  by RMS, which had left one track 2.7 LU quieter than the rest
 
-HD crosshair:
-- Third-party replacement side_small.iwi in images/, packed into mod.iwd.
-  Applies only while the mod is loaded, and reverts by deleting the file
+HD textures:
+- 8 reticles and 15 equipment HUD icons as loose .iwi in images/, packed into
+  mod.iwd by build.bat. No zone entry and no script reference needed
+- 3 font atlases, which needed both an image, line in reimagined.zone and the
+  .iwi. T6 images are streamed: the fastfile carries only an asset header,
+  which is what overrides the base game's, while the pixels come from
+  mod.iwd. A loose .iwi alone has no asset to attach to, and the menu keeps
+  stock fonts
+- Several equipment icons are MP-only and Zombies never draws them
 
 Docs:
-- README gains a Rules section and a crosshair line
-- BUILDING.md notes that images not named in zone_source travel only in
-  mod.iwd, so the fast rebuild picks them up
-- FORK.md records the new options and drops the test list to one item
+- FORK.md records the three gotchas above, the eighth RULES setting and the
+  current test status
+- README.md documents the FIRE SALE MUSIC setting

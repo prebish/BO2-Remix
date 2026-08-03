@@ -243,6 +243,10 @@ CoD.InitArchiveDvars = function()
 	if UIExpression.DvarString(nil, "zmr_shield_health") == "" then
 		Engine.Exec(nil, "seta zmr_shield_health 1")
 	end
+
+	if UIExpression.DvarString(nil, "zmr_firesale_music") == "" then
+		Engine.Exec(nil, "seta zmr_firesale_music 1")
+	end
 end
 
 CoD.SetDvars = function()

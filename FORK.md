@@ -57,7 +57,7 @@ not the deleted banking script, so it survived the revert and is documented in `
 
 | Change | Commits | Status |
 |---|---|---|
-| New Fire Sale music track | `ae23bf7c`, `daf7c4ee` | ✅ |
+| Fire Sale music rotation: a random track per Fire Sale drawn from the stock song, a hip hop remix, a 4 Minutes cut and a We Are Number One cut, never the same one twice running. Chosen once in `start_fire_sale` because stock threads the alias onto every `intercom` separately, so alias-level randomisation would have each speaker roll its own track. `setup_firesale_audio` is replaced as well as `play_firesale_audio` — replacing the latter alone does nothing, since its only caller is the stock copy of the former | `ae23bf7c`, `daf7c4ee`, working tree | ✅ |
 | Zombie Shield health 1500 → 2500 | `631df6ae` | ✅ |
 | Legacy guns back in the Mystery Box alongside their replacements: Galil, RPD, FAL, Python, Barrett M82A1. Wallbuy-only guns (MP5, AK74u, M14, M16A1, M1911) deliberately not added | `132ae227` | ✅ |
 | Max Ammo fills the magazine as well as the reserve, including akimbo off-hands. Grief and the encounter modes unchanged | `26ba1991` | ✅ |
@@ -67,8 +67,10 @@ not the deleted banking script, so it survived the revert and is documented in `
 | Perk bottles can give perks with no machine on the map (`give_random_perk` reads `level.free_perk_pool`) | `7ac44cb8` | ✅ |
 | Bank balance shown at the deposit and withdraw triggers, and the withdraw prompt corrected to read 1000 | working tree | ✅ |
 | Mod metadata renamed to Reimagined-Lite | `7de294c9` | ✅ |
-| **RULES options tab** exposing seven fork settings: Starting Points, Free Perk Drop, Free Perk Rarity, Zombie Shield Health, Carpenter Repairs Shield, Max Ammo Fills Magazine, Legacy Box Guns | working tree | ✅ |
-| HD crosshair — a third-party replacement `side_small.iwi` dropped into `images/`, which `build.bat` packs into `mod.iwd`. Overrides the stock crosshair while the mod is loaded, and reverts by deleting the one file | working tree | ✅ |
+| **RULES options tab** exposing eight fork settings: Starting Points, Free Perk Drop, Free Perk Rarity, Zombie Shield Health, Carpenter Repairs Shield, Max Ammo Fills Magazine, Legacy Box Guns, Fire Sale Music | working tree | ✅ |
+| HD crosshair — a replacement `side_small.iwi` dropped into `images/`, which `build.bat` packs into `mod.iwd`. Overrides the stock crosshair while the mod is loaded, and reverts by deleting the one file | working tree | ✅ |
+| HD font atlases — `gamefonts_pc_720` (2048x4096 A8), `devfonts` and `distfont`. Unlike the reticles these needed **both** halves: an `image,` line in `reimagined.zone` so `mod.ff` carries an asset entry that overrides the base game's, *and* the `.iwi` in `images/` for `mod.iwd` to stream the pixels from. A loose `.iwi` alone does nothing — the base asset wins and the menu keeps stock fonts. `mod.ff` barely grows because T6 images are streamed: the fastfile holds the header only. `devfonts` is a developer asset retail never draws | working tree | ✅ |
+| HD texture set — 8 further reticles (`c4`, `flechette`, `hatchet`, `hud_flamethrower`, `knife_ballistic`, `m203`, `reticle_side_round01`, `tank`) and 15 equipment HUD icons (`grenadeicon_32`, `hud_claymore_32`, `hud_bounce_betty_32`, `hud_sticky_grenade_32` and the rest of the `hud_*_32` family). Same mechanism as the crosshair: loose `.iwi` in `images/`, no zone entry, no script reference. Several are MP-only icons that Zombies never draws — they cost disk in `mod.iwd` and nothing else | working tree | ✅ |
 
 ## Nuketown
 
@@ -96,7 +98,8 @@ Everything marked ❓ or ⚠️ above. One item remains:
    station should still work on a second use. This is the step immediately after crafting the Acid
    Gat Kit, which has been confirmed.
 
-Confirmed: all seven RULES settings, and the HD crosshair. The Free Perk gate in Classic, held back
+Confirmed: all eight RULES settings, and the full HD texture set — crosshair, reticles, equipment
+icons and the font atlases, the last of these checked at the menu. The Free Perk gate in Classic, held back
 until a player holds four perks at once. Perk bottles granting Stamin-Up and Mule Kick on Nuketown,
 which were the two perks with no machine on the map. Crafting end to end on Mob of the Dead and
 Origins, including taking the finished item off the table and using the gramophone — the failure
@@ -163,6 +166,14 @@ score is not always exactly 500 — persistent upgrades and some gametypes move 
   `zone_source/includes/zm_nuked.zone` and loading the source map's fastfile in `build.bat`. The
   linker catches missing models and materials; it does **not** catch missing sound aliases, which
   play as silence, or a missing powerup pickup model, which draws as a black slab.
+* **Custom sounds have to be encoded the way the engine expects, and nothing warns you when they
+  are not.** Mono, 48kHz, 16-bit FLAC in 1024 sample blocks. ffmpeg defaults to 4608 sample blocks,
+  which links, packs and plays — as audible glitching. Pass `-frame_size 1024`. The linker does not
+  check this, and neither does anything else until you hear it.
+* **Replacing a function only helps if something outside the stock script calls it.** A stock script
+  calling its own function binds to the stock copy, so a replacement is dead code. The fire sale
+  rotation needed `setup_firesale_audio` replaced as well, to get an unbroken chain of file-local
+  calls from `init` down to `playloopsound`.
 * **Fork settings live in three places at once.** A new option on the RULES tab needs a selector in
   `ui/t6/options.lua`, a default in `CoD.InitArchiveDvars` in `ui_mp/t6/main.lua`, and a label in
   `english/localizedstrings/reimagined.str`. Miss the label and the row renders blank rather than
