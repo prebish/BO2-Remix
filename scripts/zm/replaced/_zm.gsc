@@ -1768,17 +1768,6 @@ actor_damage_override(inflictor, attacker, damage, flags, meansofdeath, weapon, 
 
 	if (isplayer(attacker))
 	{
-		if (attacker HasPerk("specialty_rof"))
-		{
-			if (meansofdeath == "MOD_PISTOL_BULLET" || meansofdeath == "MOD_RIFLE_BULLET")
-			{
-				if (!issubstr(weapon, "metalstorm"))
-				{
-					final_damage *= 1.5;
-				}
-			}
-		}
-
 		if (attacker HasPerk("specialty_deadshot"))
 		{
 			if (is_headshot(weapon, shitloc, meansofdeath))

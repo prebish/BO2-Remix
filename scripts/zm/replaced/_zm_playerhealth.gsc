@@ -26,7 +26,7 @@ playerhealthregen()
 	self thread maps\mp\zombies\_zm_playerhealth::healthoverlay();
 
 	level.playerhealth_regularregendelay = 2000;
-	level.longregentime = 4000;
+	level.longregentime = 5000;
 
 	oldratio = 1;
 	veryhurt = 0;
@@ -71,8 +71,8 @@ playerhealthregen()
 
 		if (self hasPerk("specialty_quickrevive"))
 		{
-			regularregendelay *= 0.75;
-			longregendelay *= 0.75;
+			regularregendelay *= 0.67;
+			longregendelay *= 0.67;
 		}
 
 		if (self.health > 50)

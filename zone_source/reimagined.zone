@@ -197,7 +197,6 @@ rawfile,zm/gamesettings_zmeat.cfg
 rawfile,zm/gamesettings_zturned.cfg
 rawfile,zm/playeranim.script
 
-stringtable,mp/rankicontable_zm.csv
 stringtable,mp/weaponoptions_zm.csv
 stringtable,zm/factiontable.csv
 stringtable,zm/gametypestable.csv
@@ -220,9 +219,7 @@ script,scripts/zm/replaced/_zm_ai_mechz.csc
 script,scripts/zm/replaced/_zm_audio.csc
 script,scripts/zm/replaced/_zm_gump.csc
 script,scripts/zm/replaced/_zm_perks.csc
-script,scripts/zm/replaced/_zm_perk_vulture.csc
 script,scripts/zm/replaced/_zm_powerups.csc
-script,scripts/zm/replaced/_zm_powerup_zombie_blood.csc
 script,scripts/zm/replaced/_zm_turned.csc
 script,scripts/zm/replaced/_zm_weapons.csc
 script,scripts/zm/replaced/zm_transit.csc

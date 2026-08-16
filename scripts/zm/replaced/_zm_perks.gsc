@@ -656,6 +656,14 @@ vending_trigger_think()
 
 			level.revive_machine_is_solo = 1;
 		}
+		else if (get_players().size == 1)
+		{
+			// Solo starts the machine powered as the base game does. The rest of the stock solo
+			// revive system stays off - level.using_solo_revive is forced to 0 - so the machine
+			// keeps this build's 1500 cost and its self revives stay gated on holding a perk
+			// rather than on the stock three-lives counter.
+			start_on = 1;
+		}
 	}
 
 	self sethintstring(&"ZOMBIE_NEED_POWER");
@@ -1624,6 +1632,9 @@ give_perk(perk, bought)
 			self delay_thread(1.5, maps\mp\zombies\_zm_audio::perk_vox, perk);
 		}
 
+		self setblur(4, 0.1);
+		wait 0.1;
+		self setblur(0, 0.1);
 		self notify("perk_bought");
 	}
 
@@ -1956,7 +1967,7 @@ initialize_custom_perk_arrays()
 	if (is_true(level.zombiemode_using_marathon_perk))
 	{
 		level._custom_perks["specialty_movefaster"] = spawnStruct();
-		level._custom_perks["specialty_movefaster"].cost = 2500;
+		level._custom_perks["specialty_movefaster"].cost = 2000;
 		level._custom_perks["specialty_movefaster"].alias = "marathon";
 		level._custom_perks["specialty_movefaster"].hint_string = &"ZOMBIE_PERK_MARATHON";
 		level._custom_perks["specialty_movefaster"].perk_bottle = "zombie_perk_bottle_marathon";

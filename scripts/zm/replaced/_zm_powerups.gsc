@@ -148,7 +148,7 @@ powerup_drop(drop_point)
 
 	rand_drop = randomint(100);
 
-	powerup_chance = 2;
+	powerup_chance = 3;
 
 	if (rand_drop >= powerup_chance)
 	{

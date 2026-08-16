@@ -65,8 +65,6 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::init_anim_slice_times, scripts\zm\replaced\_zm_equip_headchopper::init_anim_slice_times);
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::headchopperthink, scripts\zm\replaced\_zm_equip_headchopper::headchopperthink);
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::setupwatchers, scripts\zm\replaced\_zm_equip_headchopper::setupwatchers);
-	replaceFunc(maps\mp\zombies\_zm_perk_vulture::give_vulture_perk, scripts\zm\replaced\_zm_perk_vulture::give_vulture_perk);
-	replaceFunc(maps\mp\zombies\_zm_perk_vulture::take_vulture_perk, scripts\zm\replaced\_zm_perk_vulture::take_vulture_perk);
 	replaceFunc(maps\mp\zombies\_zm_perk_vulture::_vulture_perk_think, scripts\zm\replaced\_zm_perk_vulture::_vulture_perk_think);
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::slowgun_zombie_damage_response, scripts\zm\replaced\_zm_weap_slowgun::slowgun_zombie_damage_response);
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::slowgun_fired, scripts\zm\replaced\_zm_weap_slowgun::slowgun_fired);
@@ -76,8 +74,6 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::player_slow_for_time, scripts\zm\replaced\_zm_weap_slowgun::player_slow_for_time);
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::watch_reset_anim_rate, scripts\zm\replaced\_zm_weap_slowgun::watch_reset_anim_rate);
 	replaceFunc(maps\mp\zombies\_zm_weap_time_bomb::init_time_bomb, scripts\zm\replaced\_zm_weap_time_bomb::init_time_bomb);
-	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweaponpromptupdate);
-	replaceFunc(maps\mp\zombies\_zm_weapon_locker::wl_set_stored_weapondata, scripts\zm\replaced\_zm_weapon_locker::wl_set_stored_weapondata);
 	replaceFunc(maps\mp\zombies\_zm_banking::bank_deposit_unitrigger, scripts\zm\replaced\_zm_banking::bank_deposit_unitrigger);
 	replaceFunc(maps\mp\zombies\_zm_banking::bank_withdraw_unitrigger, scripts\zm\replaced\_zm_banking::bank_withdraw_unitrigger);
 }

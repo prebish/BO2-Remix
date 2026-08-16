@@ -113,7 +113,6 @@
 	* [Jugger-Nog](#jugger-nog)
 	* [Quick Revive](#quick-revive)
 	* [Speed Cola](#speed-cola)
-	* [Double Tap](#double-tap)
 	* [Stamin-Up](#stamin-up)
 	* [PHD Flopper](#phd-flopper)
 	* [Deadshot Daiquiri](#deadshot-daiquiri)
@@ -129,7 +128,6 @@
 	* [Carpenter](#carpenter)
 	* [Fire Sale](#fire-sale)
 	* [Free Perk](#free-perk)
-	* [Zombie Blood](#zombie-blood)
 	* [Meat Stink](#meat-stink)
 * [Persistent Upgrades](#persistent-upgrades)
 * [Buildables](#buildables)
@@ -143,7 +141,6 @@
 	* [Acidgat Kit](#acidgat-kit)
 	* [Maxis Drone](#maxis-drone)
 * [Bank](#bank)
-* [Weapon Locker](#weapon-locker)
 * [NAV Table](#nav-table)
 * [Maps](#maps)
 	* [Nuketown](#nuketown)
@@ -255,9 +252,7 @@ and they take effect on the next game rather than immediately.
 * Removed NAV cards
 
 ## Players
-* Unlimited sprint
 * Increased health from 100 to 150
-* Always have shotgun rank
 * Self revives in solo are active whenever the player has at least 1 perk
 * Upgraded starting weapon given as self revive weapon above all others except Ray Gun Mark 2
 * Increased backwards move speed from 70% to 100%
@@ -266,13 +261,11 @@ and they take effect on the next game rather than immediately.
 * Can move immediately after diving
 * Can dive again immediately after diving
 * Increased melee range by 16% (same as Black Ops 1)
-* Disabled melee lunging
 * Disabled meleeing while doing falling hands anim
 * Removed ammo counter while doing falling hands anim
 * Can look up and down 90 degrees (normally 85 degrees)
 * Changed low health threshold from 20% of player's max health to 50 health
 * Decreased normal health regeneration delay from 2.4 seconds to 2 seconds
-* Decreased low health regeneration delay from 5 seconds to 4 seconds
 * Normal health regeneration rate is no longer instant
 * Changed health regeneration rate to 100 health per second (normally fully restored health in 0.5 seconds)
 * Fall damage no longer increases when max health is increased
@@ -295,7 +288,6 @@ and they take effect on the next game rather than immediately.
 * Move direction on ladders no longer based on player view angles
 * Disabled leaning
 * Start with Semtex on maps that have Semtex
-* Barriers can no longer be rebuilt while sprinting or thowing a grenade
 * Upgraded weapon camo is applied in last stand
 * Dual wield last stand weapon is switched to when ammo is only in left clip
 * Decreased friendly player overhead name fade out time from 1.5 seconds to 0.25 seconds
@@ -855,15 +847,12 @@ and they take effect on the next game rather than immediately.
 * Players only see weapons rising up that they can currently obtain
 * Decreased weapon pick up time from 12 seconds to 9 seconds
 * Moves to new location instantly
-* Special sound no longer plays when obtaining the Ray Gun
-* Special sound plays when obtaining the wonder weapon
 * Teddy bear shows at correct angles when it first appears
 * No longer disappears then reappears at end of Fire Sale if Fire Sale started while Mystery Box was moving
 
 ## Perks
 * Added high qualty perk icons to all maps
 * Removed perk limit
-* Removed blur after drinking
 * No longer deactivated if the perk machine is powered off
 * Perk order on HUD is restored whenever perks are restored to the player
 * Perk order on HUD is shown correctly when spectating
@@ -873,24 +862,17 @@ and they take effect on the next game rather than immediately.
 * Increases current health by 100 upon purchase (normally sets current health to max)
 
 ### Quick Revive
-* No longer automatically powered on in solo
 * Increased cost in solo from 500 to 1500
-* Decreases revive time by 33.33%
-* Decreases health regeneration delay by 25%
+* Decreases health regeneration delay by 33%
 * Changed hint string from "Revive" to "Quick Revive"
 
 ### Speed Cola
-* Aim twice as fast
 * Switch weapons twice as fast
 * Throw grenades twice as fast
 
-### Double Tap
-* Removed shooting 2 bullets for every shot
-* Increases bullet damage by 50%
-
 ### Stamin-Up
-* Increased cost from 2000 to 2500
-* Move 10% faster (normally only sprint 10% faster)
+* Unlimited sprint (normally only increases sprint duration)
+* Move 2% faster
 
 ### PHD Flopper
 * Added perk bottle model from Origins to all maps
@@ -903,6 +885,7 @@ and they take effect on the next game rather than immediately.
 ### Deadshot Daiquiri
 * Added perk bottle model from Origins to all maps
 * Increases bullet headshot damage by 100%
+* Aim twice as fast
 * Move faster while aiming
 * Decreases sprint recovery time
 * Fixed not decreasing aim spread
@@ -910,7 +893,6 @@ and they take effect on the next game rather than immediately.
 ### Mule Kick
 * Added additional weapon indicator
 * Additional weapon is given back when perk is reacquired
-* Stowed weapons automatically reload over time
 * Removed bottom part of perk machine model
 
 ### Tombstone Soda
@@ -954,8 +936,6 @@ and they take effect on the next game rather than immediately.
 * Fixed last stand activation fx playing incorrectly
 
 ### Vulture-Aid
-* Added ability to see players and zombies through walls
-* Removed ability to see perks, wallbuys, and Mystery Box through walls
 * Stink areas no longer activate while the player is moving
 
 ## Pack-a-Punch
@@ -966,7 +946,6 @@ and they take effect on the next game rather than immediately.
 * Increased volume of sounds to be the same on all maps
 
 ## Powerups
-* Decreased chance to drop from 3% to 2%
 * Increased time on the ground from 26.5 seconds to 30 seconds
 * Grabbing time based powerups that are already active add to timer instead of resetting timer
 * Fx plays when a powerup drops if it is the last powerup of a cycle
@@ -992,14 +971,6 @@ and they take effect on the next game rather than immediately.
 * Drops about half as often as the other powerups
 * Can give perks that have no machine on the map, instead of only perks with a machine
 * Nuketown: can also give Stamin-Up and Mule Kick
-
-### Zombie Blood
-* Added view model and zombie eye fx from Turned
-* No longer makes zombies ignore the player
-* Makes the player invulnerable to zombie melee swipes
-* No longer changes FOV
-* Changed player world fx position
-* Player view fx is removed instantly when powerup ends
 
 ### Meat Stink
 * Added pick up, throw, and land sounds to all maps
@@ -1108,11 +1079,6 @@ and they take effect on the next game rather than immediately.
 * No longer costs 100 points to withdraw
 * No longer costs 100 points to trade points with the teller
 * Account balance displayed while at the deposit or withdraw trigger
-
-## Weapon Locker
-* Placed weapon resets each game
-* Placed weapon gains max ammo at the end of each round
-* Placed weapon displayed on HUD
 
 ## NAV Table
 * Costs 100,000 points

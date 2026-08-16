@@ -409,7 +409,7 @@ revive_do_revive(playerbeingrevived, revivergun)
 
 	if (self hasperk("specialty_quickrevive"))
 	{
-		revivetime /= 1.5;
+		revivetime /= 2;
 	}
 
 	if (self maps\mp\zombies\_zm_pers_upgrades_functions::pers_revive_active())

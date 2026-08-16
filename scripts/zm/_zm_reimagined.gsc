@@ -91,7 +91,6 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_blockers::door_opened, scripts\zm\replaced\_zm_blockers::door_opened);
 	replaceFunc(maps\mp\zombies\_zm_blockers::debris_think, scripts\zm\replaced\_zm_blockers::debris_think);
 	replaceFunc(maps\mp\zombies\_zm_blockers::handle_post_board_repair_rewards, scripts\zm\replaced\_zm_blockers::handle_post_board_repair_rewards);
-	replaceFunc(maps\mp\zombies\_zm_blockers::player_fails_blocker_repair_trigger_preamble, scripts\zm\replaced\_zm_blockers::player_fails_blocker_repair_trigger_preamble);
 	replaceFunc(maps\mp\zombies\_zm_blockers::should_delete_zbarriers, scripts\zm\replaced\_zm_blockers::should_delete_zbarriers);
 	replaceFunc(maps\mp\zombies\_zm_weapons::init_weapon_upgrade, scripts\zm\replaced\_zm_weapons::init_weapon_upgrade);
 	replaceFunc(maps\mp\zombies\_zm_weapons::add_dynamic_wallbuy, scripts\zm\replaced\_zm_weapons::add_dynamic_wallbuy);
@@ -579,7 +578,6 @@ on_player_spawned()
 			self.initial_spawn = false;
 
 			self.solo_lives_given = 0;
-			self.stored_weapon_data = undefined;
 
 			self thread init_player_fx_ent();
 
@@ -595,12 +593,9 @@ on_player_spawned()
 
 			self thread give_additional_perks();
 
-			self thread weapon_locker_give_ammo_after_rounds();
-
 			self thread alt_weapon_name_hud();
 
 			self thread additionalprimaryweapon_indicator();
-			self thread additionalprimaryweapon_stowed_weapon_refill();
 
 			if (maps\mp\zombies\_zm_weapons::is_weapon_included("crossbow_zm"))
 			{
@@ -772,7 +767,6 @@ post_init()
 
 	level.ta_vaultfee = 0;
 	level.ta_tellerfee = 0;
-	level.weapon_locker_online = 0;
 	level.disable_melee_wallbuy_icons = 0;
 	level.dont_link_common_wallbuys = 1;
 	level.magicbox_timeout = 9;
@@ -1060,9 +1054,8 @@ set_dvars()
 
 	setDvar("penetrationCount", 100);
 
-	setDvar("perk_weapRateEnhanced", 0);
 	setDvar("perk_weapSpreadAds", 1);
-	setDvar("perk_speedMultiplier", 1.1);
+	setDvar("perk_speedMultiplier", 1.02);
 
 	setDvar("riotshield_melee_damage_scale", 1);
 	setDvar("riotshield_bullet_damage_scale", 1);
@@ -1141,12 +1134,14 @@ set_client_dvars()
 	    "bg_chargeShotPreventChargingWhileNotReady", getDvar("bg_chargeShotPreventChargingWhileNotReady"));
 
 	self setClientDvars(
-	    "aim_automelee_enabled", 0,
 	    "cg_friendlyNameFadeIn", 0,
 	    "cg_friendlyNameFadeOut", 250,
 	    "cg_enemyNameFadeIn", 0,
 	    "cg_enemyNameFadeOut", 250,
 	    "cg_overheadNamesTeam", is_encounter() ? 1 : 0,
+	    // Only reaches a client whose sonar attachment is enabled, which after the Vulture-Aid
+	    // revert is Turned zombies alone - they are what keeps zombies visible to each other
+	    // and stops both survivors and zombies fading out with distance.
 	    "cg_sonarAttachmentHideFriendlies", 0,
 	    "cg_sonarAttachmentFadeFriendlies", 0,
 	    "cg_sonarAttachmentFadeEnemies", 0,
@@ -1191,7 +1186,6 @@ set_client_dvar_loop(dvar)
 
 set_perks()
 {
-	self setperk("specialty_unlimitedsprint");
 	self setperk("specialty_fastmantle");
 	self setperk("specialty_fastladderclimb");
 }
@@ -3005,13 +2999,11 @@ give_additional_perks()
 
 		if (self HasPerk("specialty_fastreload"))
 		{
-			self SetPerk("specialty_fastads");
 			self SetPerk("specialty_fastweaponswitch");
 			self Setperk("specialty_fasttoss");
 		}
 		else
 		{
-			self UnsetPerk("specialty_fastads");
 			self UnsetPerk("specialty_fastweaponswitch");
 
 			if (!is_true(self.is_zombie))
@@ -3020,45 +3012,30 @@ give_additional_perks()
 			}
 		}
 
+		// Stamin-Up. The perk is specialty_movefaster here rather than the base game's
+		// specialty_longersprint, so the sprint meter is extended from script instead.
+		// Guarded on is_zombie the same way fasttoss is, so a Turned zombie player keeps the
+		// unlimited sprint _zm_turned grants it.
+		if (self HasPerk("specialty_movefaster"))
+		{
+			self SetPerk("specialty_unlimitedsprint");
+		}
+		else if (!is_true(self.is_zombie))
+		{
+			self UnsetPerk("specialty_unlimitedsprint");
+		}
+
 		if (self HasPerk("specialty_deadshot"))
 		{
+			self SetPerk("specialty_fastads");
 			self SetPerk("specialty_stalker");
 			self Setperk("specialty_sprintrecovery");
 		}
 		else
 		{
+			self UnsetPerk("specialty_fastads");
 			self UnsetPerk("specialty_stalker");
 			self Unsetperk("specialty_sprintrecovery");
-		}
-	}
-}
-
-weapon_locker_give_ammo_after_rounds()
-{
-	self endon("disconnect");
-
-	while (1)
-	{
-		level waittill("end_of_round");
-
-		if (isDefined(self.stored_weapon_data))
-		{
-			if (self.stored_weapon_data["name"] != "none")
-			{
-				self.stored_weapon_data["clip"] = weaponClipSize(self.stored_weapon_data["name"]);
-				self.stored_weapon_data["stock"] = weaponMaxAmmo(self.stored_weapon_data["name"]);
-			}
-
-			if (self.stored_weapon_data["dw_name"] != "none")
-			{
-				self.stored_weapon_data["lh_clip"] = weaponClipSize(self.stored_weapon_data["dw_name"]);
-			}
-
-			if (self.stored_weapon_data["alt_name"] != "none")
-			{
-				self.stored_weapon_data["alt_clip"] = weaponClipSize(self.stored_weapon_data["alt_name"]);
-				self.stored_weapon_data["alt_stock"] = weaponMaxAmmo(self.stored_weapon_data["alt_name"]);
-			}
 		}
 	}
 }
@@ -3212,154 +3189,6 @@ additionalprimaryweapon_update_weapon_slots()
 	else
 	{
 		self.weapon_to_take_by_losing_specialty_additionalprimaryweapon = undefined;
-	}
-}
-
-additionalprimaryweapon_stowed_weapon_refill()
-{
-	self endon("disconnect");
-
-	while (1)
-	{
-		result = self waittill_any_return("weapon_change", "specialty_additionalprimaryweapon_start", "specialty_additionalprimaryweapon_stop", "zmb_empty_clip", "spawned_player");
-
-		if (self hasPerk("specialty_additionalprimaryweapon"))
-		{
-			curr_wep = self getCurrentWeapon();
-
-			if (curr_wep == "none")
-			{
-				continue;
-			}
-
-			primaries = self getWeaponsListPrimaries();
-
-			foreach (primary in primaries)
-			{
-				if (primary != maps\mp\zombies\_zm_weapons::get_nonalternate_weapon(curr_wep))
-				{
-					self thread refill_after_time(primary);
-				}
-				else
-				{
-					self notify(primary + "_reload_stop");
-				}
-			}
-		}
-	}
-}
-
-refill_after_time(primary)
-{
-	self endon(primary + "_reload_stop");
-	self endon("specialty_additionalprimaryweapon_stop");
-	self endon("spawned_player");
-
-	reload_time = weaponReloadTime(primary);
-	reload_amount = undefined;
-
-	if (primary == "m32_zm" || primary == "python_zm" || maps\mp\zombies\_zm_weapons::get_base_weapon_name(primary, 1) == "judge_zm" || maps\mp\zombies\_zm_weapons::get_base_weapon_name(primary, 1) == "870mcs_zm" || maps\mp\zombies\_zm_weapons::get_base_weapon_name(primary, 1) == "ksg_zm")
-	{
-		reload_amount = 1;
-
-		if (maps\mp\zombies\_zm_weapons::get_base_weapon_name(primary, 1) == "ksg_zm" && maps\mp\zombies\_zm_weapons::is_weapon_upgraded(primary))
-		{
-			reload_amount = 2;
-		}
-	}
-
-	if (!isDefined(reload_amount) && reload_time < 1)
-	{
-		reload_time = 1;
-	}
-
-	if (self hasPerk("specialty_fastreload"))
-	{
-		reload_time *= getDvarFloat("perk_weapReloadMultiplier");
-	}
-
-	wait reload_time;
-
-	ammo_clip = self getWeaponAmmoClip(primary);
-	ammo_stock = self getWeaponAmmoStock(primary);
-	missing_clip = weaponClipSize(primary) - ammo_clip;
-	og_ammo_stock = ammo_stock;
-
-	if (missing_clip > ammo_stock)
-	{
-		missing_clip = ammo_stock;
-	}
-
-	if (isDefined(reload_amount) && missing_clip > reload_amount)
-	{
-		missing_clip = reload_amount;
-	}
-
-	dw_primary = weaponDualWieldWeaponName(primary);
-	alt_primary = weaponAltWeaponName(primary);
-
-	ammo_stock -= missing_clip;
-
-	if (dw_primary != "none" && self hasweapon(dw_primary))
-	{
-		dw_ammo_clip = self getWeaponAmmoClip(dw_primary);
-		dw_missing_clip = weaponClipSize(dw_primary) - dw_ammo_clip;
-
-		if (dw_missing_clip > ammo_stock)
-		{
-			dw_missing_clip = ammo_stock;
-		}
-
-		ammo_stock -= dw_missing_clip;
-	}
-
-	if (ammo_stock != og_ammo_stock)
-	{
-		// setWeaponAmmoClip changes dual wield weapon clip ammo of current weapon when called on any dual wield weapon
-		curr_primary = self getCurrentWeapon();
-		curr_dw_primary = weaponDualWieldWeaponName(curr_primary);
-		curr_dw_ammo_clip = 0;
-
-		// save current dual wield weapon clip ammo
-		if (dw_primary != "none" && curr_dw_primary != "none")
-		{
-			curr_dw_ammo_clip = self getWeaponAmmoClip(curr_dw_primary);
-		}
-
-		self setWeaponAmmoClip(primary, ammo_clip + missing_clip);
-
-		if (dw_primary != "none")
-		{
-			self setWeaponAmmoClip(dw_primary, dw_ammo_clip + dw_missing_clip);
-		}
-
-		self setWeaponAmmoStock(primary, ammo_stock);
-
-		// restore current dual wield weapon clip ammo
-		if (dw_primary != "none" && curr_dw_primary != "none")
-		{
-			self setWeaponAmmoClip(curr_dw_primary, curr_dw_ammo_clip);
-		}
-	}
-
-	if (alt_primary != "none" && self hasweapon(alt_primary))
-	{
-		ammo_clip = self getWeaponAmmoClip(alt_primary);
-		ammo_stock = self getWeaponAmmoStock(alt_primary);
-		missing_clip = weaponClipSize(alt_primary) - ammo_clip;
-
-		if (missing_clip > ammo_stock)
-		{
-			missing_clip = ammo_stock;
-		}
-
-		self setWeaponAmmoClip(alt_primary, ammo_clip + missing_clip);
-		self setWeaponAmmoStock(alt_primary, ammo_stock - missing_clip);
-	}
-
-	if (isDefined(reload_amount) && self getWeaponAmmoStock(primary) > 0 && self getWeaponAmmoClip(primary) < weaponClipSize(primary))
-	{
-		self refill_after_time(primary);
 	}
 }
 
@@ -3574,11 +3403,6 @@ is_tazer_weapon(weapon)
 is_overheat_weapon(weapon)
 {
 	return weapon == "jetgun_zm" || weapon == "slowgun_zm";
-}
-
-is_magicbox_wonder_weapon(weapon)
-{
-	return weapon == "metalstorm_mms_zm" || weapon == "titus6_zm" || weapon == "slipgun_zm" || weapon == "slowgun_zm" || weapon == "blundergat_zm";
 }
 
 is_touching_elevator()
