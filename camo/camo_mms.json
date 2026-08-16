@@ -133,12 +133,17 @@
 		{
 			"materials": [
 				{
-					"materialOverrides": [],
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_attach_optic_mms",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies"
+						}
+					],
 					"shaderConsts": [
-						3.0,
-						3.0,
+						1.0,
+						1.0,
 						0.0,
-						0.6899999976158142,
+						1.0,
 						0.0,
 						0.0,
 						0.0,
@@ -146,7 +151,28 @@
 					],
 					"useColorMap": false,
 					"useNormalMap": true,
-					"useSpecularMap": false
+					"useSpecularMap": true
+				},
+				{
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_attach_optic_mms_camo1",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies_1"
+						}
+					],
+					"shaderConsts": [
+						1.0,
+						1.0,
+						0.0,
+						1.0,
+						0.0,
+						0.0,
+						0.0,
+						0.0
+					],
+					"useColorMap": false,
+					"useNormalMap": true,
+					"useSpecularMap": true
 				}
 			]
 		},

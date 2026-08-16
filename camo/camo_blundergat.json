@@ -113,28 +113,17 @@
 		{
 			"materials": [
 				{
-					"materialOverrides": [],
-					"shaderConsts": [
-						1.0,
-						1.0,
-						0.0,
-						1.0,
-						0.0,
-						0.0,
-						0.0,
-						0.0
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_zmb_blundergat",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies"
+						}
 					],
-					"useColorMap": false,
-					"useNormalMap": true,
-					"useSpecularMap": true
-				},
-				{
-					"materialOverrides": [],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						1.72,
+						1.7,
 						0.0,
-						1.0,
+						0.43,
 						0.0,
 						0.0,
 						0.0,

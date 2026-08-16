@@ -113,10 +113,15 @@
 		{
 			"materials": [
 				{
-					"materialOverrides": [],
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_titus",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies"
+						}
+					],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						3.0,
+						3.0,
 						0.0,
 						1.0,
 						0.0,
@@ -129,10 +134,19 @@
 					"useSpecularMap": true
 				},
 				{
-					"materialOverrides": [],
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_lmg_type95_drum",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies_1"
+						},
+						{
+							"baseMaterial": "mc/mtl_t6_attach_sniper_fastmag",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies_1"
+						}
+					],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						3.0,
+						3.0,
 						0.0,
 						1.0,
 						0.0,

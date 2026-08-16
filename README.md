@@ -959,7 +959,6 @@ and they take effect on the next game rather than immediately.
 * Stink areas no longer activate while the player is moving
 
 ## Pack-a-Punch
-* Changed default weapon camo to dragon camo from Black Ops 2 Multiplayer (modified to be darker on primary camo and not animated on secondary camo)
 * Attachments on weapons can no longer be changed
 * Reticles on optical attachments are no longer random
 * Decreased weapon pick up time from 15 seconds to 12 seconds

@@ -113,10 +113,15 @@
 		{
 			"materials": [
 				{
-					"materialOverrides": [],
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_special_storm",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies"
+						}
+					],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						2.0,
+						2.0,
 						0.0,
 						1.0,
 						0.0,
@@ -129,10 +134,15 @@
 					"useSpecularMap": true
 				},
 				{
-					"materialOverrides": [],
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_special_storm_scope",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies_1"
+						}
+					],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						3.0,
+						3.0,
 						0.0,
 						1.0,
 						0.0,

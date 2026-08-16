@@ -180,6 +180,24 @@ LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 	f1_local0.weaponText = f1_local29
 
 	local additionalPrimaryWeaponImageSize = 24
+
+	-- Mule Kick's third weapon indicator, shown beside the ammo counter while the third weapon is
+	-- out. Its own element and its own material registration, nothing to do with the perk row in
+	-- hudperkszombie.lua, which is why it kept the stock icon on Nuketown when that row moved to
+	-- the BO1 art and ended up the odd one out.
+	--
+	-- Read the map here rather than reusing useBloodDpad above. Same answer, but that name is about
+	-- the dpad and this is not, and a second dvar read once per menu build costs nothing.
+	--
+	-- Safe to register here even though uie_perk_mulekick lives in mod.ff: this runs when the menu
+	-- is built, not at file scope, which is the same point hud_zm_nuked_dpad is registered a few
+	-- lines up. The lazy registration the perk and powerup files need is only for materials named
+	-- at file scope, before mod.ff is loaded.
+	local additionalPrimaryWeaponMaterial = RegisterMaterial("specialty_additionalprimaryweapon_zombies")
+	if UIExpression.DvarString(nil, "mapname") == "zm_nuked" then
+		additionalPrimaryWeaponMaterial = RegisterMaterial("uie_perk_mulekick")
+	end
+
 	f1_local0.additionalPrimaryWeaponImage = LUI.UIImage.new({
 		left = -additionalPrimaryWeaponImageSize,
 		top = -additionalPrimaryWeaponImageSize / 2 - 32 - additionalPrimaryWeaponImageSize,
@@ -189,7 +207,7 @@ LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 		topAnchor = false,
 		rightAnchor = true,
 		bottomAnchor = false,
-		material = RegisterMaterial("specialty_additionalprimaryweapon_zombies"),
+		material = additionalPrimaryWeaponMaterial,
 		alpha = 0,
 	})
 	f1_local0.weaponLabelContainer:addElement(f1_local0.additionalPrimaryWeaponImage)

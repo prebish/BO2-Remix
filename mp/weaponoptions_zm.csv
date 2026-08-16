@@ -71,7 +71,7 @@ a0,b1,c2,d3,e4,f5,g6,f7,g8,h9,i10,j11,k12,l13,m14,n15,o16,p17,q18,r19,s20,t21,u2
 1,reticle,combo_up,mc/mtl_t6_attach_optic_combo_reticle_up_zm,,,,,,,,,,,,,,,,,,,,
 0,reticle,combo_down,mc/mtl_t6_attach_optic_combo_reticle_down,,,,,,,,,,,,,,,,,,,,
 1,reticle,combo_down,mc/mtl_t6_attach_optic_combo_reticle_down_zm,,,,,,,,,,,,,,,,,,,,
-39,camo,camo_dragon,1,12,,,,,,,,,,,,,,,,,,,
+39,camo,mtl_weapon_camo_zombies,1,4,,,,,,,,,,,,,,,,,,,
 40,camo,camo_zmb_dlc2,1,9,,,,,,,,,,,,,,,,,,,
 41,camo,camo_doll_dempsey,0,32,,,,,,,,,,,,,,,,,,,
 42,camo,camo_doll_nikolai,0,33,,,,,,,,,,,,,,,,,,,

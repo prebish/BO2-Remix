@@ -417,9 +417,14 @@ spawn_buildable_bench()
 	angles = s_spot.angles;
 
 	// p6_zm_work_bench stands 44 tall, which reads as chest height next to the player, so sink
-	// it into the floor to bring the worktop down. The assembly is offset from the bench
-	// rather than the floor so it keeps sitting on the top when this is tuned.
-	origin = ground_position(s_spot.origin) - (0, 0, 10);
+	// it into the floor to bring the worktop down. This is the knob for bench height: raise it to
+	// sink the bench further, lower it to lift the bench up.
+	//
+	// Everything else here is offset from origin rather than from the floor - the shield assembly
+	// at +70 and the trigger at +57 - so they follow the worktop down and stay in place relative
+	// to it whenever this is retuned. Started at 10, which sat noticeably high.
+	sink = 16;
+	origin = ground_position(s_spot.origin) - (0, 0, sink);
 
 	scripts\zm\locs\loc_common::barrier("p6_zm_work_bench", origin, angles, 1);
 
@@ -470,7 +475,12 @@ add_buildable_piece_spawns()
 
 	add_buildable_piece_spawn("t6_wpn_zmb_shield_door", (620, 300, -55), (0, 350, 0), 21);
 	add_buildable_piece_spawn("t6_wpn_zmb_shield_door", (-960, 570, -57), (0, 90, 0), 21);
-	add_buildable_piece_spawn("t6_wpn_zmb_shield_door", (-670, 94, -48), (0, 254, 0), 21);
+
+	// Was (-670, 94, -48) at yaw 254, which faced the wrong way and sat too far forward. Yaw turned
+	// 180 to 74, and the origin walked 24 units along the viewing angle it was judged from - a
+	// player at (-661, 133, -52) looking down yaw -109, so forward is
+	// (cos -109, sin -109) = (-0.326, -0.946) and 24 units of it is (-8, -23).
+	add_buildable_piece_spawn("t6_wpn_zmb_shield_door", (-678, 71, -48), (0, 74, 0), 21);
 }
 
 add_buildable_piece_spawn(model, origin, angles, z_base)

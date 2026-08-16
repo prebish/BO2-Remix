@@ -512,6 +512,20 @@ hide_unused_chest_zbarriers()
 			if (isdefined(zbarrier))
 			{
 				zbarrier hide();
+
+				// hide() alone is not enough. A magic box zbarrier is built from pieces with their
+				// own visibility, driven by hidezbarrierpiece/showzbarrierpiece, and the entity
+				// level hide() does not reach them - piece 0 is the base the box sits on, the
+				// platform with the teddy bear that marks a box spot, and it stayed on screen.
+				//
+				// Stock never hits this because it retires a spot through hide_chest, which routes
+				// to set_magic_box_zbarrier_state("away") - that hides every piece and then shows
+				// piece 0 deliberately, because normally you want the empty spot to read as a box
+				// location. Here the spot is not a box location at all, so every piece goes.
+				for (i = 0; i < zbarrier getnumzbarrierpieces(); i++)
+				{
+					zbarrier hidezbarrierpiece(i);
+				}
 			}
 		}
 	}

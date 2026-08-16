@@ -113,26 +113,15 @@
 		{
 			"materials": [
 				{
-					"materialOverrides": [],
-					"shaderConsts": [
-						1.0,
-						1.0,
-						0.0,
-						1.0,
-						0.0,
-						0.0,
-						0.0,
-						0.0
+					"materialOverrides": [
+						{
+							"baseMaterial": "mc/mtl_t6_wpn_zmb_slipgun",
+							"camoMaterial": "mc/mtl_weapon_camo_zombies"
+						}
 					],
-					"useColorMap": false,
-					"useNormalMap": true,
-					"useSpecularMap": true
-				},
-				{
-					"materialOverrides": [],
 					"shaderConsts": [
-						1.0,
-						1.0,
+						3.0,
+						3.0,
 						0.0,
 						1.0,
 						0.0,
