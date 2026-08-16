@@ -18,6 +18,15 @@ CoD.AmmoAreaZombie.CircleSize = 128
 CoD.AmmoAreaZombie.InventoryIconSize = 64
 CoD.AmmoAreaZombie.InventoryIconEnabledAlpha = 1
 CoD.AmmoAreaZombie.InventoryAnimationDuration = 250
+-- hud_dpad_blood carries its shape in the alpha channel and nothing else: every visible pixel of it
+-- is pure white, in the stock texture and in the replacement alike. Untinted it draws as a white
+-- smear, so the colour has to come from here. Values are 0-1, so raise r or drop g and b for a
+-- deeper red.
+CoD.AmmoAreaZombie.BloodDpadColor = {
+	r = 0.22,
+	g = 0.01,
+	b = 0.01,
+}
 LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 	local f1_local0 = CoD.Menu.NewSafeAreaFromState("AmmoAreaZombie", f1_arg0)
 	f1_local0:setOwner(f1_arg0)
@@ -45,6 +54,18 @@ LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 			CoD.AmmoAreaZombie.DpadBarImage = RegisterMaterial("hud_zm_" .. f1_local1 .. "dpad_bar")
 		end
 	end
+
+	-- Nuketown drops the green dpad circle and its bar for the BO1 blood splatter. hud_dpad_blood
+	-- is a stock material whose image this fork overrides, so nothing new has to be authored.
+	--
+	-- Held in a local rather than written into CoD.AmmoAreaZombie.DpadImage, because that cache is
+	-- filled once per session by the guards above - assigning to it would carry the splatter onto
+	-- the next map loaded without restarting the game.
+	local useBloodDpad = UIExpression.DvarString(nil, "mapname") == "zm_nuked"
+	local dpadImage = CoD.AmmoAreaZombie.DpadImage
+	if useBloodDpad then
+		dpadImage = RegisterMaterial("hud_dpad_blood")
+	end
 	local f1_local2 = 0
 	local f1_local3 = 15
 	local Widget = LUI.UIElement.new()
@@ -60,15 +81,27 @@ LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 	local f1_local6 = f1_local5 / 16
 	local f1_local7 = f1_local2 + CoD.AmmoAreaZombie.CircleSize / 2
 	local f1_local8 = f1_local6
-	local f1_local9 = LUI.UIImage.new()
-	f1_local9:setLeftRight(false, true, -f1_local5 - f1_local7, -f1_local7)
-	f1_local9:setTopBottom(false, true, -f1_local6 - f1_local8, -f1_local8)
-	f1_local9:setImage(CoD.AmmoAreaZombie.DpadBarImage)
-	Widget:addElement(f1_local9)
+	-- The splatter stands in for the bar as well, so the bar is left off entirely on Nuketown.
+	if not useBloodDpad then
+		local f1_local9 = LUI.UIImage.new()
+		f1_local9:setLeftRight(false, true, -f1_local5 - f1_local7, -f1_local7)
+		f1_local9:setTopBottom(false, true, -f1_local6 - f1_local8, -f1_local8)
+		f1_local9:setImage(CoD.AmmoAreaZombie.DpadBarImage)
+		Widget:addElement(f1_local9)
+	end
+
 	local f1_local10 = LUI.UIImage.new()
-	f1_local10:setLeftRight(true, true, 0, 0)
+	if useBloodDpad then
+		-- hud_dpad_blood is 256x128 where the dpad slot is a 128 square. Extend it left by one
+		-- slot width so it keeps its 2:1 shape - drawn into the square it comes out squashed,
+		-- which is what the earlier attempt at this looked like.
+		f1_local10:setLeftRight(true, true, -CoD.AmmoAreaZombie.CircleSize, 0)
+		f1_local10:setRGB(CoD.AmmoAreaZombie.BloodDpadColor.r, CoD.AmmoAreaZombie.BloodDpadColor.g, CoD.AmmoAreaZombie.BloodDpadColor.b)
+	else
+		f1_local10:setLeftRight(true, true, 0, 0)
+	end
 	f1_local10:setTopBottom(true, true, 0, 0)
-	f1_local10:setImage(CoD.AmmoAreaZombie.DpadImage)
+	f1_local10:setImage(dpadImage)
 	Widget:addElement(f1_local10)
 	local f1_local11 = CoD.OffhandIcons.Size * 1.5 * 3
 	local f1_local12 = -1 - CoD.AmmoAreaZombie.CircleSize / 2 + f1_local6

@@ -2,6 +2,14 @@ CoD.PowerUps = {}
 CoD.PowerUps.IconSize = 48
 CoD.PowerUps.UpgradeIconSize = 36
 CoD.PowerUps.EnemyIconSize = 48
+-- Units trimmed off each edge of the powerup icon on Nuketown, where the BO1 art is used. 5 takes
+-- the 48 unit icon down to 38, about a fifth smaller. Raise it to shrink them further.
+--
+-- Carried over unchanged from the retired hand-made icon set. That art was 256x256 and this one is
+-- 128x128, which does not affect on-screen size - the widget decides that - but the two sets pad
+-- their artwork differently inside the canvas, so this is the knob if the new icons sit too large
+-- or too small next to the perk row.
+CoD.PowerUps.NukedIconInset = 5
 CoD.PowerUps.Spacing = 8
 CoD.PowerUps.STATE_OFF = 0
 CoD.PowerUps.STATE_ON = 1
@@ -20,46 +28,59 @@ CoD.PowerUps.EnemyIconColorRed = {
 	b = 0,
 }
 CoD.PowerUps.ClientFieldNames = {}
+-- nukedMaterialName art is from mjmodz's "Black Ops 1 HUD for BO2" v1.0.0, BO1 images by
+-- Kingslayer Kyle. It replaces an earlier hand-made _bo1 set and covers all six powerups, where
+-- that one had nothing for Bonfire Sale or Death Machine.
 CoD.PowerUps.ClientFieldNames[1] = {
 	clientFieldName = "powerup_instant_kill",
 	material = RegisterMaterial("specialty_instakill_zombies"),
+	nukedMaterialName = "uie_powerup_instakill",
 }
 CoD.PowerUps.ClientFieldNames[2] = {
 	clientFieldName = "powerup_double_points",
 	material = RegisterMaterial("specialty_doublepoints_zombies"),
+	nukedMaterialName = "uie_powerup_double",
 	z_material = RegisterMaterial("specialty_doublepoints_zombies_blue"),
 }
 CoD.PowerUps.ClientFieldNames[3] = {
 	clientFieldName = "powerup_fire_sale",
 	material = RegisterMaterial("specialty_firesale_zombies"),
+	nukedMaterialName = "uie_powerup_sale",
 }
 CoD.PowerUps.ClientFieldNames[4] = {
 	clientFieldName = "powerup_bon_fire",
 	material = RegisterMaterial("zom_icon_bonfire"),
+	nukedMaterialName = "uie_powerup_bonfire",
 }
+-- The pack calls this one Death Machine, which is what BO1 named the powerup BO2 ships as Minigun.
 CoD.PowerUps.ClientFieldNames[5] = {
 	clientFieldName = "powerup_mini_gun",
 	material = RegisterMaterial("zom_icon_minigun"),
+	nukedMaterialName = "uie_powerup_deathmachine",
 }
 CoD.PowerUps.ClientFieldNames[6] = {
 	clientFieldName = "powerup_zombie_blood",
 	material = RegisterMaterial("specialty_zomblood_zombies"),
+	nukedMaterialName = "uie_powerup_blood",
 }
 CoD.PowerUps.UpgradeClientFieldNames = {}
 CoD.PowerUps.UpgradeClientFieldNames[1] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[1].clientFieldName .. "_ug",
 	material = RegisterMaterial("specialty_instakill_zombies"),
+	nukedMaterialName = "uie_powerup_instakill",
 	color = CoD.PowerUps.UpGradeIconColorRed,
 }
 CoD.PowerUps.EnemyClientFieldNames = {}
 CoD.PowerUps.EnemyClientFieldNames[1] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[1].clientFieldName .. "_enemy",
 	material = RegisterMaterial("specialty_instakill_zombies"),
+	nukedMaterialName = "uie_powerup_instakill",
 	color = CoD.PowerUps.EnemyIconColorRed,
 }
 CoD.PowerUps.EnemyClientFieldNames[2] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[2].clientFieldName .. "_enemy",
 	material = RegisterMaterial("specialty_doublepoints_zombies"),
+	nukedMaterialName = "uie_powerup_double",
 	color = CoD.PowerUps.EnemyIconColorRed,
 }
 LUI.createMenu.PowerUpsArea = function(LocalClientIndex)
@@ -80,9 +101,18 @@ LUI.createMenu.PowerUpsArea = function(LocalClientIndex)
 		Widget:setTopBottom(false, true, -f1_local2, 0)
 		Widget:registerEventHandler("transition_complete_off_fade_out", CoD.PowerUps.PowerUpIcon_UpdatePosition)
 
+		-- The BO1 icons carry less padding than the stock art, so the glyph reads larger at the
+		-- same slot size. Inset the image inside its slot on Nuketown rather than shrinking
+		-- CoD.PowerUps.IconSize, which the row layout maths below is measured against - changing
+		-- that would move the icons as well as resize them.
+		local inset = 0
+		if CoD.PowerUps.UseNukedIcons() then
+			inset = CoD.PowerUps.NukedIconInset
+		end
+
 		local powerUpIcon = LUI.UIImage.new()
-		powerUpIcon:setLeftRight(true, true, 0, 0)
-		powerUpIcon:setTopBottom(false, true, -CoD.PowerUps.IconSize, 0)
+		powerUpIcon:setLeftRight(true, true, inset, -inset)
+		powerUpIcon:setTopBottom(false, true, -CoD.PowerUps.IconSize + inset, -inset)
 		powerUpIcon:setAlpha(0)
 		Widget:addElement(powerUpIcon)
 		Widget.powerUpIcon = powerUpIcon
@@ -284,11 +314,37 @@ CoD.PowerUps.EnemyUpdateState = function(Menu, ClientInstance)
 	end
 end
 
+-- Nuketown swaps the powerup icons for BO1 styled ones. Read the map at call time rather than
+-- caching it when this file loads, since LUI files are not guaranteed to load after the map is
+-- known. All six powerups have BO1 art now; the nukedMaterialName guard in NukedMaterial below is
+-- what lets one be added without art and fall back to its stock icon.
+CoD.PowerUps.UseNukedIcons = function()
+	return UIExpression.DvarString(nil, "mapname") == "zm_nuked"
+end
+
+-- Registered on first use, not where the tables are declared. These materials live in mod.ff, which
+-- is loaded after the LUI menu files - registering at file scope got "Could not load material" for
+-- every one of them and the icons silently stayed stock.
+CoD.PowerUps.NukedMaterial = function(entry, fallback)
+	if not CoD.PowerUps.UseNukedIcons() or not entry.nukedMaterialName then
+		return fallback
+	end
+
+	if not entry.nukedMaterial then
+		entry.nukedMaterial = RegisterMaterial(entry.nukedMaterialName)
+	end
+
+	return entry.nukedMaterial
+end
+
 CoD.PowerUps.GetMaterial = function(Menu, LocalClientIndex, ClientFieldName)
 	local f7_local0 = nil
 	for f7_local1 = 1, #CoD.PowerUps.ClientFieldNames, 1 do
 		if CoD.PowerUps.ClientFieldNames[f7_local1].clientFieldName == ClientFieldName then
 			f7_local0 = CoD.PowerUps.ClientFieldNames[f7_local1].material
+			f7_local0 = CoD.PowerUps.NukedMaterial(CoD.PowerUps.ClientFieldNames[f7_local1], f7_local0)
+			-- The player-zombie variant still wins where one exists; the pack has no blue
+			-- Double Points icon to pair with it.
 			if UIExpression.IsVisibilityBitSet(LocalClientIndex, CoD.BIT_IS_PLAYER_ZOMBIE) == 1 and CoD.PowerUps.ClientFieldNames[f7_local1].z_material then
 				f7_local0 = CoD.PowerUps.ClientFieldNames[f7_local1].z_material
 				break
@@ -303,6 +359,7 @@ CoD.PowerUps.GetUpgradeMaterial = function(Menu, ClientFieldName)
 	for PowerUpIndex = 1, #CoD.PowerUps.UpgradeClientFieldNames, 1 do
 		if CoD.PowerUps.UpgradeClientFieldNames[PowerUpIndex].clientFieldName == ClientFieldName then
 			f8_local0 = CoD.PowerUps.UpgradeClientFieldNames[PowerUpIndex].material
+			f8_local0 = CoD.PowerUps.NukedMaterial(CoD.PowerUps.UpgradeClientFieldNames[PowerUpIndex], f8_local0)
 			break
 		end
 	end
@@ -314,6 +371,7 @@ CoD.PowerUps.GetEnemyMaterial = function(Menu, LocalClientIndex, ClientFieldName
 	for PowerUpIndex = 1, #CoD.PowerUps.EnemyClientFieldNames, 1 do
 		if CoD.PowerUps.EnemyClientFieldNames[PowerUpIndex].clientFieldName == ClientFieldName then
 			f8_local0 = CoD.PowerUps.EnemyClientFieldNames[PowerUpIndex].material
+			f8_local0 = CoD.PowerUps.NukedMaterial(CoD.PowerUps.EnemyClientFieldNames[PowerUpIndex], f8_local0)
 			break
 		end
 	end

@@ -7,53 +7,68 @@ CoD.Perks.STATE_OWNED = 1
 CoD.Perks.STATE_PAUSED = 2
 CoD.Perks.STATE_TBD = 3
 CoD.Perks.ClientFieldNames = {}
+-- nukedMaterialName art is from mjmodz's "Black Ops 1 HUD for BO2" v1.0.0, BO1 images by
+-- Kingslayer Kyle. It replaces an earlier hand-made _bo1 set and covers all twelve perks, where
+-- that one had nothing for Who's Who or Electric Cherry.
 CoD.Perks.ClientFieldNames[1] = {
 	clientFieldName = "perk_additional_primary_weapon",
 	material = RegisterMaterial("specialty_additionalprimaryweapon_zombies"),
+	nukedMaterialName = "uie_perk_mulekick",
 }
 CoD.Perks.ClientFieldNames[2] = {
 	clientFieldName = "perk_dead_shot",
 	material = RegisterMaterial("specialty_ads_zombies"),
+	nukedMaterialName = "uie_perk_deadshot",
 }
 CoD.Perks.ClientFieldNames[3] = {
 	clientFieldName = "perk_dive_to_nuke",
 	material = RegisterMaterial("specialty_divetonuke_zombies"),
+	nukedMaterialName = "uie_perk_phd",
 }
 CoD.Perks.ClientFieldNames[4] = {
 	clientFieldName = "perk_double_tap",
 	material = RegisterMaterial("specialty_doubletap_zombies"),
+	nukedMaterialName = "uie_perk_doubletap",
 }
 CoD.Perks.ClientFieldNames[5] = {
 	clientFieldName = "perk_juggernaut",
 	material = RegisterMaterial("specialty_juggernaut_zombies"),
+	nukedMaterialName = "uie_perk_juggernog",
 }
 CoD.Perks.ClientFieldNames[6] = {
 	clientFieldName = "perk_marathon",
 	material = RegisterMaterial("specialty_marathon_zombies"),
+	nukedMaterialName = "uie_perk_staminup",
 }
 CoD.Perks.ClientFieldNames[7] = {
 	clientFieldName = "perk_quick_revive",
 	material = RegisterMaterial("specialty_quickrevive_zombies"),
+	nukedMaterialName = "uie_perk_revive",
 }
 CoD.Perks.ClientFieldNames[8] = {
 	clientFieldName = "perk_sleight_of_hand",
 	material = RegisterMaterial("specialty_fastreload_zombies"),
+	nukedMaterialName = "uie_perk_speedcola",
 }
 CoD.Perks.ClientFieldNames[9] = {
 	clientFieldName = "perk_tombstone",
 	material = RegisterMaterial("specialty_tombstone_zombies"),
+	nukedMaterialName = "uie_perk_tombstone",
 }
 CoD.Perks.ClientFieldNames[10] = {
 	clientFieldName = "perk_chugabud",
 	material = RegisterMaterial("specialty_chugabud_zombies"),
+	nukedMaterialName = "uie_perk_who",
 }
 CoD.Perks.ClientFieldNames[11] = {
 	clientFieldName = "perk_electric_cherry",
 	material = RegisterMaterial("specialty_electric_cherry_zombie"),
+	nukedMaterialName = "uie_perk_electric_cherry",
 }
 CoD.Perks.ClientFieldNames[12] = {
 	clientFieldName = "perk_vulture",
 	material = RegisterMaterial("specialty_vulture_zombies"),
+	nukedMaterialName = "uie_perk_vulture",
 	glowMaterial = RegisterMaterial("zm_hud_stink_perk_glow"),
 }
 CoD.Perks.SpecialtyToClientFieldNames = {
@@ -143,11 +158,30 @@ CoD.Perks.UpdateVisibility = function(Menu, ClientInstance)
 	Menu:dispatchEventToChildren(ClientInstance)
 end
 
+-- Nuketown swaps the perk and powerup icons for BO1 styled ones. Read the map here rather than
+-- caching it when this file loads: LUI files are not guaranteed to be loaded after the map is
+-- known, and a stale answer would put BO1 icons on every map or none.
+CoD.Perks.UseNukedIcons = function()
+	return UIExpression.DvarString(nil, "mapname") == "zm_nuked"
+end
+
 CoD.Perks.GetMaterial = function(Menu, ClientFieldName)
 	local Material = nil
 	for ClientFieldIndex = 1, #CoD.Perks.ClientFieldNames, 1 do
 		if CoD.Perks.ClientFieldNames[ClientFieldIndex].clientFieldName == ClientFieldName then
-			Material = CoD.Perks.ClientFieldNames[ClientFieldIndex].material
+			local entry = CoD.Perks.ClientFieldNames[ClientFieldIndex]
+			Material = entry.material
+			-- Every perk in the table has BO1 art now, but the nukedMaterialName guard stays: it is
+			-- what lets a perk be added here without art and fall back to its stock icon.
+			if CoD.Perks.UseNukedIcons() and entry.nukedMaterialName then
+				-- Registered on first use, not where the table is declared. These materials live in
+				-- mod.ff, which is loaded after the LUI menu files - registering at file scope got
+				-- "Could not load material" for all of them and the icons silently stayed stock.
+				if not entry.nukedMaterial then
+					entry.nukedMaterial = RegisterMaterial(entry.nukedMaterialName)
+				end
+				Material = entry.nukedMaterial
+			end
 			break
 		end
 	end

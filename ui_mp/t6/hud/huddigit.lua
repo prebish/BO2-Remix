@@ -50,6 +50,19 @@ f0_local0 = function()
 			f2_local0 = "tomb_"
 		end
 
+		-- Nuketown draws the ammo counter with the plain zombies digits rather than its own themed
+		-- set. "transit_" is what this function already starts from before the per-map checks, and
+		-- the fork ships those materials in reimagined.zone, so they resolve on every map.
+		--
+		-- Not the empty-prefix branch below, which looks like the obvious default: its
+		-- hud_sp_num_big_*_white materials are in no zone Nuketown loads, so it would draw nothing
+		-- at all.
+		--
+		-- Nuketown only, by request. Every other map keeps its own digits.
+		if UIExpression.DvarString(nil, "mapname") == "zm_nuked" then
+			f2_local0 = "transit_"
+		end
+
 		if f2_local0 ~= "" then
 			f0_local2 = {}
 			f0_local2[#f0_local2 + 1] = RegisterMaterial("hud_zm_num_" .. f2_local0 .. "0")

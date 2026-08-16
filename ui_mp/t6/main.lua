@@ -247,6 +247,18 @@ CoD.InitArchiveDvars = function()
 	if UIExpression.DvarString(nil, "zmr_firesale_music") == "" then
 		Engine.Exec(nil, "seta zmr_firesale_music 1")
 	end
+
+	if UIExpression.DvarString(nil, "zmr_perk_limit") == "" then
+		Engine.Exec(nil, "seta zmr_perk_limit 4")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_start_round") == "" then
+		Engine.Exec(nil, "seta zmr_start_round 1")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_coord_display") == "" then
+		Engine.Exec(nil, "seta zmr_coord_display 0")
+	end
 end
 
 CoD.SetDvars = function()

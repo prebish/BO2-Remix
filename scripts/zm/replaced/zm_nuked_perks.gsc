@@ -45,6 +45,14 @@ init_nuked_perks()
 	level.nuked_perks[3].model = "zombie_vending_jugg";
 	level.nuked_perks[3].script_noteworthy = "specialty_armorvest";
 	level.nuked_perks[3].turn_on_notify = "juggernog_on";
+	// This value does not survive: _zm_perks::turn_packapunch_on overwrites the model of every
+	// specialty_weapupgrade machine with level.machine_assets["packapunch"].off_model the moment it
+	// starts, and swaps in the on model when it catches "Pack_A_Punch_on" - which turn_perks_on
+	// fires about three seconds in, long before this machine is flown down. Kept at the off model
+	// to match what the engine ends up with rather than to imply anything is chosen here.
+	//
+	// The empty spot the machine used to land on was not a model problem. See the
+	// level.buildables_built["pap"] note in zm_nuked_reimagined::register_buildables.
 	level.nuked_perks[4] = spawnstruct();
 	level.nuked_perks[4].model = "p6_anim_zm_buildable_pap";
 	level.nuked_perks[4].script_noteworthy = "specialty_weapupgrade";
@@ -65,6 +73,24 @@ init_nuked_perks()
 	level.nuked_perks[6].model = "p6_zm_al_vending_ads_on";
 	level.nuked_perks[6].script_noteworthy = "specialty_deadshot";
 	level.nuked_perks[6].turn_on_notify = "deadshot_on";
+
+	// Stamin-Up and Mule Kick, the two perks that used to be reachable here only through a bottle.
+	// Both already had everything but the machine: perk_changes enables them, their models,
+	// materials and fx are in zone_source/includes/zm_nuked.zone, and perk_machine_spawn_init has
+	// cases that name and wire both.
+	//
+	// The machine struct is keyed on specialty_longersprint, not the specialty_movefaster that the
+	// bottle pool uses - swap_marathon_perk renames the perk afterwards, but the spawn case matches
+	// the original name.
+	level.nuked_perks[7] = spawnstruct();
+	level.nuked_perks[7].model = "zombie_vending_marathon";
+	level.nuked_perks[7].script_noteworthy = "specialty_longersprint";
+	level.nuked_perks[7].turn_on_notify = "marathon_on";
+
+	level.nuked_perks[8] = spawnstruct();
+	level.nuked_perks[8].model = "zombie_vending_three_gun";
+	level.nuked_perks[8].script_noteworthy = "specialty_additionalprimaryweapon";
+	level.nuked_perks[8].turn_on_notify = "additionalprimaryweapon_on";
 
 	level.override_perk_targetname = "zm_perk_machine_override";
 	random_perk_structs = [];
@@ -133,14 +159,22 @@ perks_from_the_sky()
 	// divetonuke_perk_machine_setup is what names the PHD machine, so it only exists once the perk
 	// is enabled. Checked rather than assumed - a missing entry here would leave the arrays holding
 	// an undefined machine for bring_random_perk to pick.
+	//
+	// Appended at machines.size rather than a fixed index, and this matters. Written as [5] and [6],
+	// a missing PHD machine left index 5 empty while Deadshot still took 6, so the array had a hole
+	// in it. bring_random_perk picks randomintrange(0, machines.size) and does not test what it
+	// drew, so it could spend one of the seven deliveries on the hole - and every machine it never
+	// drew stays parked at top_height with its trigger off, invisible and unusable for the whole
+	// game. Pack-a-Punch is machines[4] and as likely to be the one stranded as any other.
 	phd_machine = getent("vending_divetonuke", "targetname");
 
 	if (isdefined(phd_machine))
 	{
-		machines[5] = phd_machine;
-		machine_triggers[5] = getent("vending_divetonuke", "target");
-		move_perk(machines[5], top_height, 5.0, 0.001);
-		machine_triggers[5] trigger_off();
+		index = machines.size;
+		machines[index] = phd_machine;
+		machine_triggers[index] = getent("vending_divetonuke", "target");
+		move_perk(machines[index], top_height, 5.0, 0.001);
+		machine_triggers[index] trigger_off();
 	}
 
 	// Deadshot names its machine and its trigger differently - vending_deadshot_model for the model,
@@ -149,10 +183,36 @@ perks_from_the_sky()
 
 	if (isdefined(deadshot_machine))
 	{
-		machines[6] = deadshot_machine;
-		machine_triggers[6] = getent("vending_deadshot", "target");
-		move_perk(machines[6], top_height, 5.0, 0.001);
-		machine_triggers[6] trigger_off();
+		index = machines.size;
+		machines[index] = deadshot_machine;
+		machine_triggers[index] = getent("vending_deadshot", "target");
+		move_perk(machines[index], top_height, 5.0, 0.001);
+		machine_triggers[index] trigger_off();
+	}
+
+	// Stamin-Up and Mule Kick, named by perk_machine_spawn_init off the structs added in
+	// init_nuked_perks. Guarded the same way as the two above, so a perk that fails to spawn a
+	// machine costs nothing rather than stranding an undefined entry in the arrays.
+	marathon_machine = getent("vending_marathon", "targetname");
+
+	if (isdefined(marathon_machine))
+	{
+		index = machines.size;
+		machines[index] = marathon_machine;
+		machine_triggers[index] = getent("vending_marathon", "target");
+		move_perk(machines[index], top_height, 5.0, 0.001);
+		machine_triggers[index] trigger_off();
+	}
+
+	mulekick_machine = getent("vending_additionalprimaryweapon", "targetname");
+
+	if (isdefined(mulekick_machine))
+	{
+		index = machines.size;
+		machines[index] = mulekick_machine;
+		machine_triggers[index] = getent("vending_additionalprimaryweapon", "target");
+		move_perk(machines[index], top_height, 5.0, 0.001);
+		machine_triggers[index] trigger_off();
 	}
 
 	flag_wait("initial_blackscreen_passed");
@@ -167,33 +227,50 @@ perks_from_the_sky()
 	}
 }
 
+// One call per machine, or whatever is left never comes down. bring_random_perk removes what it
+// delivers - arrayremoveindex is an engine builtin that mutates in place - so nine calls deliver
+// nine distinct machines and none is drawn twice.
+//
+// Every two rounds rather than every three. Nuketown carries nine of these now, four more than
+// stock's five, and on the old spacing the last one landed at round 24-25. Pack-a-Punch is drawn
+// from the same pool as the perks, so a one in nine chance of being last meant it could be most of
+// a game away. Two round gaps put the whole set down by round 17, earlier than the seven machine
+// schedule managed.
 bring_random_perks(machines, machine_triggers)
 {
 	wait(randomintrange(10, 20));
 	bring_random_perk(machines, machine_triggers);
 
 	wait_for_round_range(3, 4);
-	wait(randomintrange(30, 60));
+	wait(randomintrange(20, 45));
 	bring_random_perk(machines, machine_triggers);
 
-	wait_for_round_range(6, 7);
-	wait(randomintrange(30, 60));
+	wait_for_round_range(5, 6);
+	wait(randomintrange(20, 45));
+	bring_random_perk(machines, machine_triggers);
+
+	wait_for_round_range(7, 8);
+	wait(randomintrange(20, 45));
 	bring_random_perk(machines, machine_triggers);
 
 	wait_for_round_range(9, 10);
-	wait(randomintrange(30, 60));
+	wait(randomintrange(20, 45));
 	bring_random_perk(machines, machine_triggers);
 
-	wait_for_round_range(12, 13);
+	wait_for_round_range(11, 12);
+	wait(randomintrange(20, 45));
+	bring_random_perk(machines, machine_triggers);
+
+	wait_for_round_range(13, 14);
 	wait(randomintrange(30, 60));
 	bring_random_perk(machines, machine_triggers);
 
 	wait_for_round_range(15, 16);
-	wait(randomintrange(60, 120));
+	wait(randomintrange(30, 60));
 	bring_random_perk(machines, machine_triggers);
 
-	wait_for_round_range(18, 19);
-	wait(randomintrange(60, 120));
+	wait_for_round_range(17, 18);
+	wait(randomintrange(30, 60));
 	bring_random_perk(machines, machine_triggers);
 }
 

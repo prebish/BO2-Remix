@@ -720,6 +720,23 @@ full_ammo_powerup(drop_item, player)
 
 		players[i] notify("weapon_ammo_change");
 
+		// With the magazine fill on there is nothing left for an in-progress reload to do - the
+		// clip is already full - so the player is left standing through an animation that changes
+		// nothing, which on a slow weapon is most of the time the powerup bought them. Switching to
+		// the weapon they are already holding drops them out of it.
+		//
+		// Only for the full Max Ammo. The Grief clip-only variant tops up the reserve and not the
+		// magazine, so a reload there is still doing real work.
+		if (!clip_only && scripts\zm\_zm_reimagined::mod_setting("zmr_max_ammo_magazine", 1) && players[i] isreloading())
+		{
+			current_weapon = players[i] getcurrentweapon();
+
+			if (current_weapon != "none")
+			{
+				players[i] switchtoweapon(current_weapon);
+			}
+		}
+
 		i++;
 	}
 
@@ -1412,21 +1429,25 @@ play_firesale_audio()
 		return;
 	}
 
-	if (isDefined(level.firesale_music_playing))
+	// The rotation belongs to Richtofen. Nuketown opens on Samantha and only hands over at round
+	// 20, and her fire sale keeps her own stock track until it does - the announcer and the music
+	// would otherwise be two different people. Every other map has Richtofen announcing from round
+	// one, so this gate costs them nothing.
+	if (!is_true(level.sndannouncerisrich))
+	{
+		alias = "mus_fire_sale";
+	}
+	else if (isDefined(level.firesale_music_playing))
 	{
 		alias = level.firesale_music_playing;
 	}
-	else if (is_true(level.sndannouncerisrich))
-	{
-		// No draw to read, either because FIRE SALE MUSIC is on DEFAULT or because something
-		// turned the fire sale on without going through start_fire_sale. Both stock alias names,
-		// and mus_fire_sale_rich has to stay defined in mod.all.aliases.csv - dropping that row
-		// once left every Richtofen game with a silent fire sale.
-		alias = "mus_fire_sale_rich";
-	}
 	else
 	{
-		alias = "mus_fire_sale";
+		// No draw to read, either because FIRE SALE MUSIC is on DEFAULT or because something
+		// turned the fire sale on without going through start_fire_sale. A stock alias name, and
+		// mus_fire_sale_rich has to stay defined in mod.all.aliases.csv - dropping that row once
+		// left every Richtofen game with a silent fire sale.
+		alias = "mus_fire_sale_rich";
 	}
 
 	self playloopsound(alias);

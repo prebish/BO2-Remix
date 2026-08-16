@@ -33,6 +33,53 @@ image,gamefonts_pc_720
 image,devfonts
 image,distfont
 
+image,hud_dpad_blood
+
+// Genuine BO1 perk and powerup icons, selected on Nuketown only by the LUI. Art from mjmodz's
+// "Black Ops 1 HUD for BO2" v1.0.0 (BO1 images by Kingslayer Kyle) - see Credits in FORK.md.
+// Kept under the pack's own uie_* names with the pack's own materials rather than renamed into
+// the old _bo1 scheme, because the art is 128x128 with mipmaps where the retired set was 256x256
+// without, and repacking it would have meant transcoding and hand-authoring 18 materials.
+//
+// This set covers all twelve perks and all six powerups. The old one had no art for Who's Who,
+// Electric Cherry, Bonfire Sale or Death Machine, which fell back to stock icons on Nuketown.
+image,uie_perk_deadshot
+material,uie_perk_deadshot
+image,uie_perk_doubletap
+material,uie_perk_doubletap
+image,uie_perk_electric_cherry
+material,uie_perk_electric_cherry
+image,uie_perk_juggernog
+material,uie_perk_juggernog
+image,uie_perk_mulekick
+material,uie_perk_mulekick
+image,uie_perk_phd
+material,uie_perk_phd
+image,uie_perk_revive
+material,uie_perk_revive
+image,uie_perk_speedcola
+material,uie_perk_speedcola
+image,uie_perk_staminup
+material,uie_perk_staminup
+image,uie_perk_tombstone
+material,uie_perk_tombstone
+image,uie_perk_vulture
+material,uie_perk_vulture
+image,uie_perk_who
+material,uie_perk_who
+image,uie_powerup_blood
+material,uie_powerup_blood
+image,uie_powerup_bonfire
+material,uie_powerup_bonfire
+image,uie_powerup_deathmachine
+material,uie_powerup_deathmachine
+image,uie_powerup_double
+material,uie_powerup_double
+image,uie_powerup_instakill
+material,uie_powerup_instakill
+image,uie_powerup_sale
+material,uie_powerup_sale
+
 material,menu_zm_weapons_ray_gun
 material,menu_zm_weapons_raygun_mark2
 material,menu_zm_weapons_slipgun

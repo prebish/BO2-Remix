@@ -263,6 +263,8 @@ init()
 
 	level thread starting_points_init();
 
+	level thread coord_display_init();
+
 	if (is_encounter())
 	{
 		scripts\zm\zencounter\zencounter_reimagined::init();
@@ -856,6 +858,9 @@ init_dvars()
 	init_mod_setting("zmr_free_perk_rarity", 2);
 	init_mod_setting("zmr_shield_health", 1);
 	init_mod_setting("zmr_firesale_music", 1);
+	init_mod_setting("zmr_perk_limit", 4);
+	init_mod_setting("zmr_start_round", 1);
+	init_mod_setting("zmr_coord_display", 0);
 }
 
 // The starting score is stamped onto the player at spawn out of their persistent stats, so a level
@@ -865,6 +870,61 @@ init_dvars()
 // 500 means "leave it alone" rather than "force 500", because the stock starting score is not
 // always exactly 500 - persistent upgrades and some gametypes move it - and the default setting
 // should not quietly flatten that.
+// Mapping aid for placing buildable parts, prop spawns and the like. Off unless SHOW COORDINATES is
+// turned on in the RULES tab, so it costs a dvar read per match otherwise.
+//
+// Runs on every map, not just Nuketown - the same numbers are wanted wherever something is being
+// positioned by hand.
+coord_display_init()
+{
+	if (!mod_setting("zmr_coord_display", 0))
+	{
+		return;
+	}
+
+	players = get_players();
+
+	foreach (player in players)
+	{
+		player thread coord_display();
+	}
+
+	for (;;)
+	{
+		level waittill("connected", player);
+		player thread coord_display();
+	}
+}
+
+// Printed in the shape add_buildable_piece_spawn and register_perk_struct already take -
+// (x, y, z), (pitch, yaw, roll) - so a reading can be pasted straight into a spawn call without
+// rearranging it. Rounded to whole units, which is the precision those calls are written at.
+// Printed in the shape add_buildable_piece_spawn and register_perk_struct already take -
+// (x, y, z), (pitch, yaw, roll) - so a reading can be pasted straight into a spawn call without
+// rearranging it. Rounded to whole units, which is the precision those calls are written at.
+//
+// iprintln, NOT a hudelem. A hudelem settext with a string built at runtime allocates a config
+// string for every distinct value it is given, and a new coordinate every three seconds exhausts
+// them and takes the server down with a config string overflow. iprintln sends the text straight
+// to the client and costs nothing per message.
+coord_display()
+{
+	self endon("disconnect");
+
+	self waittill("spawned_player");
+
+	while (isDefined(self))
+	{
+		origin = self.origin;
+		angles = self.angles;
+
+		self iprintln("(" + int(origin[0]) + ", " + int(origin[1]) + ", " + int(origin[2]) + ")   ("
+			+ int(angles[0]) + ", " + int(angles[1]) + ", " + int(angles[2]) + ")");
+
+		wait 3;
+	}
+}
+
 starting_points_init()
 {
 	points = mod_setting("zmr_starting_points", 500);
@@ -898,7 +958,13 @@ give_starting_points()
 
 	// Opening round only, once each. Anyone who bleeds out later, or drops into a game already
 	// running, keeps the round-scaled points the stock code gives them instead.
-	if (level.round_number > 1 || isDefined(self.mod_starting_points_given))
+	//
+	// Measured against level.start_round rather than 1, because the STARTING ROUND setting moves
+	// where the game opens. Hardcoded to 1 this returned early on every custom start, so the
+	// chosen figure was silently ignored and the player kept stock's round-scaled points. Holds
+	// whichever order this and round_start run in: before it, both are still 1; after it, both are
+	// the chosen round.
+	if (level.round_number > level.start_round || isDefined(self.mod_starting_points_given))
 	{
 		return;
 	}
@@ -2050,6 +2116,12 @@ is_held_melee_weapon_offhand_melee(weaponname)
 
 perk_changes()
 {
+	// How many perks a player may hold at once, from the RULES tab. _zm_perks::init sets this to 4,
+	// and get_player_perk_purchase_limit reads it for every purchase, so overwriting it here is the
+	// whole change. Origins layers its own per-player limit on top through
+	// level.get_player_perk_purchase_limit, which still wins where it is set.
+	level.perk_purchase_limit = mod_setting("zmr_perk_limit", 4);
+
 	// Nuketown is Survival only, so it never reaches the Classic block below. These four have no
 	// machine on the map and are not meant to - the perk bottle is the only way to get them, and
 	// enabling a perk is what makes it grantable, not the machine. Keep this identical to the
@@ -2494,11 +2566,6 @@ weapon_changes()
 	{
 		level.zombie_weapons["ksg_zm"].cost = 1800;
 		level.zombie_weapons["ksg_zm"].ammo_cost = 900;
-	}
-
-	if (level.script == "zm_transit" || level.script == "zm_nuked" || level.script == "zm_highrise" || level.script == "zm_prison")
-	{
-		level.zombie_lethal_grenade_player_init = "sticky_grenade_zm";
 	}
 
 	if (mod_setting("zmr_legacy_box_guns", 1))

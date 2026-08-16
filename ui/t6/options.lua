@@ -629,6 +629,12 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	RulesTabContainer.buttonList = RulesTabButtonList
 	RulesTabContainer:addElement(RulesTabButtonList)
 
+	local StartRoundSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_START_ROUND_CAPS"), "zmr_start_round")
+	StartRoundSelector:addChoice(LocalClientIndex, "1", 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, "5", 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, "10", 10, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, "20", 20, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
 	local StartingPointsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_STARTING_POINTS_CAPS"), "zmr_starting_points")
 	StartingPointsSelector:addChoice(LocalClientIndex, "0", 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	StartingPointsSelector:addChoice(LocalClientIndex, "500", 500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
@@ -645,6 +651,12 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NORMAL_CAPS"), 2, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_RARE_CAPS"), 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
+	local PerkLimitSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_PERK_LIMIT_CAPS"), "zmr_perk_limit")
+	PerkLimitSelector:addChoice(LocalClientIndex, "4", 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, "6", 6, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, "8", 8, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_UNLIMITED_CAPS"), 12, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
 	local ShieldHealthSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_SHIELD_HEALTH_CAPS"), "zmr_shield_health")
@@ -660,6 +672,12 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	-- Mapping aid rather than a gameplay rule: prints the player's position and angles on the HUD
+	-- every three seconds, formatted to paste straight into an add_buildable_piece_spawn call.
+	local CoordDisplaySelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_COORD_DISPLAY_CAPS"), "zmr_coord_display")
+	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	local LegacyBoxGunsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_LEGACY_BOX_GUNS_CAPS"), "zmr_legacy_box_guns")
 	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)

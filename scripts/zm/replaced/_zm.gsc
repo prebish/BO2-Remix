@@ -147,6 +147,21 @@ init_fx()
 
 round_start()
 {
+	// Starting round, from the RULES tab. init_levelvars is what normally sets level.round_number,
+	// from the startRound gametype setting, and the fork does not replace it - so this is the first
+	// point the fork owns that still runs before any of the round loop. round_think below is what
+	// turns round_number into zombie counts and health, so both follow from setting it here.
+	//
+	// Guarded on being higher than the current round so it cannot pull a game backwards, and so a
+	// gametype that already starts late is left alone.
+	start_round = scripts\zm\_zm_reimagined::mod_setting("zmr_start_round", 1);
+
+	if (start_round > 1 && start_round > level.round_number)
+	{
+		level.start_round = start_round;
+		level.round_number = start_round;
+	}
+
 	if (isdefined(level.round_prestart_func))
 	{
 		[[level.round_prestart_func]]();
