@@ -4,29 +4,8 @@ FILENOTES           ""
 
 // UI
 
-REFERENCE           ZMUI_ZSR
-LANG_ENGLISH        "Search & Rezurrect"
-
-REFERENCE           ZMUI_ZSR_CAPS
-LANG_ENGLISH        "SEARCH & REZURRECT"
-
-REFERENCE           ZMUI_ZSR_PRO
-LANG_ENGLISH        "Search & Rezurrect Pro"
-
 REFERENCE           ZMUI_ZGRIEF_PRO
 LANG_ENGLISH        "Grief Pro"
-
-REFERENCE           ZMUI_ZRACE_PRO
-LANG_ENGLISH        "Race Pro"
-
-REFERENCE           ZMUI_ZCONTAIN
-LANG_ENGLISH        "Containment"
-
-REFERENCE           ZMUI_ZCONTAIN_CAPS
-LANG_ENGLISH        "CONTAINMENT"
-
-REFERENCE           ZMUI_ZCONTAIN_PRO
-LANG_ENGLISH        "Containment Pro"
 
 REFERENCE           ZMUI_ZMEAT_PRO
 LANG_ENGLISH        "Meat Pro"
@@ -282,12 +261,6 @@ LANG_ENGLISH        "Account Balance: "
 REFERENCE           ZOMBIE_HUD_PLACED_WEAPON
 LANG_ENGLISH        "Placed Weapon: "
 
-REFERENCE           ZOMBIE_HUD_CONTAINMENT_ZONE
-LANG_ENGLISH        "Zone: "
-
-REFERENCE           ZOMBIE_HUD_CONTAINMENT_TIME
-LANG_ENGLISH        "Time: "
-
 REFERENCE           ZOMBIE_HUD_VOTE_TIME
 LANG_ENGLISH        "Vote Time: "
 
@@ -327,17 +300,8 @@ LANG_ENGLISH        "ROUND &&1 BEGINS IN"
 REFERENCE           ZOMBIE_VOTE_HOWTO
 LANG_ENGLISH        "Press ^3[{+speed_throw}]^7 or ^3[{+attack}]^7 to change selection ^3[{+gostand}]^7 to vote"
 
-REFERENCE           ZOMBIE_ZSR_INTRO
-LANG_ENGLISH        "Down all enemy players to win a round!"
-
 REFERENCE           ZOMBIE_ZGRIEF_INTRO
 LANG_ENGLISH        "Bleed out enemy players to gain score!"
-
-REFERENCE           ZOMBIE_ZRACE_INTRO
-LANG_ENGLISH        "Kill zombies or enemy players to gain score!"
-
-REFERENCE           ZOMBIE_ZCONTAIN_INTRO
-LANG_ENGLISH        "Control the containment zone to gain score!"
 
 REFERENCE           ZOMBIE_ZMEAT_INTRO
 LANG_ENGLISH        "Hold the meat to gain score!"
@@ -404,9 +368,6 @@ LANG_ENGLISH        "Ally Revived! [&&1 V &&2]"
 
 REFERENCE           ZOMBIE_ZGRIEF_ALL_ALLIES_DOWN
 LANG_ENGLISH        "All Allies Down!"
-
-REFERENCE           ZOMBIE_NEW_CONTAINMENT_ZONE
-LANG_ENGLISH        "New containment zone!"
 
 REFERENCE           ZOMBIE_GRABBED_MEAT
 LANG_ENGLISH        "^8&&1 grabbed the meat"

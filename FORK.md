@@ -75,6 +75,21 @@ so that document describes only current behaviour.
 | **All Weapon Locker changes.** `replaced/_zm_weapon_locker.gsc` is deleted with its six `replaceFunc` lines across Tranzit, Die Rise and Buried, taking the placed-weapon HUD and the clip top-up on store. `weapon_locker_give_ammo_after_rounds` and the `self.stored_weapon_data` reset go from `_zm_reimagined.gsc`, and `level.weapon_locker_online = 0` is dropped from `post_init` — that line, not the spawn reset, was what actually made the stored weapon reset each game, by forcing the locker off the online profile storage onto per-game entity storage. Die Rise keeps its moved locker location, which is a separate fork change | working tree |
 | Barriers no longer rebuildable while sprinting or throwing a grenade. The replaced `player_fails_blocker_repair_trigger_preamble` was a byte-for-byte copy of stock apart from one `issprinting() \|\| isthrowinggrenade()` check, so the whole function and its `replaceFunc` were deleted rather than trimmed. `replaced/_zm_blockers.gsc` keeps its other four replacements | working tree |
 
+| **Three competitive game modes: Race, Search & Rezurrect and Containment.** All three were Reimagined additions on top of the stock Encounter framework. Removed: their `maps/mp/gametypes_zm/*.gsc`/`.txt`, `clientscripts/mp/gametypes/*.csc` and `zm/gamesettings_*.cfg` files (12 in total, each `.gsc`/`.csc` a thin shim calling `zgrief::main`), their rows in `gametypestable.csv` and `_gametypes.txt`, their nine `rawfile`/`script` lines in `reimagined.zone`, ten localized string blocks, their entries in four LUI files, and every gametype branch in script — 22 sites in `zencounter_reimagined.gsc` plus a handful elsewhere. Containment's seven dedicated functions (~22 KB) and its whole HUD path went with it, along with Search & Rezurrect's four `update_players_on_*` helpers and `player_bled_out_reward`, which had no callers left. `zencounter_reimagined.gsc` shrank from 103 KB to 74 KB. See the Encounter note below | working tree |
+
+### Encounter itself was deliberately kept
+
+`is_encounter()` is **stock Treyarch code** in `maps/mp/zombies/_zm_utility.gsc`, returning true when
+`ui_zm_gamemodegroup` is `zencounter`. In this mod that group covers Grief, Turned, Meat and the three
+modes removed above — so Encounter is the shared competitive framework, not a mode. Deleting it would
+have taken Grief and Turned, which are stock Black Ops 2 content, so the ~66 `is_encounter()` branches
+across 28 scripts are untouched and the framework is intact.
+
+One consequence worth recording: `replaced/_zm_game_module::wait_for_team_death_and_round_end` was
+Search & Rezurrect's round logic behind an early `return` for every other mode. Its body is gone, but
+the function and its `replaceFunc` are **kept, empty** — the registration is what stops stock's Grief
+round-end logic from running, and the Encounter framework calls `game_won` itself.
+
 ### Why two weapon reverts are approximate
 
 Weapon files ship as loose files in `mod.iwd` — one `weapons/zm/<name>` per weapon, applied to every
@@ -145,13 +160,17 @@ not the deleted banking script, so it survived the revert and is documented in `
 
 ## Still to test
 
-Everything marked ❓ or ⚠️ above. Two items remain:
+Everything marked ❓ or ⚠️ above. Three items remain:
 
-1. **QBB LSW on Nuketown** — it should appear in the Mystery Box with a world model, a view model and
+1. **Grief, Meat and Turned still work** after the Race, Search & Rezurrect and Containment removal.
+   All three share the Encounter framework the removed modes were built on, and the mode list, the
+   gametype table and several script branches were rewritten around them. Check each appears in the
+   lobby, starts, scores and ends correctly.
+2. **QBB LSW on Nuketown** — it should appear in the Mystery Box with a world model, a view model and
    its own fire sound. If it draws as a missing model, the assets are not reaching the Nuketown
    fastfile and would need `weapon,qbb95_zm` adding to `zone_source/includes/zm_nuked.zone`; check
    Mob of the Dead too in that case, since neither map declares the weapon per-map today.
-2. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by a deleted cost function and
+3. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by a deleted cost function and
    fixed the same way the crafting tables were, but found by reading the diff rather than by
    playing, so it has never been seen working. The prompt should read cleanly with no cost, and the
    station should still work on a second use. This is the step immediately after crafting the Acid

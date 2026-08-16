@@ -44,8 +44,6 @@ init()
 	precacheString(&"hud_update_game_mode_name");
 	precacheString(&"hud_update_scoring_team");
 	precacheString(&"hud_update_player_count");
-	precacheString(&"hud_update_containment_zone");
-	precacheString(&"hud_update_containment_time");
 	precacheString(&"show_dead_spectate_hud");
 	precacheString(&"hide_dead_spectate_hud");
 
@@ -61,14 +59,7 @@ init()
 	level._powerup_grab_check = ::powerup_can_player_grab;
 	level._zombiemode_powerup_grab = ::powerup_grab;
 
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		level.custom_spectate_permissions = undefined;
-	}
-	else
-	{
-		level.custom_spectate_permissions = ::setspectatepermissions;
-	}
+	level.custom_spectate_permissions = ::setspectatepermissions;
 
 	level.is_respawn_gamemode_func = ::is_respawn_gamemode;
 	level.round_start_wait_func = ::round_start_wait;
@@ -83,11 +74,6 @@ init()
 	level thread unlimited_zombies();
 	level thread unlimited_powerups();
 	level thread save_teams_on_intermission();
-
-	if (level.scr_zm_ui_gametype == "zcontain")
-	{
-		containment_init();
-	}
 
 	if (level.scr_zm_ui_gametype == "zmeat")
 	{
@@ -249,7 +235,7 @@ enemy_powerup_hud()
 
 obj_waypoint()
 {
-	if (level.scr_zm_ui_gametype == "zcontain" || level.scr_zm_ui_gametype == "zmeat")
+	if (level.scr_zm_ui_gametype == "zmeat")
 	{
 		level.game_mode_obj_ind = 16;
 
@@ -384,11 +370,6 @@ grief_onplayerdisconnect(disconnecting_player)
 		[[level.update_stats_func]](disconnecting_player);
 	}
 
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		level thread update_players_on_disconnect(disconnecting_player);
-	}
-
 	if (level.scr_zm_ui_gametype == "zgrief")
 	{
 		if (disconnecting_player maps\mp\zombies\_zm_laststand::player_is_in_laststand())
@@ -521,18 +502,6 @@ on_player_spawned()
 			}
 		}
 
-		if (level.scr_zm_ui_gametype == "zsr")
-		{
-			// round_start_wait resets these
-			self freezeControls(1);
-			self enableInvulnerability();
-		}
-
-		if (level.scr_zm_ui_gametype == "zcontain")
-		{
-			self.in_containment_zone = undefined;
-		}
-
 		if (is_respawn_gamemode())
 		{
 			self thread player_spawn();
@@ -567,20 +536,11 @@ on_player_downed()
 			}
 		}
 
-		if (level.scr_zm_ui_gametype == "zsr")
-		{
-			level thread update_players_on_downed(self);
-		}
-
 		if (level.scr_zm_ui_gametype == "zgrief")
 		{
 			level thread update_players_on_downed_no_score(self);
 		}
 
-		if (level.scr_zm_ui_gametype == "zrace")
-		{
-			increment_score(getOtherTeam(self.team), 10, 1, &"ZOMBIE_ZGRIEF_PLAYER_BLED_OUT_NO_SCORE", &"ZOMBIE_ZGRIEF_ALLY_BLED_OUT_NO_SCORE");
-		}
 	}
 }
 
@@ -597,19 +557,9 @@ on_player_revived()
 		{
 			self revive_feed(reviver);
 
-			if (level.scr_zm_ui_gametype == "zsr")
-			{
-				level thread update_players_on_revived(self);
-			}
-
 			if (level.scr_zm_ui_gametype == "zgrief")
 			{
 				level thread update_players_on_revived_no_score(self);
-			}
-
-			if (level.scr_zm_ui_gametype == "zrace")
-			{
-				increment_score(reviver.team, 5, 1, &"ZOMBIE_ZGRIEF_ALLY_REVIVED_NO_SCORE", &"ZOMBIE_ZGRIEF_PLAYER_REVIVED_NO_SCORE");
 			}
 
 			if (level.scr_zm_ui_gametype == "zturned")
@@ -663,25 +613,9 @@ on_player_bled_out()
 			}
 		}
 
-		if (level.scr_zm_ui_gametype == "zsr")
-		{
-			self.init_player_offhand_weapons_override = 1;
-			self init_player_offhand_weapons();
-			self.init_player_offhand_weapons_override = undefined;
-
-			self player_bled_out_reward();
-
-			level thread update_players_on_bleedout(self);
-		}
-
 		if (level.scr_zm_ui_gametype == "zgrief")
 		{
 			increment_score(getOtherTeam(self.team), 1, 1, &"ZOMBIE_ZGRIEF_PLAYER_DEAD_NO_SCORE", &"ZOMBIE_ZGRIEF_ALLY_DEAD_NO_SCORE");
-		}
-
-		if (level.scr_zm_ui_gametype == "zrace")
-		{
-			increment_score(getOtherTeam(self.team), 5, 1, &"ZOMBIE_ZGRIEF_PLAYER_DEAD_NO_SCORE", &"ZOMBIE_ZGRIEF_ALLY_DEAD_NO_SCORE");
 		}
 
 		if (level.scr_zm_ui_gametype == "zturned")
@@ -725,17 +659,6 @@ on_player_zom_kill()
 	{
 		self waittill("zom_kill", zombie);
 
-		if (level.scr_zm_ui_gametype == "zrace")
-		{
-			amount = 1;
-
-			if (is_true(zombie.is_brutus) || is_true(zombie.is_mechz))
-			{
-				amount = 10;
-			}
-
-			increment_score(self.team, amount, 1);
-		}
 	}
 }
 
@@ -945,20 +868,6 @@ player_downed_reward()
 	}
 }
 
-player_bled_out_reward()
-{
-	players = get_players();
-
-	foreach (player in players)
-	{
-		if (is_player_valid(player) && player.team != self.team)
-		{
-			score = 1000 * maps\mp\zombies\_zm_score::get_points_multiplier(player);
-			player maps\mp\zombies\_zm_score::add_to_player_score(score);
-		}
-	}
-}
-
 stun_fx()
 {
 	self endon("disconnect");
@@ -1077,24 +986,12 @@ round_start_wait(time, initial)
 		}
 	}
 
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		grief_score_hud_set_player_count("allies", 0, "axis", 0);
-		grief_score_hud_set_player_count("allies", get_number_of_valid_players_team("allies"), "axis", get_number_of_valid_players_team("axis"));
-	}
-
 	zombie_spawn_time = time + 10;
 
 	level thread zombie_spawn_wait(zombie_spawn_time);
 
 	text = &"MP_MATCH_STARTING_IN";
 	text_param = undefined;
-
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		text = &"ZOMBIE_ROUND_STARTING_IN";
-		text_param = level.scr_zm_ui_round_number;
-	}
 
 	countdown_hud = scripts\zm\_zm_reimagined::countdown_hud(text, text_param, time);
 
@@ -1183,118 +1080,6 @@ get_number_of_valid_players_team(team, excluded_player)
 	return num_player_valid;
 }
 
-update_players_on_downed(excluded_player)
-{
-	team = excluded_player.team;
-	other_team = getOtherTeam(team);
-	players = get_players(team);
-	other_players = get_players(other_team);
-	players_remaining = get_number_of_valid_players_team(team, excluded_player);
-	other_players_remaining = get_number_of_valid_players_team(other_team, excluded_player);
-
-	grief_score_hud_set_player_count(team, players_remaining);
-
-	foreach (player in players)
-	{
-		if (other_players_remaining > 0)
-		{
-			if (players_remaining == 0)
-			{
-				player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_ALL_ALLIES_DOWN");
-			}
-			else
-			{
-				player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_ALLY_BLED_OUT", players_remaining, other_players_remaining);
-			}
-		}
-	}
-
-	foreach (player in other_players)
-	{
-		if (other_players_remaining > 0)
-		{
-			if (players_remaining == 0)
-			{
-				player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_ALL_PLAYERS_DOWN");
-				player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_SURVIVE", undefined, undefined, 30, 1);
-			}
-			else
-			{
-				player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_PLAYER_BLED_OUT", other_players_remaining, players_remaining);
-			}
-		}
-	}
-
-	if (players_remaining == 1)
-	{
-		foreach (player in players)
-		{
-			if (player == excluded_player)
-			{
-				continue;
-			}
-
-			if (is_player_valid(player))
-			{
-				player thread maps\mp\zombies\_zm_audio_announcer::leaderdialogonplayer("last_player");
-			}
-		}
-	}
-
-	level thread maps\mp\zombies\_zm_audio_announcer::leaderdialog(players_remaining + "_player_left", other_team);
-}
-
-update_players_on_bleedout(excluded_player)
-{
-	team = excluded_player.team;
-	other_team = getOtherTeam(team);
-	players = get_players(team);
-	team_bledout = 0;
-
-	foreach (player in players)
-	{
-		if (player == excluded_player || player.sessionstate != "playing" || is_true(player.playersuicided))
-		{
-			team_bledout++;
-		}
-	}
-
-	level thread maps\mp\zombies\_zm_audio_announcer::leaderdialog(team_bledout + "_player_down", other_team);
-}
-
-update_players_on_revived(revived_player)
-{
-	team = revived_player.team;
-	other_team = getOtherTeam(team);
-	players = get_players(team);
-	other_players = get_players(other_team);
-	players_remaining = get_number_of_valid_players_team(team);
-	other_players_remaining = get_number_of_valid_players_team(other_team);
-
-	grief_score_hud_set_player_count(team, players_remaining);
-
-	foreach (player in players)
-	{
-		if (other_players_remaining > 0)
-		{
-			player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_ALLY_REVIVED", players_remaining, other_players_remaining);
-		}
-	}
-
-	foreach (player in other_players)
-	{
-		player thread show_grief_hud_msg(&"ZOMBIE_ZGRIEF_PLAYER_REVIVED", other_players_remaining, players_remaining);
-	}
-}
-
-update_players_on_disconnect(excluded_player)
-{
-	if (is_player_valid(excluded_player))
-	{
-		update_players_on_downed(excluded_player);
-	}
-}
-
 update_players_on_downed_no_score(excluded_player)
 {
 	team = excluded_player.team;
@@ -1374,11 +1159,7 @@ grief_intro_msg()
 
 	to_win_str = &"ZOMBIE_GRIEF_SCORE_TO_WIN";
 
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		to_win_str = &"ZOMBIE_GRIEF_ROUNDS_TO_WIN";
-	}
-	else if (level.scr_zm_ui_gametype == "zturned")
+	if (level.scr_zm_ui_gametype == "zturned")
 	{
 		to_win_str = &"ZOMBIE_GRIEF_REDUCE_ENEMY_SCORE_TO_WIN";
 	}
@@ -1406,21 +1187,9 @@ grief_intro_msg()
 
 get_gamemode_winning_score()
 {
-	if (level.scr_zm_ui_gametype == "zsr")
-	{
-		return 3;
-	}
-	else if (level.scr_zm_ui_gametype == "zgrief")
+	if (level.scr_zm_ui_gametype == "zgrief")
 	{
 		return 10;
-	}
-	else if (level.scr_zm_ui_gametype == "zrace")
-	{
-		return 500;
-	}
-	else if (level.scr_zm_ui_gametype == "zcontain")
-	{
-		return 250;
 	}
 	else if (level.scr_zm_ui_gametype == "zmeat")
 	{
@@ -1438,7 +1207,7 @@ get_gamemode_winning_score()
 
 is_respawn_gamemode()
 {
-	return is_encounter() && level.scr_zm_ui_gametype != "zsr" && level.scr_zm_ui_gametype != "zturned";
+	return is_encounter() && level.scr_zm_ui_gametype != "zturned";
 }
 
 show_grief_hud_msg(msg, msg_parm1, msg_parm2, offset, delay)
@@ -1846,10 +1615,6 @@ do_game_mode_stun_score_steal(eattacker)
 
 	eattacker.killsdenied++;
 
-	if (level.scr_zm_ui_gametype == "zrace")
-	{
-		increment_score(eattacker.team);
-	}
 }
 
 do_game_mode_stun_fx(einflictor, eattacker, idamage, idflags, smeansofdeath, sweapon, vpoint, vdir, shitloc, psoffsettime)
@@ -2401,911 +2166,6 @@ save_teams_on_intermission()
 
 	setDvar("team_axis", axis_guids);
 	setDvar("team_allies", allies_guids);
-}
-
-containment_init()
-{
-	level thread containment_think();
-}
-
-containment_think()
-{
-	level endon("end_game");
-
-	flag_wait("hud_visible");
-
-	ind = 0;
-	containment_zones = containment_get_zones();
-
-	if (containment_zones.size > 1)
-	{
-		players = get_players();
-
-		level.containment_zone_hud_value = &"";
-		level.containment_time_hud_value = -1;
-
-		foreach (player in players)
-		{
-			player luinotifyevent(&"hud_update_containment_zone", 1, level.containment_zone_hud_value);
-			player luinotifyevent(&"hud_update_containment_time", 1, level.containment_time_hud_value);
-		}
-	}
-
-	flag_wait("initial_blackscreen_passed");
-
-	grief_score_hud_set_scoring_team("none");
-
-	level waittill("restart_round_start");
-
-	next_zone_name = containment_zones[ind];
-	next_zone = level.zones[next_zone_name];
-	next_zone_origin = containment_get_zone_waypoint_origin(next_zone_name, next_zone);
-
-	wait 10;
-
-	while (1)
-	{
-		zone_name = next_zone_name;
-		zone_display_name = scripts\zm\_zm_reimagined::get_zone_display_name(zone_name);
-		zone = next_zone;
-		zone_origin = next_zone_origin;
-
-		ind++;
-
-		if (ind >= containment_zones.size)
-		{
-			ind = 0;
-		}
-
-		next_zone_name = containment_zones[ind];
-		next_zone = level.zones[next_zone_name];
-		next_zone_origin = containment_get_zone_waypoint_origin(next_zone_name, next_zone);
-
-		objective_position(level.game_mode_obj_ind, zone_origin);
-		objective_team(level.game_mode_obj_ind, "neutral");
-		objective_setgamemodeflags(level.game_mode_obj_ind, 1);
-
-		zone_name_to_lock = containment_get_zone_name_to_lock(zone_name);
-
-		players = get_players();
-
-		foreach (player in players)
-		{
-			player.in_containment_zone = undefined;
-
-			player thread show_grief_hud_msg(&"ZOMBIE_NEW_CONTAINMENT_ZONE");
-		}
-
-		if (containment_zones.size > 1)
-		{
-			level.containment_zone_hud_value = zone_display_name;
-
-			foreach (player in players)
-			{
-				player luinotifyevent(&"hud_update_containment_zone", 1, level.containment_zone_hud_value);
-			}
-
-			level thread containment_time_hud_countdown(60);
-		}
-
-		zone_time = 60000;
-		next_obj_waypoint_time = 10000;
-		obj_time = 1000;
-		held_time = [];
-		held_time["axis"] = undefined;
-		held_time["allies"] = undefined;
-		held_prev = "none";
-		start_time = getTime();
-
-		while ((getTime() - start_time) <= zone_time || containment_zones.size == 1)
-		{
-			if (containment_zones.size > 1)
-			{
-				spawn_points = maps\mp\gametypes_zm\_zm_gametype::get_player_spawns_for_gametype();
-
-				foreach (spawn_point in spawn_points)
-				{
-					if (spawn_point.script_noteworthy == zone_name_to_lock)
-					{
-						spawn_point.locked = 1;
-					}
-				}
-			}
-
-			zombies = getaispeciesarray(level.zombie_team, "all");
-			players = get_players();
-			in_containment_zone = [];
-			in_containment_zone["axis"] = [];
-			in_containment_zone["allies"] = [];
-			show_next_obj_waypoint = (getTime() - start_time) >= (zone_time - next_obj_waypoint_time);
-
-			foreach (player in players)
-			{
-				player_zone_name = player containment_get_current_zone();
-
-				if (isDefined(player_zone_name) && player_zone_name == zone_name)
-				{
-					if (is_player_valid(player))
-					{
-						if (!isDefined(level.meat_player) && !is_true(player.spawn_protection) && !is_true(player.revive_protection))
-						{
-							player.ignoreme = 0;
-						}
-
-						in_containment_zone[player.team][in_containment_zone[player.team].size] = player;
-					}
-
-					if (!is_true(player.in_containment_zone))
-					{
-						player.in_containment_zone = 1;
-					}
-
-					objective_setplayerusing(level.game_mode_obj_ind, player);
-				}
-				else
-				{
-					if (is_player_valid(player) && !isDefined(level.meat_player) && !is_true(player.spawn_protection) && !is_true(player.revive_protection))
-					{
-						close_zombies = get_array_of_closest(player.origin, zombies, undefined, 1, 48);
-						player.ignoreme = close_zombies.size == 0;
-					}
-
-					if (is_true(player.in_containment_zone))
-					{
-						player.in_containment_zone = undefined;
-					}
-
-					objective_clearplayerusing(level.game_mode_obj_ind, player);
-				}
-
-			}
-
-			grief_score_hud_set_player_count("allies", in_containment_zone["allies"].size, "axis", in_containment_zone["axis"].size);
-
-			if (in_containment_zone["axis"].size == in_containment_zone["allies"].size && in_containment_zone["axis"].size > 0 && in_containment_zone["allies"].size > 0)
-			{
-				objective_team(level.game_mode_obj_ind, "team3");
-
-				grief_score_hud_set_scoring_team("contested");
-
-				if (held_prev != "cont")
-				{
-					obj_time = 2000;
-					held_time["axis"] = getTime();
-					held_time["allies"] = getTime();
-					held_prev = "cont";
-				}
-			}
-			else if (in_containment_zone["axis"].size > in_containment_zone["allies"].size)
-			{
-				objective_team(level.game_mode_obj_ind, "axis");
-
-				grief_score_hud_set_scoring_team("axis");
-
-				if (held_prev != "axis")
-				{
-					obj_time = 1000;
-
-					if (!isDefined(held_time["axis"]))
-					{
-						held_time["axis"] = getTime();
-					}
-
-					held_time["allies"] = undefined;
-					held_prev = "axis";
-				}
-			}
-			else if (in_containment_zone["allies"].size > in_containment_zone["axis"].size)
-			{
-				objective_team(level.game_mode_obj_ind, "allies");
-
-				grief_score_hud_set_scoring_team("allies");
-
-				if (held_prev != "allies")
-				{
-					obj_time = 1000;
-
-					if (!isDefined(held_time["allies"]))
-					{
-						held_time["allies"] = getTime();
-					}
-
-					held_time["axis"] = undefined;
-					held_prev = "allies";
-				}
-			}
-			else
-			{
-				foreach (player in players)
-				{
-					if (is_player_valid(player))
-					{
-						if (!isDefined(level.meat_player) && !is_true(player.spawn_protection) && !is_true(player.revive_protection))
-						{
-							player.ignoreme = 0;
-						}
-					}
-				}
-
-				objective_team(level.game_mode_obj_ind, "neutral");
-
-				grief_score_hud_set_scoring_team("neutral");
-
-				if (held_prev != "none")
-				{
-					held_time["axis"] = undefined;
-					held_time["allies"] = undefined;
-					held_prev = "none";
-				}
-			}
-
-			contested_on_tied_final_score = isDefined(held_time["axis"]) && isDefined(held_time["allies"]) && (level.grief_score["A"] + 1) >= get_gamemode_winning_score() && (level.grief_score["B"] + 1) >= get_gamemode_winning_score();
-
-			if (!contested_on_tied_final_score)
-			{
-				low_score_team = "axis";
-				high_score_team = "allies";
-
-				if (level.grief_score["B"] < level.grief_score["A"])
-				{
-					low_score_team = "allies";
-					high_score_team = "axis";
-				}
-
-				if (isDefined(held_time[low_score_team]) && (getTime() - held_time[low_score_team]) >= obj_time)
-				{
-					held_time[low_score_team] = getTime();
-
-					foreach (player in in_containment_zone[low_score_team])
-					{
-						if (!isPlayer(player))
-						{
-							continue;
-						}
-
-						score = 50 * maps\mp\zombies\_zm_score::get_points_multiplier(player);
-						player maps\mp\zombies\_zm_score::add_to_player_score(score);
-						player.captures++;
-					}
-
-					increment_score(low_score_team, undefined, !isDefined(held_time[high_score_team]));
-				}
-
-				if (isDefined(held_time[high_score_team]) && (getTime() - held_time[high_score_team]) >= obj_time)
-				{
-					held_time[high_score_team] = getTime();
-
-					foreach (player in in_containment_zone[high_score_team])
-					{
-						if (!isPlayer(player))
-						{
-							continue;
-						}
-
-						score = 50 * maps\mp\zombies\_zm_score::get_points_multiplier(player);
-						player maps\mp\zombies\_zm_score::add_to_player_score(score);
-						player.captures++;
-					}
-
-					increment_score(high_score_team, undefined, !isDefined(held_time[low_score_team]));
-				}
-			}
-
-			wait 0.05;
-		}
-
-		zombies = get_round_enemy_array();
-
-		for (i = 0; i < zombies.size; i++)
-		{
-			if (!isDefined(zombies[i] containment_get_current_zone()) || zombies[i] containment_get_current_zone() == zone_name)
-			{
-				zombies[i] dodamage(zombies[i].health + 666, zombies[i].origin);
-			}
-		}
-
-		spawn_points = maps\mp\gametypes_zm\_zm_gametype::get_player_spawns_for_gametype();
-
-		if (maps\mp\zombies\_zm_zonemgr::zone_is_enabled(zone_name_to_lock))
-		{
-			foreach (spawn_point in spawn_points)
-			{
-				if (spawn_point.script_noteworthy == zone_name_to_lock)
-				{
-					spawn_point.locked = 0;
-				}
-			}
-		}
-	}
-}
-
-containment_get_zones()
-{
-	containment_zones = [];
-
-	if (level.script == "zm_transit")
-	{
-		if (level.scr_zm_map_start_location == "transit")
-		{
-			containment_zones = array("zone_pri", "zone_pri2", "zone_station_ext", "zone_trans_2b");
-		}
-		else if (level.scr_zm_map_start_location == "diner")
-		{
-			containment_zones = array("zone_gas", "zone_roadside_west", "zone_roadside_east", "zone_gar", "zone_din");
-		}
-		else if (level.scr_zm_map_start_location == "farm")
-		{
-			containment_zones = array("zone_far_ext", "zone_brn", "zone_farm_house");
-		}
-		else if (level.scr_zm_map_start_location == "power")
-		{
-			containment_zones = array("zone_pow", "zone_trans_8", "zone_prr", "zone_pcr", "zone_pow_warehouse");
-		}
-		else if (level.scr_zm_map_start_location == "town")
-		{
-			containment_zones = array("zone_tow", "zone_town_north", "zone_town_south", "zone_town_east", "zone_town_west", "zone_bar", "zone_town_barber", "zone_ban");
-		}
-		else if (level.scr_zm_map_start_location == "tunnel")
-		{
-			containment_zones = array("zone_amb_tunnel");
-		}
-		else if (level.scr_zm_map_start_location == "cornfield")
-		{
-			containment_zones = array("zone_amb_cornfield", "zone_cornfield_prototype");
-		}
-	}
-	else if (level.script == "zm_nuked")
-	{
-		if (level.scr_zm_map_start_location == "nuked")
-		{
-			containment_zones = array("culdesac_yellow_zone", "culdesac_green_zone", "openhouse1_f1_zone", "openhouse2_f1_zone", "openhouse1_f2_zone", "openhouse2_f2_zone", "openhouse1_backyard_zone", "openhouse2_backyard_zone");
-		}
-	}
-	else if (level.script == "zm_highrise")
-	{
-		if (level.scr_zm_map_start_location == "shopping_mall")
-		{
-			containment_zones = array("zone_green_start", "zone_green_level1", "zone_green_level2a", "zone_green_level2b", "zone_green_level3a", "zone_green_level3b", "zone_green_level3c");
-		}
-		else if (level.scr_zm_map_start_location == "dragon_rooftop")
-		{
-			containment_zones = array("zone_blue_level1a", "zone_blue_level1b", "zone_blue_level1c", "zone_blue_level2a", "zone_blue_level2b", "zone_blue_level2c");
-		}
-		else if (level.scr_zm_map_start_location == "sweatshop")
-		{
-			containment_zones = array("zone_blue_level4a", "zone_blue_level4b", "zone_blue_level4c", "zone_blue_level5");
-		}
-	}
-	else if (level.script == "zm_prison")
-	{
-		if (level.scr_zm_map_start_location == "cellblock")
-		{
-			containment_zones = array("zone_start", "zone_library", "zone_cellblock_west", "zone_cellblock_west_gondola", "zone_cellblock_west_barber", "zone_cellblock_east", "zone_cafeteria", "zone_warden_office");
-		}
-		else if (level.scr_zm_map_start_location == "docks")
-		{
-			containment_zones = array("zone_dock", "zone_dock_gondola", "zone_studio", "zone_citadel_basement_building");
-		}
-	}
-	else if (level.script == "zm_buried")
-	{
-		if (level.scr_zm_map_start_location == "street")
-		{
-			containment_zones = array("zone_street_lightwest", "zone_street_darkwest", "zone_street_darkeast", "zone_stables", "zone_general_store", "zone_gun_store", "zone_underground_bar", "zone_underground_courthouse", "zone_toy_store", "zone_candy_store", "zone_street_fountain", "zone_church_main", "zone_mansion_lawn");
-		}
-		else if (level.scr_zm_map_start_location == "maze")
-		{
-			containment_zones = array("zone_maze", "zone_mansion_backyard", "zone_maze_staircase");
-		}
-	}
-	else if (level.script == "zm_tomb")
-	{
-		if (level.scr_zm_map_start_location == "trenches")
-		{
-			containment_zones = array("zone_start_b", "zone_bunker_3a", "zone_bunker_4a", "zone_bunker_5a");
-		}
-		else if (level.scr_zm_map_start_location == "excavation_site")
-		{
-			containment_zones = array("zone_nml_farm", "zone_nml_11", "zone_nml_18");
-		}
-		else if (level.scr_zm_map_start_location == "church")
-		{
-			containment_zones = array("zone_village_1", "zone_village_2", "zone_village_3a");
-		}
-		else if (level.scr_zm_map_start_location == "crazy_place")
-		{
-			containment_zones = array("zone_chamber_0", "zone_chamber_2", "zone_chamber_4", "zone_chamber_6", "zone_chamber_8");
-		}
-	}
-
-	containment_zones = array_randomize(containment_zones);
-
-	return containment_zones;
-}
-
-containment_get_zone_waypoint_origin(zone_name, zone)
-{
-	if (level.script == "zm_transit")
-	{
-		if (zone_name == "zone_pri")
-		{
-			return (-6852, 5305, -56);
-		}
-		else if (zone_name == "zone_pri2")
-		{
-			return (-7316, 5247, -56);
-		}
-		else if (zone_name == "zone_station_ext")
-		{
-			return (-6979, 4769, -64);
-		}
-		else if (zone_name == "zone_trans_2b")
-		{
-			return (-7896, 4769, -59);
-		}
-		else if (zone_name == "zone_gas")
-		{
-			return (-5178, -7136, -59);
-		}
-		else if (zone_name == "zone_roadside_west")
-		{
-			return (-5913, -6934, -58);
-		}
-		else if (zone_name == "zone_roadside_east")
-		{
-			return (-4352, -7109, -64);
-		}
-		else if (zone_name == "zone_gar")
-		{
-			return (-4690, -7748, -53);
-		}
-		else if (zone_name == "zone_din")
-		{
-			return (-6030, -7662, 5);
-		}
-		else if (zone_name == "zone_far_ext")
-		{
-			return (7931, -5730, 11);
-		}
-		else if (zone_name == "zone_brn")
-		{
-			return (8213, -5201, 48);
-		}
-		else if (zone_name == "zone_farm_house")
-		{
-			return (8126, -6625, 117);
-		}
-		else if (zone_name == "zone_pow")
-		{
-			return (10274, 7823, -570);
-		}
-		else if (zone_name == "zone_trans_8")
-		{
-			return (10274, 8562, -587);
-		}
-		else if (zone_name == "zone_prr")
-		{
-			return (11842, 7581, -756);
-		}
-		else if (zone_name == "zone_pcr")
-		{
-			return (12210, 8339, -751);
-		}
-		else if (zone_name == "zone_pow_warehouse")
-		{
-			return (11039, 8587, -416);
-		}
-		else if (zone_name == "zone_tow")
-		{
-			return (1533, -384, -68);
-		}
-		else if (zone_name == "zone_town_north")
-		{
-			return (1504, 693, -62);
-		}
-		else if (zone_name == "zone_town_south")
-		{
-			return (1554, -1239, -51);
-		}
-		else if (zone_name == "zone_town_east")
-		{
-			return (2090, -481, -62);
-		}
-		else if (zone_name == "zone_town_west")
-		{
-			return (771, -508, -62);
-		}
-		else if (zone_name == "zone_bar")
-		{
-			return (2043, 268, -56);
-		}
-		else if (zone_name == "zone_town_barber")
-		{
-			return (891, -1236, 120);
-		}
-		else if (zone_name == "zone_ban")
-		{
-			return (832, 266, -40);
-		}
-		else if (zone_name == "zone_amb_tunnel")
-		{
-			return (-11249, -2010, 184);
-		}
-		else if (zone_name == "zone_amb_cornfield")
-		{
-			return (12186, -600, -153);
-		}
-		else if (zone_name == "zone_cornfield_prototype")
-		{
-			return (13421, -638, -201);
-		}
-	}
-	else if (level.script == "zm_nuked")
-	{
-		if (zone_name == "culdesac_yellow_zone")
-		{
-			return (392, 78, -48);
-		}
-		else if (zone_name == "culdesac_green_zone")
-		{
-			return (-311, 344, -44);
-		}
-		else if (zone_name == "openhouse1_f1_zone")
-		{
-			return (-806, 431, -56);
-		}
-		else if (zone_name == "openhouse2_f1_zone")
-		{
-			return (880, 264, -57);
-		}
-		else if (zone_name == "openhouse1_f2_zone")
-		{
-			return (-880, 473, 80);
-		}
-		else if (zone_name == "openhouse2_f2_zone")
-		{
-			return (953, 319, 79);
-		}
-		else if (zone_name == "openhouse1_backyard_zone")
-		{
-			return (-1491, 670, -60);
-		}
-		else if (zone_name == "openhouse2_backyard_zone")
-		{
-			return (1536, 581, -59);
-		}
-	}
-	else if (level.script == "zm_highrise")
-	{
-		if (zone_name == "zone_green_start")
-		{
-			return (1518, 1373, 3392);
-		}
-		else if (zone_name == "zone_green_level1")
-		{
-			return (1709, 1843, 3409);
-		}
-		else if (zone_name == "zone_green_level2a")
-		{
-			return (1981, 1468, 3216);
-		}
-		else if (zone_name == "zone_green_level2b")
-		{
-			return (1579, 1888, 3216);
-		}
-		else if (zone_name == "zone_green_level3a")
-		{
-			return (1934, 2266, 3040);
-		}
-		else if (zone_name == "zone_green_level3b")
-		{
-			return (2062, 1350, 3040);
-		}
-		else if (zone_name == "zone_green_level3c")
-		{
-			return (1686, 1302, 3047);
-		}
-		else if (zone_name == "zone_blue_level1a")
-		{
-			return (1985, 139, 2880);
-		}
-		else if (zone_name == "zone_blue_level1b")
-		{
-			return (2923, 97, 2880);
-		}
-		else if (zone_name == "zone_blue_level1c")
-		{
-			return (2156, 591, 3136);
-		}
-		else if (zone_name == "zone_blue_level2a")
-		{
-			return (2370, -411, 2704);
-		}
-		else if (zone_name == "zone_blue_level2b")
-		{
-			return (1683, -18, 2704);
-		}
-		else if (zone_name == "zone_blue_level2c")
-		{
-			return (2830, -4, 2704);
-		}
-		else if (zone_name == "zone_blue_level4a")
-		{
-			return (2141, 325, 1296);
-		}
-		else if (zone_name == "zone_blue_level4b")
-		{
-			return (1917, -255, 1296);
-		}
-		else if (zone_name == "zone_blue_level4c")
-		{
-			return (2691, 5, 1296);
-		}
-		else if (zone_name == "zone_blue_level5")
-		{
-			return (2329, -431, 1120);
-		}
-	}
-	else if (level.script == "zm_prison")
-	{
-		if (zone_name == "zone_start")
-		{
-			return (1306, 10595, 1336);
-		}
-		else if (zone_name == "zone_library")
-		{
-			return (591, 10504, 1344);
-		}
-		else if (zone_name == "zone_cellblock_west")
-		{
-			return (888, 9674, 1443);
-		}
-		else if (zone_name == "zone_cellblock_west_gondola")
-		{
-			return (888, 9674, 1545);
-		}
-		else if (zone_name == "zone_cellblock_west_barber")
-		{
-			return (888, 9147, 1336);
-		}
-		else if (zone_name == "zone_cellblock_east")
-		{
-			return (1920, 9674, 1336);
-		}
-		else if (zone_name == "zone_cafeteria")
-		{
-			return (2633, 9647, 1336);
-		}
-		else if (zone_name == "zone_warden_office")
-		{
-			return (-921, 9312, 1336);
-		}
-		else if (zone_name == "zone_dock")
-		{
-			return (-639, 5746, -48);
-		}
-		else if (zone_name == "zone_dock_gondola")
-		{
-			return (420, 6122, 264);
-		}
-		else if (zone_name == "zone_studio")
-		{
-			return (-205, 6590, 64);
-		}
-		else if (zone_name == "zone_citadel_basement_building")
-		{
-			return (-102, 7088, 64);
-		}
-	}
-	else if (level.script == "zm_buried")
-	{
-		if (zone_name == "zone_street_lightwest")
-		{
-			return (-667, 315, -26);
-		}
-		else if (zone_name == "zone_street_darkwest")
-		{
-			return (-598, -812, -31);
-		}
-		else if (zone_name == "zone_street_darkeast")
-		{
-			return (196, -930, -20);
-		}
-		else if (zone_name == "zone_stables")
-		{
-			return (-929, -262, -23);
-		}
-		else if (zone_name == "zone_general_store")
-		{
-			return (-19, -296, 8);
-		}
-		else if (zone_name == "zone_gun_store")
-		{
-			return (-598, -1151, 8);
-		}
-		else if (zone_name == "zone_underground_bar")
-		{
-			return (733, -1465, 55);
-		}
-		else if (zone_name == "zone_underground_courthouse")
-		{
-			return (216, 1007, 8);
-		}
-		else if (zone_name == "zone_toy_store")
-		{
-			return (720, -553, 8);
-		}
-		else if (zone_name == "zone_candy_store")
-		{
-			return (625, -139, 8);
-		}
-		else if (zone_name == "zone_street_fountain")
-		{
-			return (983, 626, -14);
-		}
-		else if (zone_name == "zone_church_main")
-		{
-			return (1464, 1740, 24);
-		}
-		else if (zone_name == "zone_mansion_lawn")
-		{
-			return (1847, 559, 0);
-		}
-		else if (zone_name == "zone_maze")
-		{
-			return (5002, 577, 4);
-		}
-		else if (zone_name == "zone_mansion_backyard")
-		{
-			return (3980, 577, 4);
-		}
-		else if (zone_name == "zone_maze_staircase")
-		{
-			return (6438, 577, 108);
-		}
-	}
-	else if (level.script == "zm_tomb")
-	{
-		if (zone_name == "zone_start_b")
-		{
-			return (2169, 4784, -291);
-		}
-		else if (zone_name == "zone_bunker_3a")
-		{
-			return (526, 2340, -107);
-		}
-		else if (zone_name == "zone_bunker_4a")
-		{
-			return (-352, 3448, -283);
-		}
-		else if (zone_name == "zone_bunker_5a")
-		{
-			return (-493, 2902, -256);
-		}
-		else if (zone_name == "zone_nml_farm")
-		{
-			return (-2626, 176, 254);
-		}
-		else if (zone_name == "zone_nml_11")
-		{
-			return (2368, 240, 132);
-		}
-		else if (zone_name == "zone_nml_18")
-		{
-			return (-156, -9, 320);
-		}
-		else if (zone_name == "zone_village_1")
-		{
-			return (515, -2642, 35);
-		}
-		else if (zone_name == "zone_village_2")
-		{
-			return (515, -2642, 369);
-		}
-		else if (zone_name == "zone_village_3a")
-		{
-			return (960, -3712, 311);
-		}
-		else if (zone_name == "zone_chamber_0")
-		{
-			return (9627, -7008, -346);
-		}
-		else if (zone_name == "zone_chamber_2")
-		{
-			return (11229, -7052, -346);
-		}
-		else if (zone_name == "zone_chamber_4")
-		{
-			return (10340, -7906, -412);
-		}
-		else if (zone_name == "zone_chamber_6")
-		{
-			return (9459, -8557, -398);
-		}
-		else if (zone_name == "zone_chamber_8")
-		{
-			return (11254, -8662, -408);
-		}
-	}
-
-	return (0, 0, 0);
-}
-
-containment_get_zone_name_to_lock(zone_name)
-{
-	if (level.script == "zm_nuked")
-	{
-		if (zone_name == "culdesac_yellow_zone")
-		{
-			return "culdesac_green_zone";
-		}
-	}
-	else if (level.script == "zm_buried")
-	{
-		if (zone_name == "zone_street_fountain")
-		{
-			return "zone_street_lighteast";
-		}
-		else if (zone_name == "zone_mansion_lawn")
-		{
-			return "zone_mansion";
-		}
-	}
-	else if (level.script == "zm_tomb")
-	{
-		if (zone_name == "zone_start_b")
-		{
-			return "zone_start";
-		}
-		else if (zone_name == "zone_chamber_0" || zone_name == "zone_chamber_2" || zone_name == "zone_chamber_6" || zone_name == "zone_chamber_8")
-		{
-			return "zone_chamber_4";
-		}
-		else if (zone_name == "zone_chamber_4")
-		{
-			return "";
-		}
-	}
-
-	return zone_name;
-}
-
-containment_get_current_zone()
-{
-	if (self scripts\zm\_zm_reimagined::is_touching_elevator())
-	{
-		return "";
-	}
-
-	return self get_current_zone();
-}
-
-containment_time_hud_countdown(time)
-{
-	level notify("containment_time_hud_countdown");
-	level endon("containment_time_hud_countdown");
-	level endon("end_game");
-
-	level.containment_time_hud_value = time;
-
-	while (1)
-	{
-		players = get_players();
-
-		foreach (player in players)
-		{
-			player luinotifyevent(&"hud_update_containment_time", 1, level.containment_time_hud_value);
-		}
-
-		if (level.containment_time_hud_value <= 0)
-		{
-			return;
-		}
-
-		wait 1;
-
-		level.containment_time_hud_value--;
-	}
 }
 
 meat_init()
@@ -4143,25 +3003,6 @@ increment_score(team, amount = 1, show_lead_msg = true, score_msg, other_score_m
 		}
 	}
 
-	if (level.scr_zm_ui_gametype == "zrace")
-	{
-		if (isdefined(score_msg))
-		{
-			foreach (player in team_players)
-			{
-				player thread show_grief_hud_msg(score_msg);
-			}
-		}
-
-		if (isdefined(other_score_msg))
-		{
-			foreach (player in other_team_players)
-			{
-				player thread show_grief_hud_msg(other_score_msg);
-			}
-		}
-	}
-
 	if (level.scr_zm_ui_gametype == "zturned")
 	{
 		if (isdefined(score_msg))
@@ -4178,7 +3019,7 @@ increment_score(team, amount = 1, show_lead_msg = true, score_msg, other_score_m
 
 			delay = undefined;
 
-			if (level.scr_zm_ui_gametype == "zgrief" || level.scr_zm_ui_gametype == "zrace")
+			if (level.scr_zm_ui_gametype == "zgrief")
 			{
 				delay = 1;
 			}

@@ -1,7 +1,5 @@
 zclassic
 zstandard
-zcontain
-zrace
 zdeadpool
 zmeat
 znml
@@ -11,4 +9,3 @@ zcleansed
 zgrief
 zrichtofen
 zmaxis
-zsr

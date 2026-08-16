@@ -166,10 +166,7 @@
 		* [The Crazy Place](#the-crazy-place)
 * [Game Modes](#game-modes)
 	* [Encounter](#encounter)
-		* [Search & Rezurrect](#search--rezurrect)
 		* [Grief](#grief)
-		* [Race](#race)
-		* [Containment](#containment)
 		* [Meat](#meat)
 		* [Turned](#turned)
 
@@ -1566,47 +1563,9 @@ and they take effect on the next game rather than immediately.
 * Pro: no Der Wunderfizz
 * Pro: no held melee weapons
 
-#### Search & Rezurrect
-* Win a round by getting all enemy players down
-* Win 3 rounds to win the game
-* Tie round if both teams die within 5 seconds of eachother
-* Players start each round with at least 10000 points
-* Bleeding out enemy players awards 1000 points to all teammates
-* Amount of players alive on each team shown on HUD
-* Enemies remaining audio and text displays when enemy players down instead of when enemy players bleed out
-* Last player alive audio only plays for the player who is alive instead of every player on the team
-* Audio plays when enemy players bleed out
-* Teams switch spawn points each round
-* Players respawn at initial spawn points
-
 #### Grief
 * Gain score by making enemy players bleed out
 * Make 10 enemy players bleed out to win the game
-* Players retain perks
-* Players respawn after being down for 10 seconds
-
-#### Race
-* Gain score by killing zombies or enemy players
-* Gain 500 score to win the game
-* Killing a zombie awards 1 score
-* Killing a boss zombie awards 10 score
-* Stunning an enemy player awards 1 score
-* Downing an enemy player awards 10 score
-* Bleeding out an enemy player awards 5 score
-* Reviving an ally player awards 5 score
-* Players retain perks
-* Players respawn after being down for 10 seconds
-
-#### Containment
-* Gain score by being the team with the most players alive in the containment zone
-* Gain 250 score to win the game
-* Contested if both teams have the same amount of players alive in the containment zone
-* Both teams gain score at half rate when contested
-* Zombies only go after players in the containment zone
-* Zombies in the containment zone die when it moves
-* Players in the containment zone gain 50 points when their team gains score
-* Containment zone moves every 60 seconds
-* Amount of players alive in the containment zone on each team shown on HUD
 * Players retain perks
 * Players respawn after being down for 10 seconds
 

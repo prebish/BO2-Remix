@@ -375,8 +375,6 @@ end
 
 CoD.GameModeObjectiveWaypoint.update = function(Menu, ClientInstance)
 	local index = Menu.index
-	local controller = ClientInstance.controller
-	local clientNum = Engine.GetClientNum(controller)
 	local objectiveFlags = Engine.GetObjectiveGamemodeFlags(Menu, index)
 	local gametype = UIExpression.DvarString(nil, "ui_gametype")
 
@@ -384,41 +382,7 @@ CoD.GameModeObjectiveWaypoint.update = function(Menu, ClientInstance)
 		local objectiveIcon = ""
 		local objectiveArrow = "waypoint_circle_arrow"
 
-		if gametype == "zcontain" then
-			local objectiveName = Engine.GetObjectiveName(controller, index)
-			local objectiveTeam = Engine.GetObjectiveTeam(Menu, index)
-			local clientTeam = Engine.GetTeamID(controller, clientNum)
-
-			if objectiveTeam == CoD.TEAM_FREE then
-				objectiveIcon = "white_waypoint_target"
-
-				if objectiveName == "OBJ_GAME_MODE_1" then
-					Menu.mainImage:setAlpha(1)
-					Menu.arrowImage:setAlpha(1)
-					Menu.mainImage:setRGB(1, 1, 1)
-					Menu.arrowImage:setRGB(1, 1, 1)
-				elseif objectiveName == "OBJ_GAME_MODE_2" then
-					Menu.mainImage:setAlpha(0.5)
-					Menu.arrowImage:setAlpha(0.5)
-					Menu.mainImage:setRGB(0.5, 0.5, 0.5)
-					Menu.arrowImage:setRGB(0.5, 0.5, 0.5)
-				end
-			elseif objectiveTeam == CoD.TEAM_THREE then
-				objectiveIcon = "white_waypoint_contested"
-				Menu.mainImage:setRGB(1, 1, 0)
-				Menu.arrowImage:setRGB(1, 1, 0)
-			elseif objectiveTeam == clientTeam then
-				objectiveIcon = "white_waypoint_defend"
-				Menu.mainImage:setRGB(0, 1, 0)
-				Menu.arrowImage:setRGB(0, 1, 0)
-			else
-				objectiveIcon = "white_waypoint_capture"
-				Menu.mainImage:setRGB(1, 0, 0)
-				Menu.arrowImage:setRGB(1, 0, 0)
-			end
-
-			Menu.zOffset = 40
-		elseif gametype == "zmeat" then
+		if gametype == "zmeat" then
 			objectiveIcon = "white_waypoint_grab"
 			Menu.mainImage:setRGB(1, 1, 1)
 			Menu.arrowImage:setRGB(1, 1, 1)

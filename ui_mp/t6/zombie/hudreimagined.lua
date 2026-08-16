@@ -379,22 +379,6 @@ LUI.createMenu.ReimaginedArea = function(LocalClientIndex)
 	gameModeInfoWidget:setAlpha(0)
 	safeArea:addElement(gameModeInfoWidget)
 
-	local containmentZoneText = LUI.UIText.new()
-	containmentZoneText:setLeftRight(true, true, 0, 0)
-	containmentZoneText:setTopBottom(true, false, 0, CoD.textSize.Default)
-	containmentZoneText:setFont(CoD.fonts.Big)
-	containmentZoneText:setAlignment(LUI.Alignment.Left)
-	gameModeInfoWidget:addElement(containmentZoneText)
-	gameModeInfoWidget.containmentZoneText = containmentZoneText
-
-	local containmentTimeText = LUI.UIText.new()
-	containmentTimeText:setLeftRight(true, true, 0, 0)
-	containmentTimeText:setTopBottom(true, false, 0 + 23, CoD.textSize.Default + 23)
-	containmentTimeText:setFont(CoD.fonts.Big)
-	containmentTimeText:setAlignment(LUI.Alignment.Left)
-	gameModeInfoWidget:addElement(containmentTimeText)
-	gameModeInfoWidget.containmentTimeText = containmentTimeText
-
 	gameModeInfoWidget:registerEventHandler("hud_update_refresh", CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
 	gameModeInfoWidget:registerEventHandler("hud_update_bit_" .. CoD.BIT_HUD_VISIBLE, CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
 	gameModeInfoWidget:registerEventHandler("hud_update_bit_" .. CoD.BIT_EMP_ACTIVE, CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
@@ -410,8 +394,6 @@ LUI.createMenu.ReimaginedArea = function(LocalClientIndex)
 	gameModeInfoWidget:registerEventHandler("hud_update_bit_" .. CoD.BIT_SCOREBOARD_OPEN, CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
 	gameModeInfoWidget:registerEventHandler("hud_update_bit_" .. CoD.BIT_PLAYER_DEAD, CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
 	gameModeInfoWidget:registerEventHandler("hud_update_bit_" .. CoD.BIT_IS_SCOPED, CoD.Reimagined.GameModeInfoArea.UpdateVisibility)
-	gameModeInfoWidget:registerEventHandler("hud_update_containment_zone", CoD.Reimagined.GameModeInfoArea.UpdateContainmentZone)
-	gameModeInfoWidget:registerEventHandler("hud_update_containment_time", CoD.Reimagined.GameModeInfoArea.UpdateContainmentTime)
 
 	return safeArea
 end
@@ -889,23 +871,6 @@ CoD.Reimagined.GameModeInfoArea.UpdateVisibility = function(Menu, ClientInstance
 		Menu:setAlpha(0)
 		Menu.visible = nil
 	end
-end
-
-CoD.Reimagined.GameModeInfoArea.UpdateContainmentZone = function(Menu, ClientInstance)
-	local zoneName = Engine.Localize(Engine.GetIString(ClientInstance.data[1], "CS_LOCALIZED_STRINGS"))
-
-	Menu.containmentZoneText:setText(Engine.Localize("ZOMBIE_HUD_CONTAINMENT_ZONE") .. zoneName)
-end
-
-CoD.Reimagined.GameModeInfoArea.UpdateContainmentTime = function(Menu, ClientInstance)
-	local timeNum = ClientInstance.data[1]
-	local time = ""
-
-	if timeNum >= 0 then
-		time = CoD.Reimagined.ConvertNumToTime(timeNum)
-	end
-
-	Menu.containmentTimeText:setText(Engine.Localize("ZOMBIE_HUD_CONTAINMENT_TIME") .. time)
 end
 
 CoD.Reimagined.ConvertNumToTime = function(num)

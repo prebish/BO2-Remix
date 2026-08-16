@@ -14,25 +14,13 @@ CoD.SelectMapListZombie.GameModes[2] = {
 }
 CoD.SelectMapListZombie.GameModes[3] = {
 	ui_zm_gamemodegroup = "zencounter",
-	ui_gametype = "zsr",
+	ui_gametype = "zgrief",
 }
 CoD.SelectMapListZombie.GameModes[4] = {
 	ui_zm_gamemodegroup = "zencounter",
-	ui_gametype = "zgrief",
-}
-CoD.SelectMapListZombie.GameModes[5] = {
-	ui_zm_gamemodegroup = "zencounter",
-	ui_gametype = "zrace",
-}
-CoD.SelectMapListZombie.GameModes[6] = {
-	ui_zm_gamemodegroup = "zencounter",
-	ui_gametype = "zcontain",
-}
-CoD.SelectMapListZombie.GameModes[7] = {
-	ui_zm_gamemodegroup = "zencounter",
 	ui_gametype = "zmeat",
 }
-CoD.SelectMapListZombie.GameModes[8] = {
+CoD.SelectMapListZombie.GameModes[5] = {
 	ui_zm_gamemodegroup = "zencounter",
 	ui_gametype = "zturned",
 }

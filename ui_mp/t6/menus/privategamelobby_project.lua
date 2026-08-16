@@ -13,12 +13,9 @@ CoD.PrivateGameLobby.Dvars[1].values = {}
 CoD.PrivateGameLobby.Dvars[1].values[1] = 0
 CoD.PrivateGameLobby.Dvars[1].values[2] = 1
 CoD.PrivateGameLobby.Dvars[1].gameTypes = {}
-CoD.PrivateGameLobby.Dvars[1].gameTypes[1] = "zsr"
-CoD.PrivateGameLobby.Dvars[1].gameTypes[2] = "zgrief"
-CoD.PrivateGameLobby.Dvars[1].gameTypes[3] = "zrace"
-CoD.PrivateGameLobby.Dvars[1].gameTypes[4] = "zcontain"
-CoD.PrivateGameLobby.Dvars[1].gameTypes[5] = "zmeat"
-CoD.PrivateGameLobby.Dvars[1].gameTypes[6] = "zturned"
+CoD.PrivateGameLobby.Dvars[1].gameTypes[1] = "zgrief"
+CoD.PrivateGameLobby.Dvars[1].gameTypes[2] = "zmeat"
+CoD.PrivateGameLobby.Dvars[1].gameTypes[3] = "zturned"
 
 CoD.PrivateGameLobby.ButtonPrompt_TeamPrev = function(f1_arg0, ClientInstance)
 	if Engine.PartyHostIsReadyToStart() == true then

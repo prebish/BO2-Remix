@@ -1299,16 +1299,6 @@ lui_notify_events()
 		self luinotifyevent(&"hud_update_player_count", 2, level.game_mode_player_count_hud_value[self.team], level.game_mode_player_count_hud_value[getotherteam(self.team)]);
 	}
 
-	if (isdefined(level.containment_zone_hud_value))
-	{
-		self luinotifyevent(&"hud_update_containment_zone", 1, level.containment_zone_hud_value);
-	}
-
-	if (isdefined(level.containment_time_hud_value))
-	{
-		self luinotifyevent(&"hud_update_containment_time", 1, level.containment_time_hud_value);
-	}
-
 	if (level.round_number > 255)
 	{
 		self luinotifyevent(&"hud_update_rounds_played", 1, level.round_number);
@@ -1413,7 +1403,7 @@ round_timer_hud_loop()
 	level endon("end_game");
 	level endon("stop_timers");
 
-	if (is_encounter() && level.scr_zm_ui_gametype != "zsr")
+	if (is_encounter())
 	{
 		return;
 	}
@@ -1891,7 +1881,7 @@ setscoreboardcolumns_gametype()
 		{
 			setscoreboardcolumns("score", "kills", "returns", "downs", "revives");
 		}
-		else if (level.scr_zm_ui_gametype == "zcontain" || level.scr_zm_ui_gametype == "zmeat")
+		else if (level.scr_zm_ui_gametype == "zmeat")
 		{
 			setscoreboardcolumns("score", "captures", "killsconfirmed", "downs", "revives");
 		}
@@ -3271,16 +3261,6 @@ set_team(team)
 		self.returns = 0;
 	}
 
-	if (level.scr_zm_ui_gametype == "zsr" && flag("initial_blackscreen_passed") && !isdefined(level.gamemodulewinningteam))
-	{
-		if (isDefined(level.grief_score_hud_set_player_count_func))
-		{
-			allies_count = scripts\zm\zencounter\zencounter_reimagined::get_number_of_valid_players_team("allies");
-			axis_count = scripts\zm\zencounter\zencounter_reimagined::get_number_of_valid_players_team("axis");
-
-			[[level.grief_score_hud_set_player_count_func]]("allies", allies_count, "axis", axis_count);
-		}
-	}
 }
 
 set_move_speed_scale(move_scale)
