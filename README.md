@@ -32,16 +32,13 @@
 	* [Panzersoldat](#panzersoldat)
 * [Weapons](#weapons)
 	* [Pistols](#pistols)
-		* [B23R](#b23r)
 		* [Executioner](#executioner)
-		* [Five-seven Dual Wield](#five-seven-dual-wield)
 		* [KAP-40](#kap-40)
 		* [M1911](#m1911)
 		* [Mauser C96](#mauser-c96)
 		* [Remington New Model Army](#remington-new-model-army)
 		* [Tac-45](#tac-45)
 	* [Assault Rifles](#assault-rifles)
-		* [AN-94](#an-94)
 		* [FAL OSW](#fal-osw)
 		* [M27](#m27)
 		* [M8A1](#m8a1)
@@ -387,17 +384,8 @@ and they take effect on the next game rather than immediately.
 * Increased move speed while aiming from 200% to 220%
 * Decreased aim FOV from 65 to 60 on all pistols
 
-#### B23R
-* Decreased weapon cost from 1000 to 900 on all maps
-* Upgraded: decreased amount of primary camo
-
 #### Executioner
 * Added alongside the Python, which is back in the box
-* Upgraded: changed attachment from None to Fast Mag
-
-#### Five-seven Dual Wield
-* Unupgraded: decreased stock ammo from 225 to 210 on all maps
-* Upgraded: decreased stock ammo from 295 to 280 on all maps
 
 #### KAP-40
 * Removed delay between last shot and reload
@@ -424,12 +412,6 @@ and they take effect on the next game rather than immediately.
 
 ### Assault Rifles
 
-#### AN-94
-* Increased weapon cost from 1200 to 1500
-* Unupgraded: decreased stock ammo from 300 to 240
-* Upgraded: decreased stock ammo from 600 to 450
-* Upgraded: changed weapon name from "94000" to "9400"
-
 #### FAL OSW
 * Added alongside the FAL, which is back in the box
 
@@ -438,13 +420,8 @@ and they take effect on the next game rather than immediately.
 
 #### M8A1
 * Added on Buried
-* Decreased recoil
-* Unupgraded: increased stock ammo from 192 to 256
-* Upgraded: decreased clip ammo from 42 to 40
-* Upgraded: increased stock ammo from 336 to 400
 
 #### MTAR
-* Decreased recoil
 * Upgraded: changed attachment from Reflex Sight to EOTech Sight
 
 #### SCAR-H
@@ -525,7 +502,7 @@ and they take effect on the next game rather than immediately.
 * Added alongside the RPD, which is back in the box (also added on Buried)
 
 #### QBB LSW
-* Added on Mob of the Dead
+* Added on Mob of the Dead and Nuketown
 
 ### Sniper Rifles
 * Decreased move speed from 95% to 90%

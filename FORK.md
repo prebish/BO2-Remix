@@ -66,8 +66,32 @@ so that document describes only current behaviour.
 | Vulture-Aid seeing players and zombies through walls, and its removal of perk, wallbuy and Mystery Box vision. Both lived in `replaced/_zm_perk_vulture.csc`, which replaced `vulture_vision_enable` to swap the stock wallbuy and perk-machine fx for a sonar attachment, and stubbed `vulture_vision_update_wallbuy_list` and `vulture_vision_mystery_box` out entirely. The whole file is deleted with its four `replaceFunc` lines, restoring both halves at once, and `give_vulture_perk`/`take_vulture_perk`/`vulture_perk_ir_think`/`vulture_perk_ir_is_valid` go with it on the server side. `_vulture_perk_think` is the only function kept, since the stink-while-moving change stays. **The three `cg_sonarAttachment*` dvars were deliberately left in place** — they read as Vulture-Aid support but only affect a client whose sonar attachment is on, which is now Turned zombies alone, and they are what lets those zombies see each other and stops distance fade | working tree |
 | Powerup drop chance cut from 3% to 2%. `powerup_chance` is 3, which reproduces stock's `rand_drop > 2` exactly | working tree |
 | **All Zombie Blood changes.** `replaced/_zm_powerup_zombie_blood.gsc` and `.csc` are deleted with their four `replaceFunc` lines in the Origins scripts. The Turned view model and orange eye fx it pulled in are stock assets Turned already loads, so no zone entries needed removing | working tree |
+| B23R weapon cost cut from 1000 to 900, and the reduced Pack-a-Punch camo coverage on the upgraded model. The cost block is gone from `wallbuy_cost_changes` — the 870 MCS and Thompson blocks beside it stay — and `camo/camo_b23r.json` is deleted, so the linker falls back to the stock camo through the existing `camo,camo_b23r` line in `common_mp.zone`. Note the README bullet read "primary **camo**", not ammo; the B23R had no ammo change | working tree |
+| Executioner gaining Fast Mag when upgraded. Its row in `zm/pap_attach.csv` goes from `dualclip` back to `none` | working tree |
+| **All Five-seven Dual Wield changes.** `fivesevendw_zm` / `_upgraded` drop from 14 reserve clips to 13, and `fivesevenlh_zm` / `_upgraded` go back to 15 max and 15 start from the fork's 0 and 1. See the per-map caveat below | working tree |
+| **All AN-94 changes.** The cost block leaves `wallbuy_cost_changes`, reserve clips go back to 10 unupgraded and 12 upgraded (300 and 600 rounds), and the upgraded name in `reimagined.str` returns to "Actuated Neutralizer 94000". Both maps that carry the gun, Buried and Die Rise, had identical stock values, so this one is exact | working tree |
+| M8A1 recoil and ammo. `adsSpread` returns to 5, reserve clips to 6 unupgraded and 8 upgraded, and the upgraded magazine to 42. Stock is uniform across the four maps that carry it, so this is exact | working tree |
+| MTAR recoil. `adsSpread` returns to 5 unupgraded and 2 upgraded. See the per-map caveat below for the view-kick fields, which are left alone | working tree |
 | **All Weapon Locker changes.** `replaced/_zm_weapon_locker.gsc` is deleted with its six `replaceFunc` lines across Tranzit, Die Rise and Buried, taking the placed-weapon HUD and the clip top-up on store. `weapon_locker_give_ammo_after_rounds` and the `self.stored_weapon_data` reset go from `_zm_reimagined.gsc`, and `level.weapon_locker_online = 0` is dropped from `post_init` — that line, not the spawn reset, was what actually made the stored weapon reset each game, by forcing the locker off the online profile storage onto per-game entity storage. Die Rise keeps its moved locker location, which is a separate fork change | working tree |
 | Barriers no longer rebuildable while sprinting or throwing a grenade. The replaced `player_fails_blocker_repair_trigger_preamble` was a byte-for-byte copy of stock apart from one `issprinting() \|\| isthrowinggrenade()` check, so the whole function and its `replaceFunc` were deleted rather than trimmed. `replaced/_zm_blockers.gsc` keeps its other four replacements | working tree |
+
+### Why two weapon reverts are approximate
+
+Weapon files ship as loose files in `mod.iwd` — one `weapons/zm/<name>` per weapon, applied to every
+map. Treyarch's stock values are **not** uniform across maps, so where they differ there is no single
+value that restores stock everywhere. Both cases were resolved toward the majority:
+
+- **Five-seven Dual Wield** reserve was 14 clips on Tranzit and 13 on the other six maps. It is now
+  13, which is exact on six maps and one clip short of stock on Tranzit. That anomaly is also where
+  the README's "225" baseline came from: stock Tranzit pairs 14 clips with a left-hand gun carrying
+  225, where every other map gives it 15.
+- **MTAR** view kick was the gentle set (`adsViewKickPitchMin` 5, `PitchMax` 52.5, `Yaw` ±45) on
+  Tranzit, Die Rise, Nuketown and Die Rise, and a harsher set (15, 65, ±100) on Buried and Mob of the
+  Dead. The fork unified everything to the gentle set. Those fields are **left as they are**: they
+  came from commit `8ae21ccf`, which baked the `sv_patch_zm_weapons` and `sv_fix_zm_weapons` dvars
+  into the weapon files, not from the "Decreased recoil" bullet. What that bullet actually described
+  is `adsSpread`, which was zeroed on both the MTAR and the M8A1 and is what has been restored.
+  Restoring the harsh kick would have made four maps worse than stock to make two match.
 
 Note that the withdraw and teller **fees** are still waived — that lives in `_zm_reimagined.gsc`,
 not the deleted banking script, so it survived the revert and is documented in `README.md`.
@@ -78,6 +102,7 @@ not the deleted banking script, so it survived the revert and is documented in `
 |---|---|---|
 | Fire Sale music rotation: a random track per Fire Sale drawn from the stock song, a hip hop remix, a 4 Minutes cut and a We Are Number One cut, never the same one twice running. Chosen once in `start_fire_sale` because stock threads the alias onto every `intercom` separately, so alias-level randomisation would have each speaker roll its own track. `setup_firesale_audio` is replaced as well as `play_firesale_audio` — replacing the latter alone does nothing, since its only caller is the stock copy of the former. Gated on `level.sndannouncerisrich`: the rotation is Richtofen's, so Samantha keeps the stock `mus_fire_sale` track for as long as she is announcing. That only bites on Nuketown, which opens on Samantha until round 20; every other map has Richtofen from round one | `ae23bf7c`, `daf7c4ee`, working tree | ✅ |
 | **Deadshot Daiquiri aims twice as fast**, inheriting the `specialty_fastads` that used to come with Speed Cola | working tree | ✅ |
+| **QBB LSW added to Nuketown**, alongside Mob of the Dead. Script only — the `level.script == "zm_prison"` test in the weapon include block now also accepts `zm_nuked`. No zone work was needed: every asset the gun depends on is map-independent, living in `common_mp.zone` (models and anims, under `t6_wpn_lmg_type95_*`), `code_post_gfx_mp.zone` (menu icon), the soundbank, and the loose `weapons/zm/qbb95_*` and `attachmentunique/zm/au_qbb95_*` files in `mod.iwd`. Mob of the Dead has no per-map entry for it either | working tree | ❓ |
 | **Stamin-Up grants unlimited sprint.** The perk is `specialty_movefaster` in this build, not the base game's `specialty_longersprint`, so it had no effect on the sprint meter at all once the free unlimited sprint was removed. `give_additional_perks` now sets `specialty_unlimitedsprint` off `specialty_movefaster`, the same way that loop already derives Speed Cola's and Deadshot's extra perks. The unset branch is guarded on `is_zombie`, matching the `specialty_fasttoss` guard beside it, so a Turned zombie player keeps the unlimited sprint `_zm_turned` grants it | working tree | ✅ |
 | Stamin-Up move speed cut from 10% to 2% (`perk_speedMultiplier` 1.1 → 1.02), now that the perk carries unlimited sprint instead | working tree | ✅ |
 | Quick Revive's health regeneration delay reduction raised from 25% to 33% (`*= 0.75` → `*= 0.67` on both delays in `playerhealthregen`) | working tree | ✅ |
@@ -120,9 +145,13 @@ not the deleted banking script, so it survived the revert and is documented in `
 
 ## Still to test
 
-Everything marked ❓ or ⚠️ above. One item remains:
+Everything marked ❓ or ⚠️ above. Two items remain:
 
-1. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by a deleted cost function and
+1. **QBB LSW on Nuketown** — it should appear in the Mystery Box with a world model, a view model and
+   its own fire sound. If it draws as a missing model, the assets are not reaching the Nuketown
+   fastfile and would need `weapon,qbb95_zm` adding to `zone_source/includes/zm_nuked.zone`; check
+   Mob of the Dead too in that case, since neither map declares the weapon per-map today.
+2. **Blundergat to Acidgat conversion on Mob of the Dead** — broken by a deleted cost function and
    fixed the same way the crafting tables were, but found by reading the diff rather than by
    playing, so it has never been seen working. The prompt should read cleanly with no cost, and the
    station should still work on a second use. This is the step immediately after crafting the Acid

@@ -2494,7 +2494,7 @@ weapon_changes()
 		add_zombie_weapon("mk48_zm", "mk48_upgraded_zm", &"WEAPON_MK48", 1000, "wpck_rpd", "", undefined, 1);
 	}
 
-	if (level.script == "zm_prison")
+	if (level.script == "zm_prison" || level.script == "zm_nuked")
 	{
 		include_weapon("qbb95_zm");
 		include_weapon("qbb95_upgraded_zm", 0);
@@ -2616,25 +2616,11 @@ wallbuy_cost_changes()
 {
 	flag_wait("initial_blackscreen_passed");
 
-	if (isDefined(level.zombie_weapons["beretta93r_zm"]))
-	{
-		cost = 900;
-		level.zombie_weapons["beretta93r_zm"].cost = cost;
-		level.zombie_weapons["beretta93r_zm"].ammo_cost = int(cost / 2);
-	}
-
 	if (isDefined(level.zombie_weapons["870mcs_zm"]))
 	{
 		cost = 1200;
 		level.zombie_weapons["870mcs_zm"].cost = cost;
 		level.zombie_weapons["870mcs_zm"].ammo_cost = int(cost / 2);
-	}
-
-	if (isDefined(level.zombie_weapons["an94_zm"]))
-	{
-		cost = 1500;
-		level.zombie_weapons["an94_zm"].cost = cost;
-		level.zombie_weapons["an94_zm"].ammo_cost = int(cost / 2);
 	}
 
 	if (isDefined(level.zombie_weapons["thompson_zm"]))
