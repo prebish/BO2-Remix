@@ -122,7 +122,7 @@ not the deleted banking script, so it survived the revert and is documented in `
 | Stamin-Up move speed cut from 10% to 2% (`perk_speedMultiplier` 1.1 → 1.02), now that the perk carries unlimited sprint instead | working tree | ✅ |
 | Quick Revive's health regeneration delay reduction raised from 25% to 33% (`*= 0.75` → `*= 0.67` on both delays in `playerhealthregen`) | working tree | ✅ |
 | Zombie Shield health 1500 → 2500 | `631df6ae` | ✅ |
-| Legacy guns back in the Mystery Box alongside their replacements: Galil, RPD, FAL, Python, Barrett M82A1. Wallbuy-only guns (MP5, AK74u, M14, M16A1, M1911) deliberately not added | `132ae227` | ✅ |
+| Legacy guns back in the Mystery Box alongside their replacements, under the `zmr_legacy_box_guns` setting. Started as Galil, RPD, FAL, Python and Barrett M82A1, with the wallbuy-only guns held back; MP5, AK74u, M14, M16A1 and M1911 were added later. The wallbuy five are the ones the mod had made unobtainable — their maps include them as `include_weapon(name, 0)`, and the mod swaps their wallbuys for INSAS, Vector, Saritch, SIG556 and Tac-45 — so returning them to the box is the only way back to them. Each gun reappears only on the maps that natively carry it, since `restore_legacy_box_weapons` guards on `isdefined(level.zombie_weapons[weapon])`; `README.md` has the per-map table | `132ae227`, working tree | ❓ |
 | Max Ammo fills the magazine as well as the reserve, including akimbo off-hands. Grief and the encounter modes unchanged | `26ba1991` | ✅ |
 | Carpenter restores a carried shield to full health, team-wide. Added to Nuketown, Mob of the Dead and Origins | `26ba1991`, `7ac44cb8` | ✅ |
 | Free Perk powerup drops in Survival on all maps, half as often as other powerups | `26ba1991`, working tree | ✅ |

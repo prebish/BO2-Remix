@@ -2572,15 +2572,23 @@ weapon_changes()
 	}
 }
 
-// The mod takes these five out of the box in favour of their Black Ops 2 stand-ins - M27 for the
+// The mod takes these out of the box in favour of their Black Ops 2 stand-ins - M27 for the
 // Galil, Mk 48 for the RPD and so on. This puts them back without touching the replacements, so
 // the box holds both. Done here rather than by deleting the is_in_box lines above so the upstream
 // blocks stay intact - several of them also set weapon vox and costs that are still wanted.
-// Every map that shipped one gets it back, since the guards above are what limit each gun to the
-// maps that natively carry it.
+// Every map that shipped one gets it back, since the isdefined guard is what limits each gun to
+// the maps that natively carry it.
+//
+// The second row are the wallbuy-only guns. Their maps include them as include_weapon(name, 0),
+// so the entry exists but the box never offers them, and the mod swaps their wallbuys for the
+// replacements - INSAS for the MP5, Vector for the AK74u, SIG556 for the M16A1, Saritch for the
+// M14, Tac-45 for the M1911 - which leaves them unobtainable. is_in_box is the only thing the box
+// reads, and each already has an add_zombie_weapon registration carrying its upgraded variant and
+// vox, so flipping the flag is all that is needed. Note the M16A1 upgrades to m16_gl_upgraded_zm.
 restore_legacy_box_weapons()
 {
-	weapons = array("galil_zm", "rpd_zm", "fnfal_zm", "python_zm", "barretm82_zm");
+	weapons = array("galil_zm", "rpd_zm", "fnfal_zm", "python_zm", "barretm82_zm",
+	                "mp5k_zm", "ak74u_zm", "m14_zm", "m16_zm", "m1911_zm");
 
 	foreach (weapon in weapons)
 	{

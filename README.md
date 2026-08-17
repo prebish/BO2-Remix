@@ -199,7 +199,7 @@ and they take effect on the next game rather than immediately.
 * Zombie Shield health: Default (1500) or Rebalanced (2500)
 * Carpenter repairs shield: enable or disable
 * Max Ammo fills magazine: enable or disable
-* Legacy box guns: enable or disable the returning Mystery Box weapons
+* Legacy box guns: enable or disable the returning Mystery Box weapons (see Mystery Box for the per-map list)
 * Fire sale music: Randomized (default) draws a different track each Fire Sale, Default keeps the
   stock one
 
@@ -821,6 +821,16 @@ and they take effect on the next game rather than immediately.
 * Players only see weapons rising up that they can currently obtain
 * Decreased weapon pick up time from 12 seconds to 9 seconds
 * Moves to new location instantly
+* Legacy box guns setting returns the Black Ops 1 era guns to the box alongside the weapons that replaced them, on every map that already carried each one:
+	* Galil and FAL OSW: all maps
+	* Barrett M82A1: all maps except Origins
+	* M14: all maps
+	* M1911: all maps except Origins
+	* MP5: all maps except Origins
+	* AK74u: all maps except Mob of the Dead
+	* M16A1: Tranzit, Nuketown, Die Rise, and Buried
+	* Python: Tranzit, Nuketown, Die Rise, and Origins
+	* RPD: Tranzit, Nuketown, and Die Rise
 * Teddy bear shows at correct angles when it first appears
 * No longer disappears then reappears at end of Fire Sale if Fire Sale started while Mystery Box was moving
 
