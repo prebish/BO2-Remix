@@ -90,6 +90,13 @@ Search & Rezurrect's round logic behind an early `return` for every other mode. 
 the function and its `replaceFunc` are **kept, empty** — the registration is what stops stock's Grief
 round-end logic from running, and the Encounter framework calls `game_won` itself.
 
+**`game_won(winner)` in that same file must not be deleted.** It sat between the Search & Rezurrect
+helpers and looks like part of them, but it is what ends *every* Encounter mode — `zencounter_reimagined`
+calls it from four places when a team is wiped. It was cut with the SR block by mistake and restored;
+the symptom was `Unresolved external: "game_won" with 1 parameters` on the first Grief game that
+reached an end. Its neighbours `check_for_round_end` and `round_end` genuinely were SR-only and are
+gone for good.
+
 ### Why two weapon reverts are approximate
 
 Weapon files ship as loose files in `mod.iwd` — one `weapons/zm/<name>` per weapon, applied to every

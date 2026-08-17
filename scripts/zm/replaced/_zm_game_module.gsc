@@ -13,6 +13,71 @@ wait_for_team_death_and_round_end()
 {
 }
 
+game_won(winner)
+{
+	waittillframeend;
+
+	level.gamemodulewinningteam = winner;
+	level.zombie_vars["spectators_respawn"] = 0;
+	players = get_players();
+
+	foreach (player in players)
+	{
+		player thread game_won_freeze_controls_think();
+
+		player scripts\zm\_zm_reimagined::clearlowermessage();
+
+		if (player._encounters_team == winner)
+		{
+			player thread maps\mp\zombies\_zm_audio_announcer::leaderdialogonplayer("grief_won");
+		}
+		else
+		{
+			player thread maps\mp\zombies\_zm_audio_announcer::leaderdialogonplayer("grief_lost");
+		}
+	}
+
+	if (isdefined(level.game_mode_scoring_team_hud_value))
+	{
+		level.game_mode_scoring_team_hud_value = undefined;
+
+		foreach (player in players)
+		{
+			player luinotifyevent(&"hud_update_scoring_team");
+		}
+	}
+
+	if (isdefined(level.game_mode_player_count_hud_value))
+	{
+		level.game_mode_player_count_hud_value = undefined;
+
+		foreach (player in players)
+		{
+			player luinotifyevent(&"hud_update_player_count");
+		}
+	}
+
+	if (isdefined(level.game_mode_obj_ind))
+	{
+		objective_setgamemodeflags(level.game_mode_obj_ind, 0);
+	}
+
+	if (isdefined(level.game_mode_next_obj_ind))
+	{
+		objective_setgamemodeflags(level.game_mode_next_obj_ind, 0);
+	}
+
+	if (isdefined(level.meat_player))
+	{
+		objective_setgamemodeflags(level.meat_player.obj_ind, 1);
+	}
+
+	level notify("game_module_ended", winner);
+	level._game_module_game_end_check = undefined;
+	maps\mp\gametypes_zm\_zm_gametype::track_encounters_win_stats(level.gamemodulewinningteam);
+	level notify("end_game");
+}
+
 game_won_freeze_controls_think()
 {
 	self endon("disconnect");
