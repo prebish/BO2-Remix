@@ -122,7 +122,7 @@ special_round_end()
 	make_super_zombies(0);
 	level._time_bomb.functionality_override = 0;
 	flag_set("time_bomb_detonation_enabled");
-	scripts\zm\replaced\_zm_weap_time_bomb::time_bomb_detonation();
+	maps\mp\zombies\_zm_weap_time_bomb::time_bomb_detonation();
 
 	a_players = get_players();
 

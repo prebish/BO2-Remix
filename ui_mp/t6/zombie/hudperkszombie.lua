@@ -14,41 +14,49 @@ CoD.Perks.ClientFieldNames[1] = {
 	clientFieldName = "perk_additional_primary_weapon",
 	material = RegisterMaterial("specialty_additionalprimaryweapon_zombies"),
 	nukedMaterialName = "uie_perk_mulekick",
+	prisonMaterialName = "uie_soe_perk_mulekick",
 }
 CoD.Perks.ClientFieldNames[2] = {
 	clientFieldName = "perk_dead_shot",
 	material = RegisterMaterial("specialty_ads_zombies"),
 	nukedMaterialName = "uie_perk_deadshot",
+	prisonMaterialName = "uie_soe_perk_deadshot",
 }
 CoD.Perks.ClientFieldNames[3] = {
 	clientFieldName = "perk_dive_to_nuke",
 	material = RegisterMaterial("specialty_divetonuke_zombies"),
 	nukedMaterialName = "uie_perk_phd",
+	prisonMaterialName = "uie_soe_perk_phd",
 }
 CoD.Perks.ClientFieldNames[4] = {
 	clientFieldName = "perk_double_tap",
 	material = RegisterMaterial("specialty_doubletap_zombies"),
 	nukedMaterialName = "uie_perk_doubletap",
+	prisonMaterialName = "uie_soe_perk_doubletap",
 }
 CoD.Perks.ClientFieldNames[5] = {
 	clientFieldName = "perk_juggernaut",
 	material = RegisterMaterial("specialty_juggernaut_zombies"),
 	nukedMaterialName = "uie_perk_juggernog",
+	prisonMaterialName = "uie_soe_perk_juggernog",
 }
 CoD.Perks.ClientFieldNames[6] = {
 	clientFieldName = "perk_marathon",
 	material = RegisterMaterial("specialty_marathon_zombies"),
 	nukedMaterialName = "uie_perk_staminup",
+	prisonMaterialName = "uie_soe_perk_staminup",
 }
 CoD.Perks.ClientFieldNames[7] = {
 	clientFieldName = "perk_quick_revive",
 	material = RegisterMaterial("specialty_quickrevive_zombies"),
 	nukedMaterialName = "uie_perk_revive",
+	prisonMaterialName = "uie_soe_perk_revive",
 }
 CoD.Perks.ClientFieldNames[8] = {
 	clientFieldName = "perk_sleight_of_hand",
 	material = RegisterMaterial("specialty_fastreload_zombies"),
 	nukedMaterialName = "uie_perk_speedcola",
+	prisonMaterialName = "uie_soe_perk_speedcola",
 }
 CoD.Perks.ClientFieldNames[9] = {
 	clientFieldName = "perk_tombstone",
@@ -59,16 +67,19 @@ CoD.Perks.ClientFieldNames[10] = {
 	clientFieldName = "perk_chugabud",
 	material = RegisterMaterial("specialty_chugabud_zombies"),
 	nukedMaterialName = "uie_perk_who",
+	prisonMaterialName = "uie_soe_perk_who",
 }
 CoD.Perks.ClientFieldNames[11] = {
 	clientFieldName = "perk_electric_cherry",
 	material = RegisterMaterial("specialty_electric_cherry_zombie"),
 	nukedMaterialName = "uie_perk_electric_cherry",
+	prisonMaterialName = "uie_soe_perk_electric_cherry",
 }
 CoD.Perks.ClientFieldNames[12] = {
 	clientFieldName = "perk_vulture",
 	material = RegisterMaterial("specialty_vulture_zombies"),
 	nukedMaterialName = "uie_perk_vulture",
+	prisonMaterialName = "uie_soe_perk_vulture",
 	glowMaterial = RegisterMaterial("zm_hud_stink_perk_glow"),
 }
 CoD.Perks.SpecialtyToClientFieldNames = {
@@ -158,9 +169,22 @@ CoD.Perks.UpdateVisibility = function(Menu, ClientInstance)
 	Menu:dispatchEventToChildren(ClientInstance)
 end
 
--- Nuketown swaps the perk and powerup icons for BO1 styled ones. Read the map here rather than
--- caching it when this file loads: LUI files are not guaranteed to be loaded after the map is
--- known, and a stale answer would put BO1 icons on every map or none.
+-- Maps that swap the perk icons, and the entry field holding each map's art. Adding another map is
+-- one row here plus that field on the entries that have art for it.
+--   zm_nuked  - BO1 styled, from mjmodz's "Black Ops 1 HUD for BO2", BO1 images by Kingslayer Kyle
+--   zm_prison - Shadows of Evil styled, perk art by Gewehr, Double Points / Insta Kill / Fire Sale
+--               by Larsendog, from the "BO3 Perk Shaders Pack"
+CoD.Perks.CustomIconFields = {
+	zm_nuked = "nukedMaterialName",
+	zm_prison = "prisonMaterialName",
+}
+
+-- Read the map here rather than caching it when this file loads: LUI files are not guaranteed to be
+-- loaded after the map is known, and a stale answer would put the wrong icons on every map or none.
+CoD.Perks.CustomIconField = function()
+	return CoD.Perks.CustomIconFields[UIExpression.DvarString(nil, "mapname")]
+end
+
 CoD.Perks.UseNukedIcons = function()
 	return UIExpression.DvarString(nil, "mapname") == "zm_nuked"
 end
@@ -171,16 +195,20 @@ CoD.Perks.GetMaterial = function(Menu, ClientFieldName)
 		if CoD.Perks.ClientFieldNames[ClientFieldIndex].clientFieldName == ClientFieldName then
 			local entry = CoD.Perks.ClientFieldNames[ClientFieldIndex]
 			Material = entry.material
-			-- Every perk in the table has BO1 art now, but the nukedMaterialName guard stays: it is
-			-- what lets a perk be added here without art and fall back to its stock icon.
-			if CoD.Perks.UseNukedIcons() and entry.nukedMaterialName then
+			-- The guard on the field being present is what lets a perk have art for one map but not
+			-- another and fall back to its stock icon. Tombstone is exactly that case: the SoE pack
+			-- ships no Tombstone icon, so it keeps stock art on Mob of the Dead.
+			local iconField = CoD.Perks.CustomIconField()
+			if iconField and entry[iconField] then
 				-- Registered on first use, not where the table is declared. These materials live in
 				-- mod.ff, which is loaded after the LUI menu files - registering at file scope got
 				-- "Could not load material" for all of them and the icons silently stayed stock.
-				if not entry.nukedMaterial then
-					entry.nukedMaterial = RegisterMaterial(entry.nukedMaterialName)
+				-- Cached per field so two maps' art can coexist in one entry.
+				local cacheField = iconField .. "Cached"
+				if not entry[cacheField] then
+					entry[cacheField] = RegisterMaterial(entry[iconField])
 				end
-				Material = entry.nukedMaterial
+				Material = entry[cacheField]
 			end
 			break
 		end

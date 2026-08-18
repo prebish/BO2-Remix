@@ -1,10 +1,18 @@
-# Call of Duty: Black Ops 2 Zombies - Reimagined
+# Call of Duty: Black Ops 2 Zombies - Reimagined-Lite
 
-> This is **Reimagined-Lite**, a fork. Everything below describes Reimagined by Jbleezy, amended
-> where this fork differs. For the fork's own changes and what has and has not been tested, see
-> [FORK.md](FORK.md).
+A fork of **Reimagined**, the Black Ops 2 Zombies mod by Jbleezy.
 
-## Created by: Jbleezy
+> **The main difference: buildables are assembled from parts you find, as in the base game.**
+> Reimagined handed you the Zombie Shield, Turret, Electric Trap, Jet Gun, Sliquifier, Trample
+> Steam, Subwoofer and Head Chopper already built at the start of a match, and crafted the power
+> switch, Pack-a-Punch, the Diner hatch and the NAV table for you. Parts were never collected. This
+> fork removed that whole system, and it is the largest single difference between the two.
+>
+> The notes below describe **this fork's** behaviour — entries for features the fork removed have
+> been taken out rather than left in place. For the full account of what was removed, added and
+> tuned relative to Reimagined, and what has and has not been play-tested, see [FORK.md](FORK.md).
+
+## Original mod created by: Jbleezy
 
 [YouTube](https://youtube.com/ItsJbirdJustin)
 
@@ -15,6 +23,21 @@
 [Discord](https://dsc.gg/Jbleezy)
 
 [Donate](https://ko-fi.com/Jbleezy)
+
+# Installing
+
+A mod for [Plutonium](https://plutonium.pw) T6 (Black Ops II).
+
+1. Put the mod folder inside `%LOCALAPPDATA%\Plutonium\storage\t6\mods\`, so you end up with a
+   `mods\zm_reimagined\` folder containing `mod.ff`, `mod.iwd`, `mod.json` and the three `.sabs` /
+   `.sabl` sound banks.
+2. Launch Plutonium, start Black Ops II in Zombies, and choose **Reimagined** from the mods menu.
+
+Settings live on two tabs in the options menu — display options under Settings, and gameplay options
+under [Rules](#rules). Rules settings are read by the host, so in co-op the host's choices apply to
+everyone, and they take effect on the next game rather than immediately.
+
+Building the mod from this repository is a separate process — see [BUILDING.md](BUILDING.md).
 
 # Change Notes
 
@@ -31,6 +54,7 @@
 	* [Brutus](#brutus)
 	* [Panzersoldat](#panzersoldat)
 * [Weapons](#weapons)
+	* [Legacy Weapons](#legacy-weapons)
 	* [Pistols](#pistols)
 		* [Executioner](#executioner)
 		* [KAP-40](#kap-40)
@@ -102,7 +126,6 @@
 		* [Semtex](#semtex)
 		* [Claymore](#claymore)
 		* [Bouncing Betty](#bouncing-betty)
-		* [Time Bomb](#time-bomb)
 		* [Syrette](#syrette)
 * [Wallbuys](#wallbuys)
 * [Mystery Box](#mystery-box)
@@ -193,15 +216,35 @@ A second options tab holding the gameplay settings, separate from the display se
 are read by the game rather than by each client, so in co-op the host's settings apply to everyone,
 and they take effect on the next game rather than immediately.
 
-* Starting points: 0, 500 (default), 1000 or 5000
-* Free perk drop: enable or disable the perk bottle powerup
-* Free perk rarity: Normal (default) or Rare
-* Zombie Shield health: Default (1500) or Rebalanced (2500)
-* Carpenter repairs shield: enable or disable
-* Max Ammo fills magazine: enable or disable
-* Legacy box guns: enable or disable the returning Mystery Box weapons (see Mystery Box for the per-map list)
-* Fire sale music: Randomized (default) draws a different track each Fire Sale, Default keeps the
-  stock one
+| Setting | Options | Default |
+| --- | --- | --- |
+| Starting round | 1, 5, 10, 20 | 1 |
+| Starting points | 0, 500, 1000, 5000 | 500 |
+| Free perk drop | Disabled, Enabled | Enabled |
+| Free perk rarity | Normal, Rare | Normal |
+| Perk purchase limit | 4, 6, 8, Unlimited | 4 |
+| Zombie Shield health | Default, Rebalanced | Rebalanced |
+| Carpenter repairs shield | Disabled, Enabled | Enabled |
+| Max Ammo fills magazine | Disabled, Enabled | Enabled |
+| Coordinate display | Disabled, Enabled | Disabled |
+| Legacy box guns | Disabled, Enabled | Enabled |
+| Fire sale music | Default, Randomized | Randomized |
+
+Where the behaviour is not obvious from the name:
+
+* **Starting points** sets your score to the chosen figure rather than adding to it, so `0` takes
+  away the points you normally start with. `500` means "leave it alone" — the stock starting score
+  is not always exactly 500, since persistent upgrades and some game modes move it.
+* **Free perk drop** is the perk bottle powerup. **Free perk rarity** controls how often it appears.
+* **Perk purchase limit** caps how many perks you can *buy*. Perks given to you — powerup drops, dig
+  rewards, perk bottles — ignore it, so you can end up holding more than the limit.
+* **Zombie Shield health** is 1500 on Default and 2500 on Rebalanced.
+* **Legacy box guns** returns the Black Ops 1 weapons to the Mystery Box — see
+  [Legacy Weapons](#legacy-weapons).
+* **Fire sale music** on Default plays the stock track, which the game picks based on whether
+  Richtofen or Maxis is the announcer. Randomized draws a different track each Fire Sale.
+* **Coordinate display** is a mapping aid rather than a gameplay rule: it prints your position and
+  angles on the HUD every three seconds.
 
 ## HUD
 * Replaced the crosshair with a higher resolution version
@@ -376,13 +419,35 @@ and they take effect on the next game rather than immediately.
 * Placeable mines: capped damage scalar at 9000
 * Placeable mines: player hit audio no longer plays
 
+### Legacy Weapons
+Black Ops 2 replaced a number of Black Ops 1 weapons with its own equivalents, and the base game
+dropped the originals from the Mystery Box. The **Legacy box guns** setting puts them back without
+removing their replacements, so the box holds both. Each weapon only returns on the maps that
+already carried it, and the setting can be turned off from the RULES tab.
+
+| Legacy weapon | Replaced in Black Ops 2 by | Returns on |
+| --- | --- | --- |
+| Galil | M27 | All maps |
+| FAL | FAL OSW | All maps |
+| M14 | Saritch | All maps |
+| Barrett M82A1 | XPR-50 | All maps except Origins |
+| M1911 | Tac-45 | All maps except Origins |
+| MP5 | INSAS | All maps except Origins |
+| AK74u | Vector | All maps except Mob of the Dead |
+| Python | Executioner | Tranzit, Nuketown, Die Rise, and Origins |
+| M16A1 | SIG556 | Tranzit, Nuketown, Die Rise, and Buried |
+| RPD | Mk 48 | Tranzit, Nuketown, and Die Rise |
+
+The MP5, AK74u, M16A1, M14 and M1911 were wallbuy-only weapons, and the mod swaps their wallbuys for
+their replacements — returning them to the box is what makes them obtainable again at all. The M16A1
+upgrades to the M16A1 GL.
+
 ### Pistols
 * Increased move speed from 100% to 110%
 * Increased move speed while aiming from 200% to 220%
 * Decreased aim FOV from 65 to 60 on all pistols
 
 #### Executioner
-* Added alongside the Python, which is back in the box
 
 #### KAP-40
 * Removed delay between last shot and reload
@@ -410,10 +475,8 @@ and they take effect on the next game rather than immediately.
 ### Assault Rifles
 
 #### FAL OSW
-* Added alongside the FAL, which is back in the box
 
 #### M27
-* Added alongside the Galil, which is back in the box
 
 #### M8A1
 * Added on Buried
@@ -444,13 +507,8 @@ and they take effect on the next game rather than immediately.
 #### Type 25
 * Added on Buried
 * Decreased recoil
-* Unupgraded: increased stock ammo from 150 to 300
-* Upgraded: increased stock ammo from 270 to 450
-* Upgraded: changed attachment from Reflex Sight to Millimeter Scanner
 
 ### Submachine Guns
-* Changed move speed from 100% or 110% to 105%
-* Changed move speed while aiming from 200% or 220% to 210%
 
 #### Chicom CQB
 * Added on Buried
@@ -461,13 +519,8 @@ and they take effect on the next game rather than immediately.
 * Upgraded: changed attachment from None to Select Fire
 
 #### M1927
-* Decreased ammo cost from 800 to 750
-* Unupgraded: decreased stock ammo from 350 to 250
-* Upgraded: decreased stock ammo from 400 to 300
 
 #### MP40
-* Increased move speed while aiming from 100% to 157.5% (move speed multiplied by 1.5)
-* Adjustable Stock: increased move speed while aiming from 250% to 262.5% (move speed multiplied by 2.5)
 
 #### MP7
 * Added on Nuketown, Tranzit, Die Rise, and Buried
@@ -488,23 +541,16 @@ and they take effect on the next game rather than immediately.
 * Replaces Ak74u
 
 ### Light Machine Guns
-* Decreased move speed from 87.5% to 85%
-* Increased move speed while aiming from 80% to 100% on all light machine guns
 
 #### HAMR
-* Decreased recoil
-* Upgraded: changed attachment from None to Fore Grip
 
 #### Mk 48
-* Added alongside the RPD, which is back in the box (also added on Buried)
+* Also added on Buried
 
 #### QBB LSW
 * Added on Mob of the Dead and Nuketown
 
 ### Sniper Rifles
-* Decreased move speed from 95% to 90%
-* Disabled scope sway
-* Unupgraded: increased scope FOV from 15 or 20 to 25
 
 #### Ballista
 * Replaces Olympia
@@ -521,7 +567,6 @@ and they take effect on the next game rather than immediately.
 * Upgraded: fixed first raise anim
 
 #### XPR-50
-* Added alongside the Barrett M82A1, which is back in the box
 
 ### Shotguns
 * Increased penetration
@@ -745,7 +790,6 @@ and they take effect on the next game rather than immediately.
 * No longer attracts after all missiles explode
 
 ### Equipment
-* Increased move speed from 100% to 110%
 
 #### Combat Knife
 * Added model from Black Ops 2 Multiplayer
@@ -791,15 +835,6 @@ and they take effect on the next game rather than immediately.
 #### Bouncing Betty
 * Replaces Claymore on Origins
 
-#### Time Bomb
-* Added to all game modes
-* No longer sends players back in time
-* Kills all zombies
-* Revives all down players
-* Can have with Monkey Bombs
-* Switches to detonator at correct time after throwing
-* Fixed detonator raise and drop anims
-
 #### Syrette
 * Added weapon name on HUD
 * Fixed being able to see view model at end of anim
@@ -817,20 +852,10 @@ and they take effect on the next game rather than immediately.
 * Added melee wallbuy HUD icons to all maps
 
 ## Mystery Box
-* Players get every weapon they can before getting duplicates
 * Players only see weapons rising up that they can currently obtain
 * Decreased weapon pick up time from 12 seconds to 9 seconds
 * Moves to new location instantly
-* Legacy box guns setting returns the Black Ops 1 era guns to the box alongside the weapons that replaced them, on every map that already carried each one:
-	* Galil and FAL OSW: all maps
-	* Barrett M82A1: all maps except Origins
-	* M14: all maps
-	* M1911: all maps except Origins
-	* MP5: all maps except Origins
-	* AK74u: all maps except Mob of the Dead
-	* M16A1: Tranzit, Nuketown, Die Rise, and Buried
-	* Python: Tranzit, Nuketown, Die Rise, and Origins
-	* RPD: Tranzit, Nuketown, and Die Rise
+* Legacy box guns setting returns the Black Ops 1 era weapons to the box (see [Legacy Weapons](#legacy-weapons))
 * Teddy bear shows at correct angles when it first appears
 * No longer disappears then reappears at end of Fire Sale if Fire Sale started while Mystery Box was moving
 
@@ -1075,9 +1100,8 @@ and they take effect on the next game rather than immediately.
 * All quests play a song on completion after ending the current round
 
 ### Nuketown
-* Added PHD Flopper and Deadshot Daiquiri machines, dropped from the sky like the others
-* Perk machines drop every 3 rounds instead of every 5, so all 7 are down by round 19
-* Perk bottles can give Stamin-Up and Mule Kick, neither of which has a machine on the map
+* Added PHD Flopper, Deadshot Daiquiri, Stamin-Up and Mule Kick machines, dropped from the sky like the others
+* Machines arrive roughly every 2 rounds rather than every 5, so all 9 — the eight perk machines and Pack-a-Punch — have landed by round 19
 * Replaced the Backyard Mystery Box location with a buildable bench
 * Added Zombie Shield, built at the Backyard bench from 2 parts that spawn around the map
 * Hellhounds spawn mid round starting at round 25 (4% chance to spawn)
@@ -1304,6 +1328,7 @@ and they take effect on the next game rather than immediately.
 * Perks and wallbuys within the maze are randomized each game
 
 ### Mob of the Dead
+* Perk and powerup icons use the Shadows of Evil style from Black Ops 3
 * Added custom loading screen
 * Replaced Remington 870 MCS wallbuy at Citadel with Semtex wallbuy
 * Added PHD Flopper machine at Showers
@@ -1389,7 +1414,6 @@ and they take effect on the next game rather than immediately.
 * Added Deadshot Daiquiri machine at Generator 2
 * Added Electric Cherry machine at The Crazy Place Ice Chamber
 * Door prices in solo cost the same as in coop
-* Shovels automatically picked up
 * Records automatically picked up
 * Gramophone initially spawns at Excavation Site gramophone table
 * Swapped spawn positions of certain staff parts to match the area where they are picked up at

@@ -194,8 +194,11 @@ LUI.createMenu.AmmoAreaZombie = function(f1_arg0)
 	-- lines up. The lazy registration the perk and powerup files need is only for materials named
 	-- at file scope, before mod.ff is loaded.
 	local additionalPrimaryWeaponMaterial = RegisterMaterial("specialty_additionalprimaryweapon_zombies")
-	if UIExpression.DvarString(nil, "mapname") == "zm_nuked" then
+	local mapName = UIExpression.DvarString(nil, "mapname")
+	if mapName == "zm_nuked" then
 		additionalPrimaryWeaponMaterial = RegisterMaterial("uie_perk_mulekick")
+	elseif mapName == "zm_prison" then
+		additionalPrimaryWeaponMaterial = RegisterMaterial("uie_soe_perk_mulekick")
 	end
 
 	f1_local0.additionalPrimaryWeaponImage = LUI.UIImage.new({

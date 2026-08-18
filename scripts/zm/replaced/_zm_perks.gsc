@@ -114,6 +114,11 @@ perk_machine_spawn_init()
 				perk_machine.turn_on_notify = pos[i].turn_on_notify;
 			}
 
+			// Recorded so zm_nuked_perks::bring_perk_landing_damage can tell which perk a machine
+			// belongs to when it touches down. targetname is not usable for this - PHD falls
+			// through the switch above to the Speed Cola default.
+			perk_machine.zmr_perk = perk;
+
 			switch (perk)
 			{
 				case "specialty_quickrevive":
@@ -755,6 +760,181 @@ vending_trigger_think()
 	self thread maps\mp\zombies\_zm_audio::perks_a_cola_jingle_timer();
 	self thread check_player_has_perk(perk);
 
+	self perk_machine_set_hint(perk, cost, solo);
+
+	for (;;)
+	{
+		self waittill("trigger", player);
+
+		index = maps\mp\zombies\_zm_weapons::get_player_index(player);
+
+		if (player maps\mp\zombies\_zm_laststand::player_is_in_laststand() || isdefined(player.intermission) && player.intermission)
+		{
+			continue;
+		}
+
+		if (player in_revive_trigger())
+		{
+			continue;
+		}
+
+		if (player isthrowinggrenade())
+		{
+			wait 0.1;
+			continue;
+		}
+
+		if (player isswitchingweapons())
+		{
+			wait 0.1;
+			continue;
+		}
+
+		if (player.is_drinking > 0)
+		{
+			wait 0.1;
+			continue;
+		}
+
+		if (player hasperk(perk) || player has_perk_paused(perk))
+		{
+			cheat = 0;
+
+			if (cheat != 1)
+			{
+				self playsound("evt_perk_deny");
+				player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "perk_deny", undefined, 1);
+				continue;
+			}
+		}
+
+		// Stock vending_trigger_think gates purchases on the perk limit; this replacement dropped
+		// that check, so machines ignored zmr_perk_limit entirely while Wunderfizz still honoured
+		// it. Anything reaching here is a new perk - players who already hold it are turned away
+		// above - so the limit applies. Called through get_player_perk_purchase_limit rather than
+		// reading level.perk_purchase_limit directly, so any map-level override still applies.
+		if (player.num_perks >= player get_player_perk_purchase_limit())
+		{
+			self playsound("evt_perk_deny");
+			player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "perk_deny", undefined, 1);
+			self thread perk_limit_hint(perk, cost, solo, player get_player_perk_purchase_limit());
+			continue;
+		}
+
+		if (isdefined(level.custom_perk_validation))
+		{
+			valid = self [[level.custom_perk_validation]](player);
+
+			if (!valid)
+			{
+				continue;
+			}
+		}
+
+		current_cost = cost;
+
+		if (player maps\mp\zombies\_zm_pers_upgrades_functions::is_pers_double_points_active())
+		{
+			current_cost = player maps\mp\zombies\_zm_pers_upgrades_functions::pers_upgrade_double_points_cost(current_cost);
+		}
+
+		if (player.score < current_cost)
+		{
+			self playsound("evt_perk_deny");
+			player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "perk_deny", undefined, 0);
+			continue;
+		}
+
+		sound = "evt_bottle_dispense";
+		playsoundatposition(sound, self.origin);
+		player maps\mp\zombies\_zm_score::minus_to_player_score(current_cost, 1);
+		player.perk_purchased = perk;
+		self thread maps\mp\zombies\_zm_audio::play_jingle_or_stinger(self.script_label);
+		self thread vending_trigger_post_think(player, perk);
+	}
+}
+
+// level.machine_assets key for the perks Nuketown flies in that stock never powers on. Anything
+// else returns undefined and is left completely alone - the four perks the map shipped with, and
+// Stamin-Up, already switch on correctly through their stock turn_on listeners.
+nuked_perk_machine_assets_key(perk)
+{
+	switch (perk)
+	{
+		case "specialty_additionalprimaryweapon":
+		case "specialty_additionalprimaryweapon_upgrade":
+			return "additionalprimaryweapon";
+
+		case "specialty_deadshot":
+		case "specialty_deadshot_upgrade":
+			return "deadshot";
+
+		case "specialty_flakjacket":
+		case "specialty_flakjacket_upgrade":
+			return "divetonuke";
+	}
+
+	return undefined;
+}
+
+// Called on the machine from zm_nuked_perks::bring_perk_landing_damage, which stock threads the
+// moment a machine touches down.
+nuked_perk_machine_power_on()
+{
+	self endon("death");
+
+	// TEMPORARY DIAGNOSTIC - remove once the machines are confirmed lighting up. Writes to
+	// games_mp.log in the mod folder. Logs every landing, not just the three perks this fixes, so
+	// the first machine of the game shows whether the hook fires at all and whether zmr_perk is set.
+	if (isdefined(self.zmr_perk))
+	{
+		logprint("ZMR landed: perk=" + self.zmr_perk + "\n");
+	}
+	else
+	{
+		logprint("ZMR landed: perk=UNDEFINED (spawn_init did not tag this machine)\n");
+	}
+
+	if (!isdefined(self.zmr_perk))
+	{
+		return;
+	}
+
+	key = nuked_perk_machine_assets_key(self.zmr_perk);
+
+	if (!isdefined(key) || !isdefined(level.machine_assets) || !isdefined(level.machine_assets[key]))
+	{
+		logprint("ZMR   -> no assets key, left alone\n");
+		return;
+	}
+
+	if (isdefined(level.machine_assets[key].on_model))
+	{
+		self setmodel(level.machine_assets[key].on_model);
+		logprint("ZMR   -> key=" + key + " lit model=" + level.machine_assets[key].on_model + "\n");
+	}
+
+	if (!isdefined(level.machine_assets[key].power_on_callback))
+	{
+		logprint("ZMR   -> no power_on_callback for " + key + "\n");
+		return;
+	}
+
+	logprint("ZMR   -> running power_on_callback for " + key + "\n");
+
+	// PHD and Deadshot light up through a client-side shader constant, and the client picks the
+	// machine out of getentarray by model name. The machine has only just been placed, so the
+	// first notify can arrive before clients have it. Re-send a few times to cover that.
+	for (i = 0; i < 3; i++)
+	{
+		self thread [[level.machine_assets[key].power_on_callback]]();
+		wait 1;
+	}
+}
+
+// The machine hint is built in one place so it can be restored after a temporary swap.
+perk_machine_set_hint(perk, cost, solo)
+{
 	switch (perk)
 	{
 		case "specialty_armorvest_upgrade":
@@ -818,84 +998,20 @@ vending_trigger_think()
 	{
 		self sethintstring(level._custom_perks[perk].hint_string, cost);
 	}
+}
 
-	for (;;)
-	{
-		self waittill("trigger", player);
+// Briefly swap the hint to explain a refusal, then restore it - the same approach
+// zm_tomb_craftables::swap_staff_hint_craftable uses. The hint belongs to the trigger rather
+// than to one player, so everyone stood at the machine sees it for those few seconds.
+perk_limit_hint(perk, cost, solo, limit)
+{
+	self notify("perk_limit_hint");
+	self endon("perk_limit_hint");
+	self endon("death");
 
-		index = maps\mp\zombies\_zm_weapons::get_player_index(player);
-
-		if (player maps\mp\zombies\_zm_laststand::player_is_in_laststand() || isdefined(player.intermission) && player.intermission)
-		{
-			continue;
-		}
-
-		if (player in_revive_trigger())
-		{
-			continue;
-		}
-
-		if (player isthrowinggrenade())
-		{
-			wait 0.1;
-			continue;
-		}
-
-		if (player isswitchingweapons())
-		{
-			wait 0.1;
-			continue;
-		}
-
-		if (player.is_drinking > 0)
-		{
-			wait 0.1;
-			continue;
-		}
-
-		if (player hasperk(perk) || player has_perk_paused(perk))
-		{
-			cheat = 0;
-
-			if (cheat != 1)
-			{
-				self playsound("evt_perk_deny");
-				player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "perk_deny", undefined, 1);
-				continue;
-			}
-		}
-
-		if (isdefined(level.custom_perk_validation))
-		{
-			valid = self [[level.custom_perk_validation]](player);
-
-			if (!valid)
-			{
-				continue;
-			}
-		}
-
-		current_cost = cost;
-
-		if (player maps\mp\zombies\_zm_pers_upgrades_functions::is_pers_double_points_active())
-		{
-			current_cost = player maps\mp\zombies\_zm_pers_upgrades_functions::pers_upgrade_double_points_cost(current_cost);
-		}
-
-		if (player.score < current_cost)
-		{
-			self playsound("evt_perk_deny");
-			player maps\mp\zombies\_zm_audio::create_and_play_dialog("general", "perk_deny", undefined, 0);
-			continue;
-		}
-
-		sound = "evt_bottle_dispense";
-		playsoundatposition(sound, self.origin);
-		player maps\mp\zombies\_zm_score::minus_to_player_score(current_cost, 1);
-		player.perk_purchased = perk;
-		self thread maps\mp\zombies\_zm_audio::play_jingle_or_stinger(self.script_label);
-		self thread vending_trigger_post_think(player, perk);
-	}
+	self sethintstring(&"ZOMBIE_PERK_LIMIT_REACHED", limit);
+	wait 3;
+	self perk_machine_set_hint(perk, cost, solo);
 }
 
 vending_trigger_post_think(player, perk)

@@ -413,6 +413,12 @@ grief_bring_perk(machine, trigger)
 
 bring_perk_landing_damage()
 {
+	// Stock threads this on the machine the moment it lands, in both the normal and grief paths,
+	// which makes it the one reliable "this machine has arrived" hook. Nuketown has no power
+	// switch, so the machines added to the drop rotation - Mule Kick, PHD, Deadshot - would
+	// otherwise sit on their unlit model with their power-on callback never run.
+	self thread scripts\zm\replaced\_zm_perks::nuked_perk_machine_power_on();
+
 	player_prone_damage_radius = 300;
 	zombie_damage_radius = 500;
 	earthquake(0.7, 2.5, self.origin, 1000);

@@ -64,9 +64,15 @@ main()
 	replaceFunc(maps\mp\zm_tomb_craftables::onpickup_crystal, scripts\zm\replaced\zm_tomb_craftables::onpickup_crystal);
 	replaceFunc(maps\mp\zm_tomb_craftables::clear_player_crystal, scripts\zm\replaced\zm_tomb_craftables::clear_player_crystal);
 	replaceFunc(maps\mp\zm_tomb_craftables::staff_fullycrafted, scripts\zm\replaced\zm_tomb_craftables::staff_fullycrafted);
-	replaceFunc(maps\mp\zm_tomb_dig::init_shovel, scripts\zm\replaced\zm_tomb_dig::init_shovel);
+	// init_shovel is deliberately NOT replaced: the mod's copy dropped stock's shovel pickup
+	// spawning and handed every player a shovel on connect instead. Letting stock run restores the
+	// vanilla "go find a shovel" behaviour along with its own init_shovel_player.
 	replaceFunc(maps\mp\zm_tomb_dig::waittill_dug, scripts\zm\replaced\zm_tomb_dig::waittill_dug);
 	replaceFunc(maps\mp\zm_tomb_dig::increment_player_perk_purchase_limit, scripts\zm\replaced\zm_tomb_dig::increment_player_perk_purchase_limit);
+	// The limit getter is not replaced here. Stock init_shovel stores it as a function pointer in
+	// level.get_player_perk_purchase_limit, so a replaceFunc would only apply if detours reach
+	// pointer-invoked calls. _zm_reimagined::post_init clears that pointer instead, which makes
+	// zmr_perk_limit authoritative on this map regardless.
 	replaceFunc(maps\mp\zm_tomb_giant_robot::init_giant_robot_glows, scripts\zm\replaced\zm_tomb_giant_robot::init_giant_robot_glows);
 	replaceFunc(maps\mp\zm_tomb_giant_robot::giant_robot_initial_spawns, scripts\zm\replaced\zm_tomb_giant_robot::giant_robot_initial_spawns);
 	replaceFunc(maps\mp\zm_tomb_giant_robot::robot_cycling, scripts\zm\replaced\zm_tomb_giant_robot::robot_cycling);

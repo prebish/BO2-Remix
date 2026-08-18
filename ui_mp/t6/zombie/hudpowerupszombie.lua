@@ -35,17 +35,20 @@ CoD.PowerUps.ClientFieldNames[1] = {
 	clientFieldName = "powerup_instant_kill",
 	material = RegisterMaterial("specialty_instakill_zombies"),
 	nukedMaterialName = "uie_powerup_instakill",
+	prisonMaterialName = "uie_soe_powerup_instakill",
 }
 CoD.PowerUps.ClientFieldNames[2] = {
 	clientFieldName = "powerup_double_points",
 	material = RegisterMaterial("specialty_doublepoints_zombies"),
 	nukedMaterialName = "uie_powerup_double",
+	prisonMaterialName = "uie_soe_powerup_doublepoints",
 	z_material = RegisterMaterial("specialty_doublepoints_zombies_blue"),
 }
 CoD.PowerUps.ClientFieldNames[3] = {
 	clientFieldName = "powerup_fire_sale",
 	material = RegisterMaterial("specialty_firesale_zombies"),
 	nukedMaterialName = "uie_powerup_sale",
+	prisonMaterialName = "uie_soe_powerup_firesale",
 }
 CoD.PowerUps.ClientFieldNames[4] = {
 	clientFieldName = "powerup_bon_fire",
@@ -68,6 +71,7 @@ CoD.PowerUps.UpgradeClientFieldNames[1] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[1].clientFieldName .. "_ug",
 	material = RegisterMaterial("specialty_instakill_zombies"),
 	nukedMaterialName = "uie_powerup_instakill",
+	prisonMaterialName = "uie_soe_powerup_instakill",
 	color = CoD.PowerUps.UpGradeIconColorRed,
 }
 CoD.PowerUps.EnemyClientFieldNames = {}
@@ -75,12 +79,14 @@ CoD.PowerUps.EnemyClientFieldNames[1] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[1].clientFieldName .. "_enemy",
 	material = RegisterMaterial("specialty_instakill_zombies"),
 	nukedMaterialName = "uie_powerup_instakill",
+	prisonMaterialName = "uie_soe_powerup_instakill",
 	color = CoD.PowerUps.EnemyIconColorRed,
 }
 CoD.PowerUps.EnemyClientFieldNames[2] = {
 	clientFieldName = CoD.PowerUps.ClientFieldNames[2].clientFieldName .. "_enemy",
 	material = RegisterMaterial("specialty_doublepoints_zombies"),
 	nukedMaterialName = "uie_powerup_double",
+	prisonMaterialName = "uie_soe_powerup_doublepoints",
 	color = CoD.PowerUps.EnemyIconColorRed,
 }
 LUI.createMenu.PowerUpsArea = function(LocalClientIndex)
@@ -322,19 +328,33 @@ CoD.PowerUps.UseNukedIcons = function()
 	return UIExpression.DvarString(nil, "mapname") == "zm_nuked"
 end
 
+-- Same map-to-field table as the perk HUD keeps. Mob of the Dead only has SoE art for Insta Kill,
+-- Double Points and Fire Sale; Bonfire Sale, Death Machine and Zombie Blood fall back to stock.
+CoD.PowerUps.CustomIconFields = {
+	zm_nuked = "nukedMaterialName",
+	zm_prison = "prisonMaterialName",
+}
+
+CoD.PowerUps.CustomIconField = function()
+	return CoD.PowerUps.CustomIconFields[UIExpression.DvarString(nil, "mapname")]
+end
+
 -- Registered on first use, not where the tables are declared. These materials live in mod.ff, which
 -- is loaded after the LUI menu files - registering at file scope got "Could not load material" for
 -- every one of them and the icons silently stayed stock.
 CoD.PowerUps.NukedMaterial = function(entry, fallback)
-	if not CoD.PowerUps.UseNukedIcons() or not entry.nukedMaterialName then
+	local iconField = CoD.PowerUps.CustomIconField()
+	if not iconField or not entry[iconField] then
 		return fallback
 	end
 
-	if not entry.nukedMaterial then
-		entry.nukedMaterial = RegisterMaterial(entry.nukedMaterialName)
+	-- Cached per field so two maps' art can coexist in one entry.
+	local cacheField = iconField .. "Cached"
+	if not entry[cacheField] then
+		entry[cacheField] = RegisterMaterial(entry[iconField])
 	end
 
-	return entry.nukedMaterial
+	return entry[cacheField]
 end
 
 CoD.PowerUps.GetMaterial = function(Menu, LocalClientIndex, ClientFieldName)

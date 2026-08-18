@@ -526,7 +526,15 @@ tomb_check_crafted_weapon_persistence(player)
 
 tomb_custom_craftable_validation(player)
 {
-	if (self.stub.equipname == "equip_dieseldrone_zm")
+	// Vanilla _zm_buildables calls this for every craftable table, including ones that
+	// produce no weapon (gramophone, vinyl records). Guard the stub fields so those
+	// tables validate instead of erroring out and killing their interaction thread.
+	if (!isdefined(self.stub))
+	{
+		return 1;
+	}
+
+	if (isdefined(self.stub.equipname) && self.stub.equipname == "equip_dieseldrone_zm")
 	{
 		level.quadrotor_status.pickup_trig = self.stub;
 
@@ -536,7 +544,7 @@ tomb_custom_craftable_validation(player)
 		}
 	}
 
-	if (!issubstr(self.stub.weaponname, "staff"))
+	if (!isdefined(self.stub.weaponname) || !issubstr(self.stub.weaponname, "staff"))
 	{
 		return 1;
 	}

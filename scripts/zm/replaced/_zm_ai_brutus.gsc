@@ -208,7 +208,11 @@ check_craftable_table_valid(player)
 			self.stub.is_locked = 0;
 			self.stub.locked_cost = undefined;
 			self.stub.lock_fx delete();
-			self scripts\zm\zm_prison\zm_prison_reimagined::craftabletrigger_update_prompt(player);
+			// Stock, not zm_prison_reimagined: the map-local craftable table overrides were deleted
+			// when the crafting tables were handed back to stock code, leaving this call pointing at
+			// a function that no longer exists. It crashed Mob of the Dead on load with
+			// "Unresolved external: craftabletrigger_update_prompt".
+			self maps\mp\zombies\_zm_craftables::craftabletrigger_update_prompt(player);
 		}
 
 		return false;

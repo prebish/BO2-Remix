@@ -498,7 +498,7 @@ treasure_chest_weapon_spawn(chest, player, respin)
 
 	for (i = 0; i < number_cycles; i++)
 	{
-		rand = treasure_chest_chooseweightedrandomweapon(player, rand, 0);
+		rand = treasure_chest_chooseweightedrandomweapon(player, rand);
 		modelname = getweaponmodel(rand);
 
 		if (isdefined(self.weapon_model))
@@ -772,7 +772,13 @@ treasure_chest_weapon_spawn(chest, player, respin)
 	self notify("box_spin_done");
 }
 
-treasure_chest_chooseweightedrandomweapon(player, prev_weapon, add_to_acquired = 1)
+// Vanilla weighted-random selection: shuffle the pool, hand back the first weapon this player can
+// currently receive, skipping only the one already on display. The previous behaviour tracked every
+// weapon a player had been given in player.random_weapons_acquired and refused to repeat any of
+// them until the pool ran dry, so the box walked the whole list before duplicating.
+// The pool itself is untouched - level.zombie_weapons still carries whatever the legacy box guns
+// setting added, and level.customrandomweaponweights still applies.
+treasure_chest_chooseweightedrandomweapon(player, prev_weapon)
 {
 	keys = array_randomize(getarraykeys(level.zombie_weapons));
 
@@ -783,46 +789,22 @@ treasure_chest_chooseweightedrandomweapon(player, prev_weapon, add_to_acquired =
 
 	pap_triggers = getentarray("specialty_weapupgrade", "script_noteworthy");
 
-	if (!isDefined(player.random_weapons_acquired))
-	{
-		player.random_weapons_acquired = [];
-	}
-
 	for (i = 0; i < keys.size; i++)
 	{
 		if (treasure_chest_canplayerreceiveweapon(player, keys[i], pap_triggers))
 		{
-			if (!isInArray(player.random_weapons_acquired, keys[i]))
+			if (isDefined(prev_weapon) && prev_weapon == keys[i])
 			{
-				if (isDefined(prev_weapon) && prev_weapon == keys[i])
-				{
-					continue;
-				}
-
-				if (add_to_acquired)
-				{
-					player.random_weapons_acquired[player.random_weapons_acquired.size] = keys[i];
-				}
-
-				return keys[i];
+				continue;
 			}
+
+			return keys[i];
 		}
 	}
 
 	if (isDefined(prev_weapon))
 	{
-		if (add_to_acquired)
-		{
-			player.random_weapons_acquired[player.random_weapons_acquired.size] = prev_weapon;
-		}
-
 		return prev_weapon;
-	}
-
-	if (player.random_weapons_acquired.size > 0)
-	{
-		player.random_weapons_acquired = [];
-		return treasure_chest_chooseweightedrandomweapon(player);
 	}
 
 	return keys[0];

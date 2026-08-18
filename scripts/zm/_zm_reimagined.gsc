@@ -771,7 +771,29 @@ post_init()
 	level.dont_link_common_wallbuys = 1;
 	level.magicbox_timeout = 9;
 	level.packapunch_timeout = 12;
-	level.perk_purchase_limit = 9;
+	// Assigned here as well as in perk_changes() because stock _zm_perks::init runs after
+	// _zm_reimagined::main and resets this to 4, so the perk_changes() value never survives on its
+	// own. post_init runs after that, making this the assignment that actually takes effect.
+	// It reads the RULES setting rather than a fixed number so 4/6/8/12 all work.
+	level.perk_purchase_limit = mod_setting("zmr_perk_limit", 4);
+
+	// Origins' init_shovel installs a per-player limit getter here that ignores
+	// level.perk_purchase_limit, so the RULES setting had no effect on that map. Clearing it makes
+	// _zm_perks::get_player_perk_purchase_limit fall back to level.perk_purchase_limit everywhere.
+	// Cleared at this point rather than during main() because stock init_shovel assigns it during
+	// map init; no perk is buyable before start_zombie_round_logic, so nothing reads it earlier.
+	// Reimagined already replaces increment_player_perk_purchase_limit with a free-perk reward
+	// instead of a cap increase, so no map still needs a growing per-player limit.
+	level.get_player_perk_purchase_limit = undefined;
+
+	// Set explicitly rather than left alone. Upstream had "level.weapon_locker_online = 0" here,
+	// which forced the locker off online profile storage onto per-game entity storage and made the
+	// stored weapon reset every match. Deleting that line was not enough: the flag then read as
+	// undefined, which the locker treats the same as 0, so the weapon still did not survive. Set to
+	// 1 so it uses profile storage and the exact stored weapon comes back between matches and
+	// across the maps that have a locker, as it does in the base game.
+	level.weapon_locker_online = 1;
+
 	level._random_zombie_perk_cost = 2500;
 	level.flopper_network_optimized = 0;
 	level.equipment_etrap_needs_power = 0;
@@ -2114,10 +2136,12 @@ is_held_melee_weapon_offhand_melee(weaponname)
 
 perk_changes()
 {
-	// How many perks a player may hold at once, from the RULES tab. _zm_perks::init sets this to 4,
-	// and get_player_perk_purchase_limit reads it for every purchase, so overwriting it here is the
-	// whole change. Origins layers its own per-player limit on top through
-	// level.get_player_perk_purchase_limit, which still wins where it is set.
+	// How many perks a player may PURCHASE, from the RULES tab (4 / 6 / 8 / 12-as-unlimited).
+	// Perks handed out for free - powerup drops, dig rewards, perk bottles - are not gated by this,
+	// so a player can end up holding more than the limit; it only blocks buying another one.
+	// Stock _zm_perks::init resets this to 4 after main() runs, so post_init() assigns it again
+	// from the same setting and that is the value that actually takes effect. Kept here too so the
+	// limit is populated early for anything reading it before post_init.
 	level.perk_purchase_limit = mod_setting("zmr_perk_limit", 4);
 
 	// Nuketown is Survival only, so it never reaches the Classic block below. These four have no
@@ -2621,10 +2645,6 @@ wallbuy_cost_changes()
 		level.zombie_weapons["870mcs_zm"].ammo_cost = int(cost / 2);
 	}
 
-	if (isDefined(level.zombie_weapons["thompson_zm"]))
-	{
-		level.zombie_weapons["thompson_zm"].ammo_cost = 750;
-	}
 }
 
 player_waypoint()

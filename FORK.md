@@ -265,6 +265,14 @@ score is not always exactly 500 — persistent upgrades and some gametypes move 
   The pack's readme asks that the author's signature be kept on the scoreboard and pause menu.
   Neither is used here, so nothing was stripped; this section is the credit instead.
 
+* **BO3 Perk Shaders Pack** — Shadows of Evil styled icons, scoped to Mob of the Dead by the LUI.
+  Perk shaders by **Gewehr**; Double Points, Insta Kill and Fire Sale shaders by **Larsendog**.
+  The pack also ships Default, Default (Origins), BO1 Style and Old Gen variants, none of which are
+  used here. Eleven perks and three powerups come across as `uie_soe_perk_*` / `uie_soe_powerup_*`.
+  The SoE set has no Tombstone or Zombie Blood icon, and none for Bonfire Sale or Death Machine, so
+  those four keep their stock art on Mob of the Dead — the per-entry field guard in
+  `CoD.Perks.GetMaterial` and `CoD.PowerUps.NukedMaterial` is what makes that fall back cleanly.
+
 ## Things worth knowing when changing this fork
 
 * **Nuketown carries almost none of the assets other maps have.** Adding anything to it — a powerup,
