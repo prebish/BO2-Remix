@@ -49,10 +49,7 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 * [Players](#players)
 * [Zombies](#zombies)
 	* [Denizens](#denizens)
-	* [Avogadro](#avogadro)
-	* [Leapers](#leapers)
 	* [Brutus](#brutus)
-	* [Panzersoldat](#panzersoldat)
 * [Weapons](#weapons)
 	* [Legacy Weapons](#legacy-weapons)
 	* [Pistols](#pistols)
@@ -367,17 +364,6 @@ Where the behaviour is not obvious from the name:
 * Removed hint when player is first attacked in solo
 * Fixed not spawning in correct zone sometimes
 
-### Avogadro
-* Drops a random powerup when killed
-* Increased player damage from 90 to 100
-* Decreased minimum distance away from players to be able to attack
-* Respawns on the same round if exited due to being too far away from players (normally respawns on the next round)
-
-### Leapers
-* Initial round always happens on round 5 or 6
-* No longer give each player 2000 points when rewarded a free perk powerup
-* Fixed gaining kill points twice
-
 ### Brutus
 * Increased round for initial spawn in coop from 5-7 to 9
 * Smoke Grenade kills zombies
@@ -385,17 +371,6 @@ Where the behaviour is not obvious from the name:
 * Decreased footstep screen shake by 25%
 * No longer receives additional damage from Ray Gun Mark 2
 * Teleports away less frequently
-
-### Panzersoldat
-* Increased number of rounds for next spawn in coop from 3 to 4-5
-* Decreased amount that spawn per round in coop from 1-3 to 1
-* Flamethrower damage no longer changes based on player's health
-* Decreased flamethrower damage from 45 to 30
-* Death explosion kills zombies
-* Changed death explosion player damage from 100-25 to 75
-* Decreased fire zombie death explosion max damage from 30 to 15
-* Decreased footstep screen shake by 25%
-* No longer receives additional damage from Boomhilda or Ray Gun Mark 2
 
 ## Weapons
 * Switch to melee weapon by pressing the Melee Weapon button (same button as Time Bomb and Maxis Drone)
@@ -1265,44 +1240,23 @@ upgrades to the M16A1 GL.
 * Pack-a-Punch
 
 ### Buried
-* Added Frag Grenade wallbuy at Candy Store Upstairs
+* Added Semtex wallbuy at Candy Store Upstairs
 * Added PHD Flopper machine at Lower Processing
 * Added Deadshot Daiquiri machine at Mansion Backyard
 * Added Tombstone Soda machine at General Store
-* Removed Turbine, key, booze, and candy
-* Power automatically on
-* Remington 870 MCS wallbuy chalk automatically drawn in the Center Tunnels zone
 * Moved MSMC wallbuy to its location on Borough
 * Moved buildable wallbuy in Courthouse to AN-94 wallbuy location on Borough
 * Adjusted buildable wallbuy positions
-* Drawing wallbuys no longer gives points
-* Arthur barricades are buyable debris
-* Arthur can be purchased to feed him candy and make him run around and kill zombies for 30 seconds
-* Ghosts take 20% of player's points instead of 2000 points
-* Ghosts no longer drop a free perk powerup if any player takes damage from ghosts during a ghost round
-* Ghosts no longer spawn and go after players not in the Mansion during a ghost round
 * Added controller aim assist to ghosts
 * Adjusted volume of zombie vocals
 * Fountain portal automatically active
 * Players no longer take fall damage after using the fountain teleporter
-* Players can no longer get into the corner next to Jugger-Nog
 * Removed buildable table hint icons
 * Added buildable table hint strings on buildable purchase
 * Zombies spawn in the Toy Store Downstairs zone when players are in the Candy Store Downstairs zone (and vice versa)
 * Fixed not switching back to weapon immediately after drawing wallbuy
-* Quest: added "Benn - Bury Me" song
-* Quest: all 5 signs must be meleed for wisp to spawn
-* Quest: changed number of targets that need to be hit to 20 multiplied by the amount of players
-* Quest: perks given on completion are no longer permament
-* Quest: completion button always activatable after completing the quest
-* Quest (Maxis): no longer need to activate the Time Bomb to be able to spawn the 2nd wisp
 * Quest (Maxis): no longer need to activate the lever in the Mansion before activating the bells
-* Quest (Maxis): bells can be activated in any order
-* Quest (Maxis): Richtofen zombie completion button reward can only drop powerup if killed by a player
-* Quest (Maxis): Richtofen zombie completion button reward no longer gives player 500 points when killed
 * Quest (Richtofen): can enter round infinity without having all players next to the Guillotine
-* Quest (Richtofen): Maze levers can be activated in an order
-* Quest (Richtofen): completion button reward increases weapon limit from 2 to 3
 
 #### Borough
 * Upper tunnels and bank area disabled

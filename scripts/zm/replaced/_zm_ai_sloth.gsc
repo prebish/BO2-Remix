@@ -294,7 +294,3 @@ sloth_ragdoll_zombie(zombie)
 	return false;
 }
 
-wait_start_candy_booze(piece)
-{
-	// remove
-}

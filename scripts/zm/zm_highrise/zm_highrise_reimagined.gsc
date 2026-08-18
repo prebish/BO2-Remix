@@ -42,9 +42,6 @@ main()
 	replaceFunc(maps\mp\zm_highrise_distance_tracking::escaped_zombies_cleanup_init, scripts\zm\replaced\zm_highrise_distance_tracking::escaped_zombies_cleanup_init);
 	replaceFunc(maps\mp\zm_highrise_distance_tracking::zombies_off_building, scripts\zm\replaced\zm_highrise_distance_tracking::zombies_off_building);
 	replaceFunc(maps\mp\zm_highrise_distance_tracking::delete_zombie_noone_looking, scripts\zm\replaced\zm_highrise_distance_tracking::delete_zombie_noone_looking);
-	replaceFunc(maps\mp\zombies\_zm_ai_leaper::leaper_round_tracker, scripts\zm\replaced\_zm_ai_leaper::leaper_round_tracker);
-	replaceFunc(maps\mp\zombies\_zm_ai_leaper::leaper_round_accuracy_tracking, scripts\zm\replaced\_zm_ai_leaper::leaper_round_accuracy_tracking);
-	replaceFunc(maps\mp\zombies\_zm_ai_leaper::leaper_death, scripts\zm\replaced\_zm_ai_leaper::leaper_death);
 	replaceFunc(maps\mp\zombies\_zm_equip_springpad::springpadthink, scripts\zm\replaced\_zm_equip_springpad::springpadthink);
 	replaceFunc(maps\mp\zombies\_zm_weap_slipgun::slipgun_zombie_1st_hit_response, scripts\zm\replaced\_zm_weap_slipgun::slipgun_zombie_1st_hit_response);
 	replaceFunc(maps\mp\zombies\_zm_weap_slipgun::slipgun_zombie_death_response, scripts\zm\replaced\_zm_weap_slipgun::slipgun_zombie_death_response);

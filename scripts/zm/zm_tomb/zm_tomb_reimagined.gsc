@@ -95,11 +95,6 @@ main()
 	replaceFunc(maps\mp\zm_tomb_ffotd::player_spawn_fix, scripts\zm\replaced\zm_tomb_ffotd::player_spawn_fix);
 	replaceFunc(maps\mp\zm_tomb_distance_tracking::escaped_zombies_cleanup_init, scripts\zm\replaced\zm_tomb_distance_tracking::escaped_zombies_cleanup_init);
 	replaceFunc(maps\mp\zm_tomb_distance_tracking::delete_zombie_noone_looking, scripts\zm\replaced\zm_tomb_distance_tracking::delete_zombie_noone_looking);
-	replaceFunc(maps\mp\zombies\_zm_ai_mechz::mechz_set_starting_health, scripts\zm\replaced\_zm_ai_mechz::mechz_set_starting_health);
-	replaceFunc(maps\mp\zombies\_zm_ai_mechz::mechz_round_tracker, scripts\zm\replaced\_zm_ai_mechz::mechz_round_tracker);
-	replaceFunc(maps\mp\zombies\_zm_ai_mechz::mechz_death, scripts\zm\replaced\_zm_ai_mechz::mechz_death);
-	replaceFunc(maps\mp\zombies\_zm_ai_mechz_ft::mechz_watch_for_flamethrower_damage, scripts\zm\replaced\_zm_ai_mechz_ft::mechz_watch_for_flamethrower_damage);
-	replaceFunc(maps\mp\zombies\_zm_ai_mechz_ft::explode_on_death, scripts\zm\replaced\_zm_ai_mechz_ft::explode_on_death);
 	replaceFunc(maps\mp\zombies\_zm_ai_quadrotor::quadrotor_movementupdate, scripts\zm\replaced\_zm_ai_quadrotor::quadrotor_movementupdate);
 	replaceFunc(maps\mp\zombies\_zm_challenges::onplayerspawned, scripts\zm\replaced\_zm_challenges::onplayerspawned);
 	replaceFunc(maps\mp\zombies\_zm_challenges::team_stats_init, scripts\zm\replaced\_zm_challenges::team_stats_init);

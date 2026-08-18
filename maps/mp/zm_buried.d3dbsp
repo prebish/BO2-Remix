@@ -33792,7 +33792,7 @@
 "angles" "0 0 0"
 "origin" "599 -374 205"
 "classname" "script_struct"
-"zombie_weapon_upgrade" "frag_grenade_zm"
+"zombie_weapon_upgrade" "sticky_grenade_zm"
 "targetname" "weapon_upgrade"
 "target" "pf3666_auto37"
 "guid" "834D841B"

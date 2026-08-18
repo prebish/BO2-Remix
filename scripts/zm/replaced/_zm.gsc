@@ -52,7 +52,7 @@ init_fx()
 		level.disable_fx_zmb_wall_buy_semtex = 0;
 	}
 
-	if (level.script == "zm_prison")
+	if (level.script == "zm_buried" || level.script == "zm_prison")
 	{
 		register_lethal_grenade_for_level("sticky_grenade_zm");
 	}
@@ -118,12 +118,11 @@ init_fx()
 	{
 		if (!(isdefined(level.disable_fx_zmb_wall_buy_semtex) && level.disable_fx_zmb_wall_buy_semtex))
 		{
+			// Buried used to be special-cased to frag_grenade_zm here, because its Candy Store
+			// Upstairs wallbuy sold frags while using the semtex bag model and this semtex wallbuy
+			// fx. That wallbuy now sells Semtex, so the fx keys off the same weapon as every other
+			// map.
 			grenade = "sticky_grenade_zm";
-
-			if (level.script == "zm_buried")
-			{
-				grenade = "frag_grenade_zm";
-			}
 
 			level._effect[grenade + "_fx"] = loadfx("maps/zombie/fx_zmb_wall_buy_semtex");
 		}

@@ -883,18 +883,6 @@ nuked_perk_machine_power_on()
 {
 	self endon("death");
 
-	// TEMPORARY DIAGNOSTIC - remove once the machines are confirmed lighting up. Writes to
-	// games_mp.log in the mod folder. Logs every landing, not just the three perks this fixes, so
-	// the first machine of the game shows whether the hook fires at all and whether zmr_perk is set.
-	if (isdefined(self.zmr_perk))
-	{
-		logprint("ZMR landed: perk=" + self.zmr_perk + "\n");
-	}
-	else
-	{
-		logprint("ZMR landed: perk=UNDEFINED (spawn_init did not tag this machine)\n");
-	}
-
 	if (!isdefined(self.zmr_perk))
 	{
 		return;
@@ -904,23 +892,18 @@ nuked_perk_machine_power_on()
 
 	if (!isdefined(key) || !isdefined(level.machine_assets) || !isdefined(level.machine_assets[key]))
 	{
-		logprint("ZMR   -> no assets key, left alone\n");
 		return;
 	}
 
 	if (isdefined(level.machine_assets[key].on_model))
 	{
 		self setmodel(level.machine_assets[key].on_model);
-		logprint("ZMR   -> key=" + key + " lit model=" + level.machine_assets[key].on_model + "\n");
 	}
 
 	if (!isdefined(level.machine_assets[key].power_on_callback))
 	{
-		logprint("ZMR   -> no power_on_callback for " + key + "\n");
 		return;
 	}
-
-	logprint("ZMR   -> running power_on_callback for " + key + "\n");
 
 	// PHD and Deadshot light up through a client-side shader constant, and the client picks the
 	// machine out of getentarray by model name. The machine has only just been placed, so the

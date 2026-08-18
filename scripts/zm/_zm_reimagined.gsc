@@ -2318,6 +2318,16 @@ weapon_changes()
 		level.zombie_weapons["willy_pete_zm"].is_in_box = 1;
 	}
 
+	// The Candy Store Upstairs wallbuy sells Semtex rather than frags. Buried already had
+	// level._uses_sticky_grenades set and drew the wallbuy with the semtex bag model and the semtex
+	// wallbuy fx - only the weapon it handed out was a frag. Registered the same way Mob of the Dead
+	// registers it above; the map ships no other grenade wallbuy, so nothing else changes hands.
+	if (level.script == "zm_buried")
+	{
+		include_weapon("sticky_grenade_zm", 0);
+		add_zombie_weapon("sticky_grenade_zm", undefined, &"ZOMBIE_WEAPON_STICKY_GRENADE", 250, "wpck_explo", "", 250);
+	}
+
 	if (level.script == "zm_tomb")
 	{
 		include_weapon("held_one_inch_punch_zm", 0);
