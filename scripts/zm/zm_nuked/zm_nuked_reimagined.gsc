@@ -431,7 +431,7 @@ spawn_buildable_bench()
 	// The bench's base is at its origin and t6_wpn_zmb_shield_world hangs 26 below its own,
 	// so 70 up rests the assembly on the bench top.
 	shield = spawn("script_model", origin + (0, 0, 70));
-	shield.angles = angles + (0, 180, 0);
+	shield.angles = angles;
 	shield setModel("t6_wpn_zmb_shield_world");
 	shield.targetname = "buildable_riotshield";
 
