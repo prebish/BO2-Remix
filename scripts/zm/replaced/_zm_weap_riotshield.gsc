@@ -130,7 +130,11 @@ riotshield_fling_zombie(player, fling_vec, index)
 	if (self.health < 1)
 	{
 		self.riotshield_death = 1;
-		player maps\mp\zombies\_zm_score::player_add_points("death", "MOD_MELEE");
+		// A shield kill pays the base 50 like a body shot rather than the 80-point melee bonus.
+		// Passing no means-of-death and a torso hit location is what drops the bonus:
+		// _zm_score::player_add_points_kill_bonus only pays the melee rate for MOD_MELEE, and
+		// still counts the kill as a normal one for the death_normal stat.
+		player maps\mp\zombies\_zm_score::player_add_points("death", "", "torso_upper");
 		self startragdoll();
 		self launchragdoll(fling_vec);
 	}
@@ -181,7 +185,11 @@ riotshield_knockdown_zombie(player, gib)
 
 	if (self.health < 1)
 	{
-		player maps\mp\zombies\_zm_score::player_add_points("death", "MOD_MELEE");
+		// A shield kill pays the base 50 like a body shot rather than the 80-point melee bonus.
+		// Passing no means-of-death and a torso hit location is what drops the bonus:
+		// _zm_score::player_add_points_kill_bonus only pays the melee rate for MOD_MELEE, and
+		// still counts the kill as a normal one for the death_normal stat.
+		player maps\mp\zombies\_zm_score::player_add_points("death", "", "torso_upper");
 	}
 	else
 	{
