@@ -14,9 +14,9 @@ cd C:\Users\Joel\Desktop\blops2\BO2-Reimagined
 .\build.bat
 
 # 2. install
-$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_reimagined"
+$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_zombiesplusplus"
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
-Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_reimagined\*' -Destination $dest -Force
+Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_zombiesplusplus\*' -Destination $dest -Force
 
 # 3. check — this must print NOTHING
 @('mod.ff','mod.iwd','mod.json','mod.all.sabs','mod.all.sabl','mod.english.sabs') |
@@ -59,9 +59,9 @@ Watch for the last line:
 ### Step 4 — Install the mod
 
 ```powershell
-$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_reimagined"
+$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_zombiesplusplus"
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
-Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_reimagined\*' -Destination $dest -Force
+Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_zombiesplusplus\*' -Destination $dest -Force
 ```
 
 > ### ⚠ The finished mod is NOT in the repo folder
@@ -76,7 +76,7 @@ Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_reimagined\*' -Destination $dest -For
 >     │   ├── scripts\
 >     │   └── mod.ff, mod.all.sabs, ...   (leftovers - incomplete, ignore them)
 >     │
->     └── zm_reimagined\       <-- HERE. all 6 files. copy from this one.
+>     └── zm_zombiesplusplus\  <-- HERE. all 6 files. copy from this one.
 >         ├── mod.ff
 >         ├── mod.iwd
 >         ├── mod.json
@@ -85,7 +85,7 @@ Copy-Item 'C:\Users\Joel\Desktop\blops2\zm_reimagined\*' -Destination $dest -For
 >         └── mod.english.sabs
 > ```
 >
-> `zm_reimagined` is a **sibling** of `BO2-Reimagined`, not inside it. If you're browsing the repo
+> `zm_zombiesplusplus` is a **sibling** of `BO2-Reimagined`, not inside it. If you're browsing the repo
 > looking for it, you won't find it — go up one folder.
 >
 > The repo folder keeps some mod files after a build, but it's **missing `mod.iwd` and `mod.json`**
@@ -129,7 +129,7 @@ If you **only** changed `.gsc` files or Lua in `ui/` / `ui_mp/`, skip `build.bat
 ```powershell
 cd C:\Users\Joel\Desktop\blops2\BO2-Reimagined
 Compress-Archive -Force -Path attachmentunique,images,maps,scripts,ui,ui_mp,weapons -DestinationPath mod.iwd
-Copy-Item mod.iwd "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_reimagined\" -Force
+Copy-Item mod.iwd "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_zombiesplusplus\" -Force
 Remove-Item mod.iwd
 ```
 
@@ -166,32 +166,32 @@ When in doubt, run the full build. It's only 30 seconds.
 ## Three rules
 
 1. **Run `build.bat` from the repo folder.** It uses your current folder to find everything.
-2. **Install from `blops2\zm_reimagined`, and check you have 6 files.** Never copy from the repo folder.
+2. **Install from `blops2\zm_zombiesplusplus`, and check you have 6 files.** Never copy from the repo folder.
 3. **Close the game before installing.**
 
 ---
 
 ## Something went wrong
 
-### I can't find the `zm_reimagined` folder
+### I can't find the `zm_zombiesplusplus` folder
 
 It's **not inside the repo**. It's one level up, next to it:
 
 ```
-C:\Users\Joel\Desktop\blops2\zm_reimagined
+C:\Users\Joel\Desktop\blops2\zm_zombiesplusplus
 ```
 
 Open it directly:
 
 ```powershell
-explorer C:\Users\Joel\Desktop\blops2\zm_reimagined
+explorer C:\Users\Joel\Desktop\blops2\zm_zombiesplusplus
 ```
 
 If that errors, the build didn't finish — re-run Step 3 and check for `0 errors`.
 
 ### The Step 5 check printed `mod.iwd` and `mod.json` as missing
 
-You copied from the repo folder instead of `blops2\zm_reimagined`. Redo Step 4.
+You copied from the repo folder instead of `blops2\zm_zombiesplusplus`. Redo Step 4.
 
 This is the most common mistake, and the symptom is confusing: the game still loads and looks
 normal, but none of your script changes are there.
@@ -287,7 +287,7 @@ Since `mod.iwd` is just a ZIP, you can read your script back out of the installe
 change shipped:
 
 ```powershell
-$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_reimagined"
+$dest = "$env:LOCALAPPDATA\Plutonium\storage\t6\mods\zm_zombiesplusplus"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [System.IO.Compression.ZipFile]::OpenRead("$dest\mod.iwd")
 $e = $zip.Entries | Where-Object FullName -eq 'scripts/zm/_zm_reimagined.gsc'
@@ -302,9 +302,9 @@ $sr.Close(); $zip.Dispose()
    `soundbank/*.aliases.csv` plus `sound/`.
 2. Zips `attachmentunique, images, maps, scripts, ui, ui_mp, weapons` into `mod.iwd`.
 3. Deletes the intermediates.
-4. Copies all six output files to `..\zm_reimagined`.
+4. Copies all six output files to `..\zm_zombiesplusplus`.
 5. **Deletes `mod.iwd` from the repo folder** — which is why the repo folder looks incomplete
-   afterwards, and why you must install from `..\zm_reimagined`.
+   afterwards, and why you must install from `..\zm_zombiesplusplus`.
 
 It does **not** install the mod. That's Step 4, and it's on you.
 
