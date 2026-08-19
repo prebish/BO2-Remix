@@ -17,6 +17,89 @@ CoD.PrivateGameLobby.Dvars[1].gameTypes[1] = "zgrief"
 CoD.PrivateGameLobby.Dvars[1].gameTypes[2] = "zmeat"
 CoD.PrivateGameLobby.Dvars[1].gameTypes[3] = "zturned"
 
+-- Starting round sits in the lobby rather than the options menu so it can be seen and
+-- changed on the way into a match. No gameTypes list, so it shows for every mode. Only
+-- the host gets these selectors, which is right for a setting the game reads once at
+-- map load. init_mod_setting only fills the dvar in when it is empty, so whatever is
+-- chosen here survives into the match.
+CoD.PrivateGameLobby.Dvars[2] = {}
+CoD.PrivateGameLobby.Dvars[2].id = "zmr_start_round"
+CoD.PrivateGameLobby.Dvars[2].name = "MENU_START_ROUND_CAPS"
+CoD.PrivateGameLobby.Dvars[2].hintText = "MENU_ZMR_START_ROUND_DESC"
+CoD.PrivateGameLobby.Dvars[2].labels = {}
+CoD.PrivateGameLobby.Dvars[2].labels[1] = "MENU_ZMR_DEFAULT_1_CAPS"
+CoD.PrivateGameLobby.Dvars[2].labels[2] = "MENU_ZMR_NUM_5_CAPS"
+CoD.PrivateGameLobby.Dvars[2].labels[3] = "MENU_ZMR_NUM_10_CAPS"
+CoD.PrivateGameLobby.Dvars[2].labels[4] = "MENU_ZMR_NUM_15_CAPS"
+CoD.PrivateGameLobby.Dvars[2].labels[5] = "MENU_ZMR_NUM_20_CAPS"
+CoD.PrivateGameLobby.Dvars[2].labels[6] = "MENU_ZMR_NUM_25_CAPS"
+CoD.PrivateGameLobby.Dvars[2].values = {}
+CoD.PrivateGameLobby.Dvars[2].values[1] = 1
+CoD.PrivateGameLobby.Dvars[2].values[2] = 5
+CoD.PrivateGameLobby.Dvars[2].values[3] = 10
+CoD.PrivateGameLobby.Dvars[2].values[4] = 15
+CoD.PrivateGameLobby.Dvars[2].values[5] = 20
+CoD.PrivateGameLobby.Dvars[2].values[6] = 25
+
+-- 500 means "leave the stock score alone" rather than "force 500", so it is the default
+-- rather than a value in its own right. See the note in _zm_reimagined::give_starting_points.
+CoD.PrivateGameLobby.Dvars[3] = {}
+CoD.PrivateGameLobby.Dvars[3].id = "zmr_starting_points"
+CoD.PrivateGameLobby.Dvars[3].name = "MENU_STARTING_POINTS_CAPS"
+CoD.PrivateGameLobby.Dvars[3].hintText = "MENU_ZMR_START_POINTS_DESC"
+CoD.PrivateGameLobby.Dvars[3].labels = {}
+CoD.PrivateGameLobby.Dvars[3].labels[1] = "MENU_ZMR_NUM_0_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[2] = "MENU_ZMR_DEFAULT_500_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[3] = "MENU_ZMR_NUM_1000_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[4] = "MENU_ZMR_NUM_1500_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[5] = "MENU_ZMR_NUM_2000_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[6] = "MENU_ZMR_NUM_2500_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[7] = "MENU_ZMR_NUM_5000_CAPS"
+CoD.PrivateGameLobby.Dvars[3].labels[8] = "MENU_ZMR_NUM_10000_CAPS"
+CoD.PrivateGameLobby.Dvars[3].values = {}
+CoD.PrivateGameLobby.Dvars[3].values[1] = 0
+CoD.PrivateGameLobby.Dvars[3].values[2] = 500
+CoD.PrivateGameLobby.Dvars[3].values[3] = 1000
+CoD.PrivateGameLobby.Dvars[3].values[4] = 1500
+CoD.PrivateGameLobby.Dvars[3].values[5] = 2000
+CoD.PrivateGameLobby.Dvars[3].values[6] = 2500
+CoD.PrivateGameLobby.Dvars[3].values[7] = 5000
+CoD.PrivateGameLobby.Dvars[3].values[8] = 10000
+
+-- Unlimited is 12 rather than a flag: it is the number of perks in the game, so the cap can
+-- never be reached. level.perk_purchase_limit takes the value straight off this dvar.
+CoD.PrivateGameLobby.Dvars[4] = {}
+CoD.PrivateGameLobby.Dvars[4].id = "zmr_perk_limit"
+CoD.PrivateGameLobby.Dvars[4].name = "MENU_PERK_LIMIT_CAPS"
+CoD.PrivateGameLobby.Dvars[4].hintText = "MENU_ZMR_PERK_LIMIT_DESC"
+CoD.PrivateGameLobby.Dvars[4].labels = {}
+CoD.PrivateGameLobby.Dvars[4].labels[1] = "MENU_ZMR_NUM_1_CAPS"
+CoD.PrivateGameLobby.Dvars[4].labels[2] = "MENU_ZMR_VANILLA_4_CAPS"
+CoD.PrivateGameLobby.Dvars[4].labels[3] = "MENU_ZMR_NUM_5_CAPS"
+CoD.PrivateGameLobby.Dvars[4].labels[4] = "MENU_ZMR_NUM_6_CAPS"
+CoD.PrivateGameLobby.Dvars[4].labels[5] = "MENU_ZMR_UNLIMITED_CAPS"
+CoD.PrivateGameLobby.Dvars[4].values = {}
+CoD.PrivateGameLobby.Dvars[4].values[1] = 1
+CoD.PrivateGameLobby.Dvars[4].values[2] = 4
+CoD.PrivateGameLobby.Dvars[4].values[3] = 5
+CoD.PrivateGameLobby.Dvars[4].values[4] = 6
+CoD.PrivateGameLobby.Dvars[4].values[5] = 12
+
+-- Health is 50 per hit, so this also decides whether Jugger-Nog is worth buying: its flat
+-- 160 beats two and three hits, but not five, where it is floored at base health instead.
+CoD.PrivateGameLobby.Dvars[5] = {}
+CoD.PrivateGameLobby.Dvars[5].id = "zmr_hit_down"
+CoD.PrivateGameLobby.Dvars[5].name = "MENU_HIT_DOWN_CAPS"
+CoD.PrivateGameLobby.Dvars[5].hintText = "MENU_ZMR_HIT_DOWN_DESC"
+CoD.PrivateGameLobby.Dvars[5].labels = {}
+CoD.PrivateGameLobby.Dvars[5].labels[1] = "MENU_ZMR_VANILLA_2_CAPS"
+CoD.PrivateGameLobby.Dvars[5].labels[2] = "MENU_ZMR_DEFAULT_3_CAPS"
+CoD.PrivateGameLobby.Dvars[5].labels[3] = "MENU_ZMR_NUM_5_CAPS"
+CoD.PrivateGameLobby.Dvars[5].values = {}
+CoD.PrivateGameLobby.Dvars[5].values[1] = 2
+CoD.PrivateGameLobby.Dvars[5].values[2] = 3
+CoD.PrivateGameLobby.Dvars[5].values[3] = 5
+
 CoD.PrivateGameLobby.ButtonPrompt_TeamPrev = function(f1_arg0, ClientInstance)
 	if Engine.PartyHostIsReadyToStart() == true then
 		return

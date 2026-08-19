@@ -34,7 +34,12 @@ main()
 	replaceFunc(maps\mp\zombies\_zm::last_stand_pistol_rank_init, scripts\zm\replaced\_zm::last_stand_pistol_rank_init);
 	replaceFunc(maps\mp\zombies\_zm::last_stand_best_pistol, scripts\zm\replaced\_zm::last_stand_best_pistol);
 	replaceFunc(maps\mp\zombies\_zm::can_track_ammo, scripts\zm\replaced\_zm::can_track_ammo);
-	replaceFunc(maps\mp\zombies\_zm::take_additionalprimaryweapon, scripts\zm\replaced\_zm::take_additionalprimaryweapon);
+	// Mule Kick handing the third weapon back on reacquire lives entirely in this replacement,
+	// so PERK BUFFS on VANILLA simply leaves the stock function in place.
+	if (mod_setting("zmr_perk_buffs", 1))
+	{
+		replaceFunc(maps\mp\zombies\_zm::take_additionalprimaryweapon, scripts\zm\replaced\_zm::take_additionalprimaryweapon);
+	}
 	replaceFunc(maps\mp\zombies\_zm::getfreespawnpoint, scripts\zm\replaced\_zm::getfreespawnpoint);
 	replaceFunc(maps\mp\zombies\_zm::check_for_valid_spawn_near_team, scripts\zm\replaced\_zm::check_for_valid_spawn_near_team);
 	replaceFunc(maps\mp\zombies\_zm::get_valid_spawn_location, scripts\zm\replaced\_zm::get_valid_spawn_location);
@@ -190,18 +195,36 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_weap_cymbal_monkey::init, scripts\zm\replaced\_zm_weap_cymbal_monkey::init);
 	replaceFunc(maps\mp\zombies\_zm_weap_cymbal_monkey::player_handle_cymbal_monkey, scripts\zm\replaced\_zm_weap_cymbal_monkey::player_handle_cymbal_monkey);
 	replaceFunc(maps\mp\zombies\_zm_perk_divetonuke::divetonuke_precache, scripts\zm\replaced\_zm_perk_divetonuke::divetonuke_precache);
-	replaceFunc(maps\mp\zombies\_zm_perk_divetonuke::divetonuke_perk_machine_setup, scripts\zm\replaced\_zm_perk_divetonuke::divetonuke_perk_machine_setup);
-	replaceFunc(maps\mp\zombies\_zm_perk_divetonuke::divetonuke_explode, scripts\zm\replaced\_zm_perk_divetonuke::divetonuke_explode);
-	replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::enable_electric_cherry_perk_for_level, scripts\zm\replaced\_zm_perk_electric_cherry::enable_electric_cherry_perk_for_level);
-	replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electic_cherry_precache, scripts\zm\replaced\_zm_perk_electric_cherry::electic_cherry_precache);
-	replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electric_cherry_reload_attack, scripts\zm\replaced\_zm_perk_electric_cherry::electric_cherry_reload_attack);
-	replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electric_cherry_laststand, scripts\zm\replaced\_zm_perk_electric_cherry::electric_cherry_laststand);
+	// PHD Flopper. divetonuke_precache above stays put either way - it only carries the Origins
+	// bottle model and the machine assets. These two are the behaviour: the dive explosion using
+	// radiusdamage so it catches every zombie in range at once, and the machine setup that goes
+	// with it.
+	if (mod_setting("zmr_perk_buffs", 1))
+	{
+		replaceFunc(maps\mp\zombies\_zm_perk_divetonuke::divetonuke_perk_machine_setup, scripts\zm\replaced\_zm_perk_divetonuke::divetonuke_perk_machine_setup);
+		replaceFunc(maps\mp\zombies\_zm_perk_divetonuke::divetonuke_explode, scripts\zm\replaced\_zm_perk_divetonuke::divetonuke_explode);
+	}
+	// Electric Cherry, all six changes. The enable function has to go with them: it registers the
+	// mod's reload attack as a function pointer from inside its own file, so replacing the two
+	// behaviour functions alone would be bypassed entirely. Letting stock enable run instead
+	// registers stock's pointers. Safe for co-op - the mod's file never defines the clientfield
+	// functions, it includes stock and reuses them, so registration is identical either way.
+	if (mod_setting("zmr_perk_buffs", 1))
+	{
+		replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::enable_electric_cherry_perk_for_level, scripts\zm\replaced\_zm_perk_electric_cherry::enable_electric_cherry_perk_for_level);
+		replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electic_cherry_precache, scripts\zm\replaced\_zm_perk_electric_cherry::electic_cherry_precache);
+		replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electric_cherry_reload_attack, scripts\zm\replaced\_zm_perk_electric_cherry::electric_cherry_reload_attack);
+		replaceFunc(maps\mp\zombies\_zm_perk_electric_cherry::electric_cherry_laststand, scripts\zm\replaced\_zm_perk_electric_cherry::electric_cherry_laststand);
+	}
 	replaceFunc(maps\mp\zombies\_zm_tombstone::tombstone_player_init, scripts\zm\replaced\_zm_tombstone::tombstone_player_init);
 	replaceFunc(maps\mp\zombies\_zm_tombstone::tombstone_spawn, scripts\zm\replaced\_zm_tombstone::tombstone_spawn);
 	replaceFunc(maps\mp\zombies\_zm_tombstone::tombstone_laststand, scripts\zm\replaced\_zm_tombstone::tombstone_laststand);
 	replaceFunc(maps\mp\zombies\_zm_tombstone::is_weapon_available_in_tombstone, scripts\zm\replaced\_zm_tombstone::is_weapon_available_in_tombstone);
 	replaceFunc(maps\mp\zombies\_zm_chugabud::chugabud_laststand, scripts\zm\replaced\_zm_chugabud::chugabud_laststand);
 	replaceFunc(maps\mp\zombies\_zm_chugabud::is_weapon_available_in_chugabud_corpse, scripts\zm\replaced\_zm_chugabud::is_weapon_available_in_chugabud_corpse);
+	// The weapon locker replaceFunc used to sit here. It is now in the zm_transit, zm_highrise
+	// and zm_buried scripts, because naming its stock script from this shared file broke every
+	// map that has no locker - see the note beside the call in any of the three.
 
 	init_dvars();
 	perk_changes();
@@ -220,12 +243,32 @@ init()
 	precache_strings();
 	precache_status_icons();
 
-	level.using_solo_revive = 0;
+	// Forcing this off is what makes solo Quick Revive cost 1500 rather than 500 - the cost
+	// switch reads the solo flag - and what moves self revives onto "holding a perk" instead of
+	// the stock three-lives counter. Both are fork behaviour, so VANILLA hands the system back.
+	if (mod_setting("zmr_perk_buffs", 1))
+	{
+		level.using_solo_revive = 0;
+	}
 	level.claymores_max_per_player = 20;
 	level.powerup_intro_vox = undefined;
 	level.hotjoin_player_setup = undefined;
 	level.player_too_many_players_check = 0;
-	level.player_starting_health = 150;
+	// HIT DOWN on the lobby page: how many zombie hits it takes to go down without Jugger-Nog.
+	// Zombie melee is 60, so 50 health per hit lands just inside the boundary every time - 100
+	// survives one hit and goes down on the second, 150 survives two, 250 survives four. Read
+	// through mod_setting rather than getDvarInt because init_dvars is not guaranteed to have run
+	// yet and an unset dvar reads as 0.
+	hits = mod_setting("zmr_hit_down", 3);
+
+	// A stale dvar from an older build could hold anything, and health at or below zero would
+	// kill the player the moment they spawn.
+	if (hits < 2)
+	{
+		hits = 2;
+	}
+
+	level.player_starting_health = hits * 50;
 	level.lowertextyalign = "CENTER";
 	level.lowertexty = 40;
 
@@ -799,8 +842,25 @@ post_init()
 	level.equipment_etrap_needs_power = 0;
 	level.equipment_turret_needs_power = 0;
 	level.equipment_subwoofer_needs_power = 0;
-	level.limited_weapons["ray_gun_zm"] = 8;
 	level.limited_weapons["raygun_mark2_zm"] = 1;
+
+	// Guns the weapon locker will not accept, read by
+	// scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweapon.
+	//
+	// The locker is shared by Tranzit, Die Rise and Buried, so only a weapon all three carry can be
+	// taken back out again. These are the ones at least one of those maps has and at least one does
+	// not - the Jet Gun on Tranzit, the Sliquifier on Die Rise, the Paralyzer on Buried, and the six
+	// ordinary guns that never spread across all three. Base names only: the locker resolves the
+	// upgraded variant back to its base before testing, so listing both would be redundant.
+	//
+	// Wonder weapons are covered without naming them as a category. The three above are map-exclusive
+	// anyway, and the Ray Gun and Ray Gun Mark 2 are on every map but limited, which the stock check
+	// already rejects. Nothing else needs excluding on that basis.
+	//
+	// Derived from the include_weapon lists of the three maps plus this file's own per-map additions.
+	// If a gun is later added to or dropped from one of them, this list is what needs revisiting.
+	level.locker_excluded_weapons = array("jetgun_zm", "slipgun_zm", "slowgun_zm", "lsat_zm",
+	                                      "metalstorm_mms_zm", "python_zm", "rnma_zm", "rpd_zm");
 
 	if (isDefined(level.zombie_weapons["slipgun_zm"]))
 	{
@@ -884,12 +944,13 @@ init_dvars()
 	init_mod_setting("zmr_legacy_box_guns", 1);
 	init_mod_setting("zmr_max_ammo_magazine", 1);
 	init_mod_setting("zmr_carpenter_shield", 1);
-	init_mod_setting("zmr_free_perk", 1);
 	init_mod_setting("zmr_free_perk_rarity", 2);
 	init_mod_setting("zmr_shield_health", 1);
 	init_mod_setting("zmr_firesale_music", 1);
 	init_mod_setting("zmr_perk_limit", 4);
 	init_mod_setting("zmr_start_round", 1);
+	init_mod_setting("zmr_hit_down", 3);
+	init_mod_setting("zmr_perk_buffs", 1);
 	init_mod_setting("zmr_coord_display", 0);
 }
 
@@ -1037,7 +1098,7 @@ mod_setting(name, default_value)
 
 set_dvars()
 {
-	setDvar("sv_hostname", "Reimagined");
+	setDvar("sv_hostname", "ZombiesPlusPlus");
 	makedvarserverinfo("sv_hostname");
 
 	setDvar("sv_rateBoostingEnabled", 1);
@@ -1077,7 +1138,15 @@ set_dvars()
 	setDvar("penetrationCount", 100);
 
 	setDvar("perk_weapSpreadAds", 1);
-	setDvar("perk_speedMultiplier", 1.02);
+	// Stamin-Up's 2% move speed. Stock is a flat 1, restored when PERK BUFFS is on VANILLA.
+	if (mod_setting("zmr_perk_buffs", 1))
+	{
+		setDvar("perk_speedMultiplier", 1.03);
+	}
+	else
+	{
+		setDvar("perk_speedMultiplier", 1);
+	}
 
 	setDvar("riotshield_melee_damage_scale", 1);
 	setDvar("riotshield_bullet_damage_scale", 1);
@@ -1546,32 +1615,48 @@ health_bar_hud()
 	prev_health = 0;
 	prev_maxhealth = 0;
 	prev_shield_health = 0;
+	prev_shield_max = 0;
+
+	// The first update can be sent before the LUI menu has registered its handler, in which case it
+	// is dropped. The bar still looks right - its creation defaults happen to match full health -
+	// but the text has no default and stays blank until something changes. Rather than guess when
+	// the menu is ready, resend at least once a second so a missed update corrects itself.
+	frames_since_send = 20;
 
 	while (1)
 	{
 		player = self get_current_spectating_player();
 
 		shield_health = 0;
+		shield_max = 0;
 
 		if (is_true(player.hasriotshield) && isdefined(player.shielddamagetaken) && player.shielddamagetaken < level.zombie_vars["riotshield_hit_points"])
 		{
-			shield_health = level.zombie_vars["riotshield_hit_points"] - player.shielddamagetaken;
-			shield_health = int((shield_health / level.zombie_vars["riotshield_hit_points"]) * 100);
+			// Reported at a tenth of the internal hit points so the number sits on the same scale as
+			// player health instead of dwarfing it. Sent as a real value plus its maximum rather than
+			// as a percentage, so the readout shows 250, or whatever the map's own stock figure is,
+			// rather than always counting down from 100. Durability itself is untouched.
+			shield_max = int(level.zombie_vars["riotshield_hit_points"] / 10);
+			shield_health = int((level.zombie_vars["riotshield_hit_points"] - player.shielddamagetaken) / 10);
 		}
 
-		if (player.health == prev_health && player.maxhealth == prev_maxhealth && shield_health == prev_shield_health)
+		if (frames_since_send < 20 && player.health == prev_health && player.maxhealth == prev_maxhealth && shield_health == prev_shield_health && shield_max == prev_shield_max)
 		{
+			frames_since_send++;
 			wait 0.05;
 			waittillframeend;
 			waittillframeend; // wait for playerhealthregen
 			continue;
 		}
 
-		self luinotifyevent(&"hud_update_health_bar", 3, player.health, player.maxhealth, shield_health);
+		self luinotifyevent(&"hud_update_health_bar", 4, player.health, player.maxhealth, shield_health, shield_max);
+
+		frames_since_send = 0;
 
 		prev_health = player.health;
 		prev_maxhealth = player.maxhealth;
 		prev_shield_health = shield_health;
+		prev_shield_max = shield_max;
 
 		wait 0.05;
 		waittillframeend;
@@ -2250,15 +2335,6 @@ weapon_changes()
 
 		include_weapon("held_tazer_knuckles_zm", 0);
 		register_melee_weapon_for_level("held_tazer_knuckles_zm");
-
-		level.laststandpistol = "fnp45_zm";
-		level.default_laststandpistol = "fnp45_zm";
-		level.default_solo_laststandpistol = "fnp45_upgraded_zm";
-		level.start_weapon = "fnp45_zm";
-		include_weapon("fnp45_zm", 0);
-		include_weapon("fnp45_upgraded_zm", 0);
-		add_limited_weapon("fnp45_zm", 0);
-		add_zombie_weapon("fnp45_zm", "fnp45_upgraded_zm", &"WEAPON_FNP45", 500, "", "", undefined, 1);
 	}
 
 	if (level.script == "zm_transit")
@@ -2284,14 +2360,6 @@ weapon_changes()
 
 	if (level.script == "zm_nuked")
 	{
-		include_weapon("titus6_zm");
-		include_weapon("titus6_upgraded_zm", 0);
-		add_limited_weapon("titus6_zm", 1);
-		add_limited_weapon("titus6_upgraded_zm", 1);
-		add_zombie_weapon("titus6_zm", "titus6_upgraded_zm", &"WEAPON_TITUS6_EXPLOSIVE", 1000, "", "", undefined, 1);
-		precacheitem("titus6_explosive_dart_zm");
-		precacheitem("titus6_explosive_dart_upgraded_zm");
-
 		include_weapon("riotshield_zm", 0);
 		add_zombie_weapon("riotshield_zm", undefined, &"ZOMBIE_WEAPON_RIOTSHIELD", 2000, "riot", "", undefined);
 		include_equipment("riotshield_zm");
@@ -2412,7 +2480,12 @@ weapon_changes()
 		add_zombie_weapon("mp7_zm", "mp7_upgraded_zm", &"WEAPON_MP7", 1000, "", "", undefined, 1);
 	}
 
-	if (level.script == "zm_nuked" || level.script == "zm_transit" || level.script == "zm_highrise" || level.script == "zm_buried" || level.script == "zm_prison" || level.script == "zm_tomb")
+
+	// Peacekeeper only on the maps with no weapon locker - Nuketown, Mob of the Dead and Origins.
+	// The locker maps are Tranzit, Die Rise and Buried, and anything stored there has to exist on all
+	// three to be retrievable; a gun that is only on some of them is a dead end once you move on. It
+	// is left off those three entirely rather than added and then barred from the locker.
+	if (level.script == "zm_nuked" || level.script == "zm_prison" || level.script == "zm_tomb")
 	{
 		vox = "";
 
@@ -2602,7 +2675,72 @@ weapon_changes()
 
 	if (mod_setting("zmr_legacy_box_guns", 1))
 	{
+		add_missing_legacy_weapons();
 		restore_legacy_box_weapons();
+	}
+}
+
+// Mob of the Dead and Origins never shipped some of these guns at all, so restore_legacy_box_weapons
+// below has nothing to flip on those maps - its isdefined guard finds no level.zombie_weapons entry.
+// Registering them here creates the entry, and restore then puts them in the box like everywhere
+// else. Inside the legacy setting on purpose: with it off nothing is registered and both maps keep
+// exactly their stock weapon list.
+//
+// Neither map's own fastfile carries these weapons. Two other things have to line up or this fails:
+// the weapon and its upgrade need a line in zone_source/includes/zm_prison.zone or zm_tomb.zone, and
+// build.bat has to load zm_transit.ff on that map's pass so the linker can find them - every gun
+// added here lives in Tranzit's fastfile. Miss either and the mod pass stops with "Missing asset".
+//
+// Costs are the stock ones, though add_zombie_weapon overrides them from mp/zombiemode.csv wherever
+// that table has a row, so they are nominal.
+add_missing_legacy_weapons()
+{
+	if (level.script == "zm_prison")
+	{
+		include_weapon("rpd_zm", 0);
+		include_weapon("rpd_upgraded_zm", 0);
+		add_zombie_weapon("rpd_zm", "rpd_upgraded_zm", &"ZOMBIE_WEAPON_RPD", 50, "wpck_rpd", "", undefined, 1);
+
+		include_weapon("python_zm", 0);
+		include_weapon("python_upgraded_zm", 0);
+		add_zombie_weapon("python_zm", "python_upgraded_zm", &"ZOMBIE_WEAPON_PYTHON", 50, "wpck_python", "", undefined, 1);
+
+		include_weapon("ak74u_zm", 0);
+		include_weapon("ak74u_upgraded_zm", 0);
+		add_zombie_weapon("ak74u_zm", "ak74u_upgraded_zm", &"ZOMBIE_WEAPON_AK74U", 1200, "smg", "", undefined);
+
+		// Upgrades to m16_gl_upgraded_zm, not m16_upgraded_zm - the Pack-a-Punch M16 is the
+		// grenade launcher variant.
+		include_weapon("m16_zm", 0);
+		include_weapon("m16_gl_upgraded_zm", 0);
+		add_zombie_weapon("m16_zm", "m16_gl_upgraded_zm", &"ZOMBIE_WEAPON_M16", 1200, "burstrifle", "", undefined);
+	}
+
+	if (level.script == "zm_tomb")
+	{
+		include_weapon("rpd_zm", 0);
+		include_weapon("rpd_upgraded_zm", 0);
+		add_zombie_weapon("rpd_zm", "rpd_upgraded_zm", &"ZOMBIE_WEAPON_RPD", 50, "wpck_rpd", "", undefined, 1);
+
+		include_weapon("barretm82_zm", 0);
+		include_weapon("barretm82_upgraded_zm", 0);
+		add_zombie_weapon("barretm82_zm", "barretm82_upgraded_zm", &"ZOMBIE_WEAPON_BARRETM82", 50, "sniper", "", undefined);
+
+		include_weapon("mp5k_zm", 0);
+		include_weapon("mp5k_upgraded_zm", 0);
+		add_zombie_weapon("mp5k_zm", "mp5k_upgraded_zm", &"ZOMBIE_WEAPON_MP5K", 1000, "smg", "", undefined);
+
+		include_weapon("m16_zm", 0);
+		include_weapon("m16_gl_upgraded_zm", 0);
+		add_zombie_weapon("m16_zm", "m16_gl_upgraded_zm", &"ZOMBIE_WEAPON_M16", 1200, "burstrifle", "", undefined);
+
+		include_weapon("m1911_zm", 0);
+		include_weapon("m1911_upgraded_zm", 0);
+		add_zombie_weapon("m1911_zm", "m1911_upgraded_zm", &"ZOMBIE_WEAPON_M1911", 50, "", "", undefined);
+
+		include_weapon("rottweil72_zm", 0);
+		include_weapon("rottweil72_upgraded_zm", 0);
+		add_zombie_weapon("rottweil72_zm", "rottweil72_upgraded_zm", &"ZOMBIE_WEAPON_ROTTWEIL72", 500, "shotgun", "", undefined);
 	}
 }
 
@@ -2616,13 +2754,27 @@ weapon_changes()
 // The second row are the wallbuy-only guns. Their maps include them as include_weapon(name, 0),
 // so the entry exists but the box never offers them, and the mod swaps their wallbuys for the
 // replacements - INSAS for the MP5, Vector for the AK74u, SIG556 for the M16A1, Saritch for the
-// M14, Tac-45 for the M1911 - which leaves them unobtainable. is_in_box is the only thing the box
-// reads, and each already has an add_zombie_weapon registration carrying its upgraded variant and
-// vox, so flipping the flag is all that is needed. Note the M16A1 upgrades to m16_gl_upgraded_zm.
+// M14, 870 MCS for the Olympia - which leaves them unobtainable. is_in_box is the
+// only thing the box reads, and each already has an add_zombie_weapon registration carrying its
+// upgraded variant and vox, so flipping the flag is all that is needed. Note the M16A1 upgrades to
+// m16_gl_upgraded_zm.
+//
+// The guns each map lacked outright are registered by add_missing_legacy_weapons above, so by the
+// time this runs every map has an entry for all eleven and the isdefined guard passes everywhere.
+//
+// The M1911 is the odd one out. It is the starting pistol on every map that carries it, so
+// putting it in the box there would only sell the player a gun they already have. Origins is
+// the exception - it starts on the Mauser C96 and never shipped an M1911 at all, so there it
+// is a genuine addition and add_missing_legacy_weapons is what created its entry.
 restore_legacy_box_weapons()
 {
 	weapons = array("galil_zm", "rpd_zm", "fnfal_zm", "python_zm", "barretm82_zm",
-	                "mp5k_zm", "ak74u_zm", "m14_zm", "m16_zm", "m1911_zm");
+	                "mp5k_zm", "ak74u_zm", "m14_zm", "m16_zm", "rottweil72_zm");
+
+	if (level.script == "zm_tomb")
+	{
+		weapons[weapons.size] = "m1911_zm";
+	}
 
 	foreach (weapon in weapons)
 	{
@@ -3007,11 +3159,18 @@ give_additional_perks()
 {
 	self endon("disconnect");
 
+	// PERK BUFFS on the RULES tab. Every specialty handed out here is a fork addition on top of
+	// what the perk does in stock, so VANILLA stops granting them. Stamin-Up is the exception: it
+	// is registered as specialty_movefaster rather than the base game's specialty_longersprint, so
+	// the vanilla sprint extension has to be granted explicitly or the perk would come out weaker
+	// than stock instead of equal to it. Read once - RULES settings only apply from the next game.
+	buffs = mod_setting("zmr_perk_buffs", 1);
+
 	while (1)
 	{
 		self waittill_any("perk_acquired", "perk_lost");
 
-		if (self HasPerk("specialty_fastreload"))
+		if (buffs && self HasPerk("specialty_fastreload"))
 		{
 			self SetPerk("specialty_fastweaponswitch");
 			self Setperk("specialty_fasttoss");
@@ -3032,14 +3191,22 @@ give_additional_perks()
 		// unlimited sprint _zm_turned grants it.
 		if (self HasPerk("specialty_movefaster"))
 		{
-			self SetPerk("specialty_unlimitedsprint");
+			if (buffs)
+			{
+				self SetPerk("specialty_unlimitedsprint");
+			}
+			else
+			{
+				self SetPerk("specialty_longersprint");
+			}
 		}
 		else if (!is_true(self.is_zombie))
 		{
 			self UnsetPerk("specialty_unlimitedsprint");
+			self UnsetPerk("specialty_longersprint");
 		}
 
-		if (self HasPerk("specialty_deadshot"))
+		if (buffs && self HasPerk("specialty_deadshot"))
 		{
 			self SetPerk("specialty_fastads");
 			self SetPerk("specialty_stalker");

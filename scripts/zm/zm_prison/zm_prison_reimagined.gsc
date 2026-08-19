@@ -56,12 +56,6 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_afterlife::afterlife_can_revive, scripts\zm\replaced\_zm_afterlife::afterlife_can_revive);
 	replaceFunc(maps\mp\zombies\_zm_afterlife::afterlife_doors_open, scripts\zm\replaced\_zm_afterlife::afterlife_doors_open);
 	replaceFunc(maps\mp\zombies\_zm_afterlife::afterlife_doors_close, scripts\zm\replaced\_zm_afterlife::afterlife_doors_close);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::init, scripts\zm\replaced\_zm_ai_brutus::init);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::brutus_round_tracker, scripts\zm\replaced\_zm_ai_brutus::brutus_round_tracker);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::get_brutus_spawn_pos_val, scripts\zm\replaced\_zm_ai_brutus::get_brutus_spawn_pos_val);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::brutus_spawn, scripts\zm\replaced\_zm_ai_brutus::brutus_spawn);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::brutus_health_increases, scripts\zm\replaced\_zm_ai_brutus::brutus_health_increases);
-	replaceFunc(maps\mp\zombies\_zm_ai_brutus::brutus_cleanup_at_end_of_grief_round, scripts\zm\replaced\_zm_ai_brutus::brutus_cleanup_at_end_of_grief_round);
 
 	replaceFunc(maps\mp\zombies\_zm_riotshield_prison::doriotshielddeploy, scripts\zm\replaced\_zm_riotshield_prison::doriotshielddeploy);
 	replaceFunc(maps\mp\zombies\_zm_riotshield_prison::trackriotshield, scripts\zm\replaced\_zm_riotshield_prison::trackriotshield);
@@ -371,7 +365,6 @@ grief_brutus_spawn_after_time()
 
 		wait time;
 
-		maps\mp\zombies\_zm_ai_brutus::attempt_brutus_spawn(1);
 
 		while (level.brutus_count <= 0)
 		{

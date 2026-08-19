@@ -69,7 +69,9 @@ playerhealthregen()
 			continue;
 		}
 
-		if (self hasPerk("specialty_quickrevive"))
+		// Quick Revive cutting the regen delay by a third is a fork addition - in stock the perk only
+		// speeds up reviving - so PERK BUFFS on VANILLA leaves the delay alone.
+		if (self hasPerk("specialty_quickrevive") && scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1))
 		{
 			regularregendelay *= 0.67;
 			longregendelay *= 0.67;

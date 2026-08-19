@@ -8,9 +8,8 @@ A fork of **Reimagined**, the Black Ops 2 Zombies mod by Jbleezy.
 > switch, Pack-a-Punch, the Diner hatch and the NAV table for you. Parts were never collected. This
 > fork removed that whole system, and it is the largest single difference between the two.
 >
-> The notes below describe **this fork's** behaviour — entries for features the fork removed have
-> been taken out rather than left in place. For the full account of what was removed, added and
-> tuned relative to Reimagined, and what has and has not been play-tested, see [FORK.md](FORK.md).
+> The notes below describe **this fork's** behaviour: entries for features the fork removed have
+> been taken out rather than left in place, so what is written here is what the mod currently does.
 
 ## Original mod created by: Jbleezy
 
@@ -24,18 +23,39 @@ A fork of **Reimagined**, the Black Ops 2 Zombies mod by Jbleezy.
 
 [Donate](https://ko-fi.com/Jbleezy)
 
+
+## Credits
+
+The mod itself is by **Jbleezy** (links above). The HUD and icon art below comes from third-party
+packs, used with credit as their authors ask.
+
+* **Black Ops 1 HUD for BO2** — [mjmodz](https://github.com/mjmodz/Black-Ops-1-HUD-for-BO2) v1.0.0,
+  BO1 images by **Kingslayer Kyle**. Only the HUD art is used: the twelve perk icons, six powerup
+  icons, and the blood splatter standing in for the stock dpad image. All of it is scoped to
+  Nuketown. The pack's scoreboard, pause menu and options screens are deliberately not used — its
+  readme asks that the author's signature be kept on those, and since none of them ship here,
+  nothing was stripped and this credit stands in their place.
+* **BO3 Perk Shaders Pack** — Shadows of Evil styled icons, scoped to Mob of the Dead. Perk shaders
+  by **Gewehr**; Double Points, Insta Kill and Fire Sale shaders by **Larsendog**. Eleven perks and
+  three powerups are used. The set has no Tombstone, Zombie Blood, Bonfire Sale or Death Machine
+  icon, so those four keep their stock art on that map.
+
 # Installing
 
 A mod for [Plutonium](https://plutonium.pw) T6 (Black Ops II).
 
 1. Put the mod folder inside `%LOCALAPPDATA%\Plutonium\storage\t6\mods\`, so you end up with a
-   `mods\zm_reimagined\` folder containing `mod.ff`, `mod.iwd`, `mod.json` and the three `.sabs` /
+   `mods\zm_zombiesplusplus\` folder containing `mod.ff`, `mod.iwd`, `mod.json` and the three `.sabs` /
    `.sabl` sound banks.
-2. Launch Plutonium, start Black Ops II in Zombies, and choose **Reimagined** from the mods menu.
+2. Launch Plutonium, start Black Ops II in Zombies, and choose **zm_zombiesplusplus** from the mods menu.
 
-Settings live on two tabs in the options menu — display options under Settings, and gameplay options
-under [Rules](#rules). Rules settings are read by the host, so in co-op the host's choices apply to
-everyone, and they take effect on the next game rather than immediately.
+Settings live on tabs in the options menu — per-player display options under **HUD**, and
+gameplay options under **[MOD RULES](#mod-rules)**. Mod Rules settings are read by the host, so in
+co-op the host's choices apply to everyone, and they take effect on the next game rather than
+immediately.
+
+Four more decide how a match starts — see [Match](#match). Those sit on the lobby page as well as
+on a **MATCH** tab that only appears in the pause menu.
 
 Building the mod from this repository is a separate process — see [BUILDING.md](BUILDING.md).
 
@@ -44,12 +64,12 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 ## Table of Contents
 * [General](#general)
 * [Settings](#settings)
-	* [Rules](#rules)
+	* [Match](#match)
+	* [Mod Rules](#mod-rules)
 * [HUD](#hud)
 * [Players](#players)
 * [Zombies](#zombies)
 	* [Denizens](#denizens)
-	* [Brutus](#brutus)
 * [Weapons](#weapons)
 	* [Legacy Weapons](#legacy-weapons)
 	* [Pistols](#pistols)
@@ -58,7 +78,6 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 		* [M1911](#m1911)
 		* [Mauser C96](#mauser-c96)
 		* [Remington New Model Army](#remington-new-model-army)
-		* [Tac-45](#tac-45)
 	* [Assault Rifles](#assault-rifles)
 		* [FAL OSW](#fal-osw)
 		* [M27](#m27)
@@ -89,15 +108,13 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 		* [XPR-50](#xpr-50)
 	* [Shotguns](#shotguns)
 		* [Remington 870 MCS](#remington-870-mcs)
-		* [S12](#s12)
-	* [Launchers](#launchers)
+		* [Launchers](#launchers)
 		* [War Machine](#war-machine)
 	* [Specials](#specials)
 		* [Ballistic Knife](#ballistic-knife)
 		* [Crossbow](#crossbow)
 		* [Death Machine](#death-machine)
 		* [Storm PSR](#storm-psr)
-		* [Titus-6](#titus-6)
 	* [Wonder Weapons](#wonder-weapons)
 		* [Ray Gun](#ray-gun)
 		* [Ray Gun Mark 2](#ray-gun-mark-2)
@@ -127,6 +144,7 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 * [Wallbuys](#wallbuys)
 * [Mystery Box](#mystery-box)
 * [Perks](#perks)
+	* [Perk buffs](#perk-buffs)
 	* [Jugger-Nog](#jugger-nog)
 	* [Quick Revive](#quick-revive)
 	* [Speed Cola](#speed-cola)
@@ -167,23 +185,14 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 		* [Farm](#farm)
 		* [Power Station](#power-station)
 		* [Town](#town)
-		* [Tunnel](#tunnel)
-		* [Cornfield](#cornfield)
 	* [Die Rise](#die-rise)
 		* [Shopping Mall](#shopping-mall)
 		* [Dragon Rooftop](#dragon-rooftop)
-		* [Sweatshop](#sweatshop)
 	* [Buried](#buried)
-		* [Borough](#borough)
-		* [Maze](#maze)
 	* [Mob of the Dead](#mob-of-the-dead)
 		* [Cell Block](#cell-block)
-		* [Docks](#docks)
 	* [Origins](#origins)
-		* [Trenches](#trenches)
-		* [Excavation Site](#excavation-site)
 		* [Church](#church)
-		* [The Crazy Place](#the-crazy-place)
 * [Game Modes](#game-modes)
 	* [Encounter](#encounter)
 		* [Grief](#grief)
@@ -191,6 +200,8 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 		* [Turned](#turned)
 
 ## General
+* Every game mode is always offered when picking one, including in a solo party
+* Map list only offers the start locations the selected game mode actually supports
 * Removed round cap
 * Removed 5 second wait before match start
 * Added restart game button when in online solo game
@@ -207,41 +218,95 @@ Building the mod from this repository is a separate process — see [BUILDING.md
 * Added option to enable or disable fog
 * Added option to enable or disable depth of field
 * Added option to enable or disable character dialog
+* Added option to show your position and angles on the HUD, as a mapping aid
 
-### Rules
-A second options tab holding the gameplay settings, separate from the display settings above. These
-are read by the game rather than by each client, so in co-op the host's settings apply to everyone,
-and they take effect on the next game rather than immediately.
+### Match
 
-| Setting | Options | Default |
-| --- | --- | --- |
-| Starting round | 1, 5, 10, 20 | 1 |
-| Starting points | 0, 500, 1000, 5000 | 500 |
-| Free perk drop | Disabled, Enabled | Enabled |
-| Free perk rarity | Normal, Rare | Normal |
-| Perk purchase limit | 4, 6, 8, Unlimited | 4 |
-| Zombie Shield health | Default, Rebalanced | Rebalanced |
-| Carpenter repairs shield | Disabled, Enabled | Enabled |
-| Max Ammo fills magazine | Disabled, Enabled | Enabled |
-| Coordinate display | Disabled, Enabled | Disabled |
-| Legacy box guns | Disabled, Enabled | Enabled |
-| Fire sale music | Default, Randomized | Randomized |
+Four settings decide how a match starts. They sit on the lobby page itself rather than in the
+options menu, below Change Map and Change Game Mode, so they can be seen and set on the way into
+a match. Only the host sees them, and as with Mod Rules it is the host's choice that applies to
+everyone.
+
+The same four are repeated on a **MATCH** tab in the options menu, which appears only while a game
+is running. The lobby is unreachable mid-match, so that tab is what shows you which settings the
+current game actually started with. Changing one there takes effect on the next game, so the way
+to use it is to set the value and restart the level.
+
+| Setting | Options | Ships as | Vanilla |
+| --- | --- | --- | --- |
+| Start round | 1, 5, 10, 15, 20, 25 | 1 | — |
+| Start points | 0, 500, 1000, 1500, 2000, 2500, 5000, 10000 | 500 | — |
+| Perk purchase limit | 1, 4, 5, 6, Unlimited | 4 | 4 |
+| Hit down | 2, 3, 5 | 3 | 2 |
+
+* **Start points** sets your score to the chosen figure rather than adding to it, so `0` takes
+  away the points you normally start with. `500` means "leave it alone" — the stock starting score
+  is not always exactly 500, since persistent upgrades and some game modes move it.
+* **Hit down** is how many zombie hits it takes to be downed without Jugger-Nog. Health is 50 per
+  hit against a zombie's 60 damage, so `2` is stock's 100, `3` is 150 and `5` is 250. Jugger-Nog
+  adds two more hits on top of whatever this is set to — 200, 250 and 350 respectively — so it is
+  worth the same amount at every setting.
+* **Perk purchase limit** caps how many perks you can *buy*. Perks given to you — powerup drops, dig
+  rewards, perk bottles — ignore it, so you can end up holding more than the limit. `Unlimited` is
+  the twelve perks in the game rather than a flag, so the cap can never be reached.
+
+### Mod Rules
+A second options tab holding the gameplay settings, separate from the HUD settings above. These are
+read by the game rather than by each client, so in co-op the host's settings apply to everyone, and
+they take effect on the next game rather than immediately. Fog at the top of the tab is the one
+exception: it is a client setting that applies immediately, for the player who changed it only.
+
+Two labels mark the choices worth knowing about. `VANILLA (…)` is the setting that matches stock
+Black Ops 2, and `DEFAULT (…)` is the value the fork ships with. A choice never carries both — where
+the two coincide it reads `VANILLA`, since that is the more useful fact when you are changing things.
+Anything unlabelled is neither. Settings that stock has no equivalent for at all carry only
+`DEFAULT`, since no choice there can be said to match vanilla.
+
+| Setting | Options | Ships as | Vanilla |
+| --- | --- | --- | --- |
+| Perk drop rate | None, Rare, Normal, Extra, Crazy | Normal | None |
+| Perk buffs | Vanilla, Enhanced | Enhanced | Vanilla |
+| Zombie Shield health | Vanilla, Rebalanced | Rebalanced (250) | Vanilla (150 or 225 by map) |
+| Carpenter behavior | Default, BO4 | BO4 | Default |
+| Max Ammo behavior | Default, BO4 | BO4 | Default |
+| Legacy box guns | Disabled, Enabled | Enabled | Disabled |
+| Fog | Disabled, Enabled | Enabled | Enabled |
+| Fire sale music | Default, Randomized | Randomized | Default |
 
 Where the behaviour is not obvious from the name:
 
-* **Starting points** sets your score to the chosen figure rather than adding to it, so `0` takes
-  away the points you normally start with. `500` means "leave it alone" — the stock starting score
-  is not always exactly 500, since persistent upgrades and some game modes move it.
-* **Free perk drop** is the perk bottle powerup. **Free perk rarity** controls how often it appears.
-* **Perk purchase limit** caps how many perks you can *buy*. Perks given to you — powerup drops, dig
-  rewards, perk bottles — ignore it, so you can end up holding more than the limit.
-* **Zombie Shield health** is 1500 on Default and 2500 on Rebalanced.
+* **Perk drop rate** controls how often the perk bottle powerup appears. Every powerup gets one
+  slot in the shuffle, so taking that slot every single time still caps the bottle at one drop in
+  seven on Nuketown's pool. Rare and Normal are fractions of that slot; Extra and Crazy go past
+  the cap by also claiming a share of slots that drew something else:
+
+  | | Its own slot | Other slots | Roughly, of all drops |
+  | --- | --- | --- | --- |
+  | None | never | — | 0% |
+  | Rare | a quarter | — | ~4% |
+  | Normal | half | — | ~7% |
+  | Extra | always | 20% | ~31% |
+  | Crazy | always | 40% | ~49% |
+
+  A bottle that fails its check is replaced by the next powerup rather than nothing dropping, so
+  rarity changes the mix rather than how much drops.
+* **Carpenter behavior** and **Max Ammo behavior** pick between what the powerup does in stock
+  Black Ops 2 and its Black Ops 4 version — Carpenter repairing your Zombie Shield, and Max Ammo
+  refilling the magazine in your weapon as well as your reserve. Both ship on `BO4`, so `DEFAULT`
+  here means stock Black Ops 2 rather than the value the fork defaults to.
+* **Perk buffs** switches the perks between the fork's enhanced versions and what they do in
+  stock. See [Perk buffs](#perk-buffs) for exactly what changes.
+* **Zombie Shield health** is a flat 250 on every map under Rebalanced. Vanilla is left alone rather than
+  pinned to one figure, because stock varies by map — 225 on Tranzit, Die Rise and Buried, 150
+  on Mob of the Dead and Origins — which is why that option carries no number.
+
+  These are a tenth of the internal values (2500, 2250, 1500). The HUD shows the tenth so the
+  shield number sits on the same scale as your health instead of dwarfing it; durability is
+  unchanged.
 * **Legacy box guns** returns the Black Ops 1 weapons to the Mystery Box — see
   [Legacy Weapons](#legacy-weapons).
 * **Fire sale music** on Default plays the stock track, which the game picks based on whether
   Richtofen or Maxis is the announcer. Randomized draws a different track each Fire Sale.
-* **Coordinate display** is a mapping aid rather than a gameplay rule: it prints your position and
-  angles on the HUD every three seconds.
 
 ## HUD
 * Replaced the crosshair with a higher resolution version
@@ -286,7 +351,7 @@ Where the behaviour is not obvious from the name:
 * Removed NAV cards
 
 ## Players
-* Increased health from 100 to 150
+* Increased health from 100 to 150 — configurable with **Hit down**, see [Match](#match)
 * Self revives in solo are active whenever the player has at least 1 perk
 * Upgraded starting weapon given as self revive weapon above all others except Ray Gun Mark 2
 * Increased backwards move speed from 70% to 100%
@@ -353,24 +418,12 @@ Where the behaviour is not obvious from the name:
 * Fixed not being able to drop powerups after doing certain traversals
 
 ### Denizens
-* Added 2% chance to drop a free perk powerup when killed while flying to a player
-* Changed max amount that can be spawned at once from 2 total to 1 per player in the fog
-* No longer spawn for a player for 5 seconds after being killed
 * Decreased health from 200 to 150
 * Decreased number of melees to kill from 5 to 3
 * Decreased number of melees to kill with Bowie Knife from 3 to 2
 * Decreased number of melees to kill with Galvaknuckles from 2 to 1
 * No longer automatically run away when player is first attacked in solo
 * Removed hint when player is first attacked in solo
-* Fixed not spawning in correct zone sometimes
-
-### Brutus
-* Increased round for initial spawn in coop from 5-7 to 9
-* Smoke Grenade kills zombies
-* Increased player damage from 99 to 100
-* Decreased footstep screen shake by 25%
-* No longer receives additional damage from Ray Gun Mark 2
-* Teleports away less frequently
 
 ## Weapons
 * Switch to melee weapon by pressing the Melee Weapon button (same button as Time Bomb and Maxis Drone)
@@ -397,38 +450,42 @@ Where the behaviour is not obvious from the name:
 ### Legacy Weapons
 Black Ops 2 replaced a number of Black Ops 1 weapons with its own equivalents, and the base game
 dropped the originals from the Mystery Box. The **Legacy box guns** setting puts them back without
-removing their replacements, so the box holds both. Each weapon only returns on the maps that
-already carried it, and the setting can be turned off from the RULES tab.
+removing their replacements, so the box holds both. The setting can be turned off from the RULES
+tab, and with it off every map keeps exactly its stock weapon list.
 
 | Legacy weapon | Replaced in Black Ops 2 by | Returns on |
 | --- | --- | --- |
 | Galil | M27 | All maps |
 | FAL | FAL OSW | All maps |
 | M14 | Saritch | All maps |
-| Barrett M82A1 | XPR-50 | All maps except Origins |
-| M1911 | Tac-45 | All maps except Origins |
-| MP5 | INSAS | All maps except Origins |
-| AK74u | Vector | All maps except Mob of the Dead |
-| Python | Executioner | Tranzit, Nuketown, Die Rise, and Origins |
-| M16A1 | SIG556 | Tranzit, Nuketown, Die Rise, and Buried |
-| RPD | Mk 48 | Tranzit, Nuketown, and Die Rise |
+| Barrett M82A1 | XPR-50 | All maps |
+| M1911 | Not replaced — it is the starting pistol | Origins |
+| MP5 | INSAS | All maps |
+| AK74u | Vector | All maps |
+| M16A1 | SIG556 | All maps |
+| Olympia | Remington 870 MCS | All maps |
+| Python | Executioner | All maps except Buried |
+| RPD | Mk 48 | All maps except Buried |
 
-The MP5, AK74u, M16A1, M14 and M1911 were wallbuy-only weapons, and the mod swaps their wallbuys for
-their replacements — returning them to the box is what makes them obtainable again at all. The M16A1
-upgrades to the M16A1 GL.
+Most of these only shipped on some maps. Where a gun was missing from a map entirely — the RPD and
+Python on Mob of the Dead, the Barrett, MP5, M1911 and Olympia on Origins, the M16A1 on both — the
+mod links the weapon in and registers it, so it now appears wherever the setting is on. The RPD and
+Python are the two exceptions: Buried never carried either.
+
+The MP5, AK74u, M16A1, M14 and Olympia were wallbuy-only weapons, and the mod swaps their
+wallbuys for their replacements — returning them to the box is what makes them obtainable again at
+all. The M16A1 upgrades to the M16A1 GL.
+
+The M1911 is the exception. Every map that carries it already hands it to you as the starting
+pistol, so the box only offers it on Origins, which starts on the Mauser C96 and never shipped an
+M1911 at all.
 
 ### Pistols
-* Increased move speed from 100% to 110%
-* Increased move speed while aiming from 200% to 220%
-* Decreased aim FOV from 65 to 60 on all pistols
 
 #### Executioner
 
 #### KAP-40
 * Removed delay between last shot and reload
-* Unupgraded: increased clip ammo from 12 to 15
-* Unupgraded: increased stock ammo from 96 to 180
-* Upgraded: increased stock ammo from 180 to 270
 
 #### M1911
 * Upgraded: decreased stock ammo from 50 to 48
@@ -443,9 +500,6 @@ upgrades to the M16A1 GL.
 
 #### Remington New Model Army
 * Upgraded: added proper fire sound
-
-#### Tac-45
-* Replaces M1911 (except on Mob of the Dead)
 
 ### Assault Rifles
 
@@ -504,7 +558,7 @@ upgrades to the M16A1 GL.
 * Replaces MP5
 
 #### Peacekeeper
-* Added on all maps
+* Added on Nuketown, Mob of the Dead and Origins — the maps with no weapon locker
 
 #### PDW-57
 * Upgraded: changed weapon name from "57000" to "5700"
@@ -549,9 +603,6 @@ upgrades to the M16A1 GL.
 #### Remington 870 MCS
 * Changed weapon cost from 900 or 1500 to 1200 on all maps
 
-#### S12
-* Unupgraded: increased stock ammo from 30 to 40
-* Upgraded: increased stock ammo from 50 to 60
 
 ### Launchers
 
@@ -585,19 +636,11 @@ upgrades to the M16A1 GL.
 * Kills on any round fully charged
 * Infinite penetration
 
-#### Titus-6
-* Added on Nuketown
-* Kills on any round in 1-2 bursts
-* Buckshot: kills on any round in 1-2 shots
-
 ### Wonder Weapons
 
 #### Ray Gun
 * Added model from Buried to all maps
 * Added first raise and empty fire sounds from Mob of the Dead to all maps
-* Increased move speed from 100% to 105%
-* Increased move speed while aiming from 100% to 157.5% (move speed multiplied by 1.5)
-* No longer limited to 4 players
 * Decreased volume of empty fire sound
 * Unupgraded: increased impact damage from 1000 to 1500 (same as max splash damage)
 * Upgraded: increased impact damage from 1000 to 2000 (same as max splash damage)
@@ -606,8 +649,6 @@ upgrades to the M16A1 GL.
 * Added empty fire sound from Ray Gun
 * Same probability to obtain as other weapons
 * Can be obtained if player has Ray Gun
-* Increased move speed from 100% to 105%
-* Increased move speed while aiming from 100% to 157.5% (move speed multiplied by 1.5)
 * Limited to 1 player on all maps
 * Decreased last stand ammo from 3 clips to 1 clip
 * Unupgraded: increased stock ammo from 162 to 168
@@ -835,14 +876,33 @@ upgrades to the M16A1 GL.
 * No longer disappears then reappears at end of Fire Sale if Fire Sale started while Mystery Box was moving
 
 ## Perks
-* Added high qualty perk icons to all maps
-* Removed perk limit
+* Added high quality perk icons, used on every map except Nuketown and Mob of the Dead, which have their own sets (see [Credits](#credits))
+* Removed the cap on how many perks a player can hold — perks given for free can take you past it. Buying is still capped, by the perk purchase limit, see [Match](#match)
 * No longer deactivated if the perk machine is powered off
 * Perk order on HUD is restored whenever perks are restored to the player
 * Perk order on HUD is shown correctly when spectating
 * Fixed perk machine bump sound continuously playing when player is down
 
+### Perk buffs
+The **Perk buffs** setting on the [Mod Rules](#mod-rules) tab switches these between the fork's enhanced
+behaviour and stock. Everything else on the perks below — bug fixes, icons, machine placement,
+Tombstone and Who's Who mechanics — is unaffected by the setting and always applies.
+
+| Perk | Enhanced | Vanilla |
+| --- | --- | --- |
+| Speed Cola | Also switches weapons and throws grenades twice as fast | Faster reload only |
+| Stamin-Up | Unlimited sprint, and 2% faster movement | Longer sprint, no speed bonus |
+| Deadshot Daiquiri | Double headshot damage, double ADS speed, faster movement while aiming, quicker sprint recovery | Aim assist and reduced ADS spread only |
+| Quick Revive | Health regeneration delay cut by a third | No effect on regeneration |
+
+Stamin-Up is worth a note: the fork registers it as `specialty_movefaster` rather than stock's
+`specialty_longersprint`, so on Vanilla the sprint extension is granted explicitly. Without that it
+would end up weaker than stock rather than equal to it.
+
 ### Jugger-Nog
+* Adds 100 maximum health, two hits' worth, on top of the [Hit down](#match) setting instead of
+  setting it to a flat 160 — so the perk is worth the same two hits whatever the base is
+* Upgraded keeps stock's 30-point lead over the base perk, so it adds 130
 * Increases current health by 100 upon purchase (normally sets current health to max)
 
 ### Quick Revive
@@ -991,6 +1051,8 @@ upgrades to the M16A1 GL.
 ### Zombie Shield
 * Added shield health bar on HUD
 * Awards points for kills and damage
+* Kills pay the base 50, the same as a body shot, rather than the 130 a melee kill normally
+  earns — the shield kills far too easily for the melee rate to be right
 * Zombies that are on fire no longer explode on death
 * Can be destroyed by player damage when deployed
 * Destroyed sound plays when player is holding
@@ -1063,6 +1125,17 @@ upgrades to the M16A1 GL.
 * No longer costs 100 points to withdraw
 * No longer costs 100 points to trade points with the teller
 * Account balance displayed while at the deposit or withdraw trigger
+
+## Weapon Locker
+The locker is shared by Tranzit, Die Rise and Buried, and the weapon you leave in it travels between
+them, so it only accepts guns all three maps carry — otherwise the slot fills with something the
+other maps refuse to hand back.
+
+* Only stores weapons available on Tranzit, Die Rise and Buried
+* Turned away: the Jet Gun, Sliquifier and Paralyzer, each of which exists on one map only, plus the
+  LSAT, Metal Storm, Python, Remington New Model Army and RPD
+* The Ray Gun and Ray Gun Mark 2 were already refused, as the base game bars limited weapons
+* Stored weapons persist through profile storage, so the exact gun comes back between matches
 
 ## NAV Table
 * Costs 100,000 points
@@ -1171,16 +1244,6 @@ upgrades to the M16A1 GL.
 * Moved Stamin-Up to its location on Tranzit
 * Moved Tombstone Soda to the laundry room front door
 
-#### Tunnel
-* Wallbuys: SMR, Ballista, Vector K10, SWAT-556 Semtex, Bowie Knife
-* Perks: Jugger-Nog, Quick Revive, Speed Cola, Double Tap, Stamin-Up
-* Pack-a-Punch
-
-#### Cornfield
-* Wallbuys: SMR, Ballista, B23R, MSMC, Vector K10, SWAT-556 Remington 870 MCS, Semtex, Claymore
-* Pack-a-Punch
-* No perks
-
 ### Die Rise
 * Added Stamin-Up machine at Buddha Room area
 * Added PHD Flopper machine at Escape Pod area
@@ -1233,12 +1296,6 @@ upgrades to the M16A1 GL.
 * Perks: Jugger-Nog, Double Tap, Mule Kick
 * Pack-a-Punch
 
-#### Sweatshop
-* Wallbuys: SMR, Vector K10, AN-94, Remington 870 MCS, Galvaknuckles
-* Perks: Jugger-Nog, Double Tap
-* Buildables: Trample Steam
-* Pack-a-Punch
-
 ### Buried
 * Added Semtex wallbuy at Candy Store Upstairs
 * Added PHD Flopper machine at Lower Processing
@@ -1257,30 +1314,6 @@ upgrades to the M16A1 GL.
 * Fixed not switching back to weapon immediately after drawing wallbuy
 * Quest (Maxis): no longer need to activate the lever in the Mansion before activating the bells
 * Quest (Richtofen): can enter round infinity without having all players next to the Guillotine
-
-#### Borough
-* Upper tunnels and bank area disabled
-* Players spawn at Stables
-* Mystery Box initially spawns at a random location
-* Added B23R, SWAT-556, Claymore, and Bowie Knife wallbuys at their locations on Buried
-* Added Remington 870 MCS wallbuy at Stables
-* Added PDW-57 wallbuy at Morgue
-* Added Vector K10 wallbuy at Saloon
-* Added SVU-AS wallbuy at Church
-* Added Galvaknuckles wallbuy behind the top of General Store & Bank
-* Moved Quick Revive to Speed Cola's location on Borough
-* Moved Speed Cola to its location on Buried
-* Moved Stamin-Up to Vulture Aid's location on Buried
-* Added Head Chopper buildable
-* Buildables can spawn at Church buildable table
-* Fixed randomization for buildables
-
-#### Maze
-* Wallbuys: SMR, Ballista, B23R, PDW-57, AN-94, LSAT
-* Perks: Jugger-Nog, Quick Revive, Speed Cola, Double Tap, Stamin-Up, Mule Kick
-* Pack-a-Punch
-* Perks and wallbuys within the maze are randomized each game
-
 ### Mob of the Dead
 * Perk and powerup icons use the Shadows of Evil style from Black Ops 3
 * Added custom loading screen
@@ -1356,11 +1389,6 @@ upgrades to the M16A1 GL.
 * Zombies spawn in the Cell Block 3rd Floor zone
 * Fixed players taking damage from the key spawn positions
 * Fixed the electric fence in the Warden's Office making noise when bumping into it
-
-#### Docks
-* Wallbuys: SMR, Ballista, MSMC, Uzi, M1927
-* Perks: Jugger-Nog, Electric Cherry
-* Pack-a-Punch
 
 ### Origins
 * Added Double Tap machine at Generator 6 Church
@@ -1467,34 +1495,26 @@ upgrades to the M16A1 GL.
 * Quest (raise hell step): all staffs must be fully charged for souls to be collected
 * Quest (raise hell step): zombies in The Crazy Place get knocked down during the screen flash after collecting all of the souls
 * Quest (freedom step): teleport trigger can be triggered without looking at it
-
-#### Trenches
-* Wallbuys: SMR, Ballista, B23R, Five-seven, Vector K10, MP40, Remington 870 MCS, Frag Grenade, Bouncing Betty
-* Perks: Quick Revive, Speed Cola, Deadshot Daiquiri
-* Der Wunderfizz
-* Pack-a-Punch
-* One Inch Punch
-
-#### Excavation Site
-* Wallbuys: Ballista, Vector K10, MP40, Remington 870 MCS, Bouncing Betty
-* Perks: Jugger-Nog, Stamin-Up
-* Der Wunderfizz
-* Pack-a-Punch
-
 #### Church
 * Wallbuys: B23R, STG-44, Remington 870 MCS, Frag Grenade
 * Perks: Double Tap
 * Der Wunderfizz
 * One Inch Punch
-
-#### The Crazy Place
-* Wallbuys: Vector K10, Skorpion EVO, STG-44, SCAR-H, MG08/15, KSG
-* Perks: Jugger-Nog, Quick Revive, Speed Cola, Double Tap, PHD Flopper, Electric Cherry
-* Pack-a-Punch
-* No Mystery Box
-* Perks on the teleport pads and wallbuys in the staff chargers are randomized each game
-
 ## Game Modes
+
+Picking a mode never hides the others, so the map list narrows to match instead. Meat runs wherever
+Grief runs, since it shares Grief's map setup. Turned is only wired up on Buried Street.
+
+| Mode | Start locations |
+| --- | --- |
+| Classic | Tranzit, Die Rise, Buried, Mob of the Dead, Origins |
+| Survival | Nuketown, Bus Depot, Diner, Farm, Power Station, Town, Shopping Mall, Dragon Rooftop, Cell Block, Church |
+| Grief | the Survival locations, plus Buried Street |
+| Meat | the Survival locations, plus Buried Street |
+| Turned | Buried Street |
+
+Grief, Meat and Turned are built around two teams, so a solo party can start them but has no one to
+play against.
 
 ### Encounter
 * Group of competitive game modes

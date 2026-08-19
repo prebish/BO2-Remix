@@ -53,6 +53,7 @@ init()
 	if (isDefined(level.zombie_powerups["free_perk"]) && (is_gametype_active("zstandard") || is_classic()))
 	{
 		level.zombie_powerups["free_perk"].func_should_drop_with_regular_powerups = ::func_should_drop_free_perk;
+		level.free_perk_in_rotation = 1;
 
 		if (is_classic())
 		{
@@ -308,7 +309,42 @@ get_next_powerup()
 		level thread play_fx_on_powerup_dropped();
 	}
 
+	// EXTRA and COMMON hand a share of the slots that drew something else to the perk bottle. This
+	// is the only place it can be done - func_should_drop_free_perk is consulted after the slot has
+	// already been decided, so it can turn the bottle down but never promote it. Gated on the same
+	// eligibility as the drop hook, and on func_should_drop_free_perk so the Classic unlock still
+	// applies. The caller re-runs that check on what is returned, which is why EXTRA and COMMON
+	// answer true there unconditionally rather than rolling twice.
+	if (powerup != "free_perk" && is_true(level.free_perk_in_rotation))
+	{
+		promote = free_perk_promote_chance();
+
+		if (promote > 0 && randomint(100) < promote && func_should_drop_free_perk())
+		{
+			return "free_perk";
+		}
+	}
+
 	return powerup;
+}
+
+// Percent of otherwise-taken slots handed to the perk bottle. Zero for NONE, RARE and NORMAL,
+// which all sit inside the normal rotation and are handled by the divisor.
+free_perk_promote_chance()
+{
+	rarity = scripts\zm\_zm_reimagined::mod_setting("zmr_free_perk_rarity", 2);
+
+	if (rarity == 1)
+	{
+		return 20;
+	}
+
+	if (rarity == 5)
+	{
+		return 40;
+	}
+
+	return 0;
 }
 
 play_fx_on_powerup_dropped()
@@ -1486,20 +1522,24 @@ func_should_drop_carpenter_nuked()
 	return false;
 }
 
-// Every powerup gets one slot in the shuffle, so passing every time would make the perk bottle as
-// common as Max Ammo. The rarity setting is that divisor: 2 leaves it half as common as any other
-// single powerup, which on Nuketown's seven-powerup pool works out at roughly one bottle per
-// fourteen drops, and 4 halves it again.
+// Every powerup gets one slot in the shuffle, so taking that slot every time still only makes the
+// perk bottle as common as Max Ammo - one drop in seven on Nuketown's pool. The rarity setting
+// spans both sides of that ceiling:
 //
-// A failed check deals the next powerup instead of dropping nothing, so turning this off changes
-// the mix rather than the amount that drops.
+//   0 NONE    never drops
+//   4 RARE    a quarter of its own slot
+//   2 NORMAL  half of its own slot
+//   1 EXTRA   all of its own slot, plus 20% of slots that drew something else
+//   5 COMMON  all of its own slot, plus 40% of slots that drew something else
+//
+// RARE and NORMAL are divisors handled here. Going past one-in-seven cannot be done from this
+// function, which is only consulted once the bottle's own slot comes up, so EXTRA and COMMON are
+// applied in get_next_powerup instead - see free_perk_promote_chance.
+//
+// A failed check deals the next powerup instead of dropping nothing, so rarity changes the mix
+// rather than the amount that drops.
 func_should_drop_free_perk()
 {
-	if (!scripts\zm\_zm_reimagined::mod_setting("zmr_free_perk", 1))
-	{
-		return false;
-	}
-
 	if (is_classic() && !is_true(level.free_perk_unlocked))
 	{
 		return false;
@@ -1507,8 +1547,19 @@ func_should_drop_free_perk()
 
 	rarity = scripts\zm\_zm_reimagined::mod_setting("zmr_free_perk_rarity", 2);
 
-	// randomint(0) errors and randomint(1) would make it as common as everything else, so anything
-	// under 2 is treated as the default rather than trusted.
+	if (rarity == 0)
+	{
+		return false;
+	}
+
+	// EXTRA and COMMON always take the bottle's own slot; their extra frequency comes from the
+	// promotion in get_next_powerup rather than from this check.
+	if (rarity == 1 || rarity == 5)
+	{
+		return true;
+	}
+
+	// randomint(0) errors, and anything the menu does not offer falls back to the default.
 	if (rarity < 2)
 	{
 		rarity = 2;

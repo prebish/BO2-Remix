@@ -1926,6 +1926,17 @@ perk_think(perk)
 	self notify("perk_lost");
 }
 
+// Jugger-Nog is worth a flat two extra hits rather than stock's fixed 160. The stock number
+// only makes sense against stock's 100 base: once HIT DOWN can set the base to 150 or 250 a
+// constant either shrinks to almost nothing or drops below the base and cuts the maximum
+// outright. Deriving it from level.player_starting_health keeps the perk worth exactly the
+// same two hits at every HIT DOWN setting - 200 at two, 250 at three, 350 at five.
+//
+// Health is 50 per hit, so +100 is two hits. The upgraded tier keeps stock's 30-point lead
+// over the base perk (160 -> 190) rather than inventing a new margin.
+//
+// This is not part of PERK BUFFS: the amount is the same either way. That setting only decides
+// whether the purchase also heals, further down.
 perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 {
 	max_total_health = undefined;
@@ -1937,7 +1948,7 @@ perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 			self.premaxhealth = self.maxhealth;
 		}
 
-		max_total_health = level.zombie_vars["zombie_perk_juggernaut_health"];
+		max_total_health = level.player_starting_health + 100;
 	}
 	else if (perk == "specialty_armorvest_upgrade")
 	{
@@ -1946,7 +1957,7 @@ perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 			self.premaxhealth = self.maxhealth;
 		}
 
-		max_total_health = level.zombie_vars["zombie_perk_juggernaut_health_upgrade"];
+		max_total_health = level.player_starting_health + 130;
 	}
 	else if (perk == "jugg_upgrade")
 	{
@@ -1957,7 +1968,7 @@ perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 
 		if (self hasperk("specialty_armorvest"))
 		{
-			max_total_health = level.zombie_vars["zombie_perk_juggernaut_health"];
+			max_total_health = level.player_starting_health + 100;
 		}
 		else
 		{
@@ -1968,7 +1979,7 @@ perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 	{
 		if (self hasperk("specialty_armorvest"))
 		{
-			max_total_health = level.zombie_vars["zombie_perk_juggernaut_health"];
+			max_total_health = level.player_starting_health + 100;
 		}
 		else
 		{
@@ -1988,9 +1999,19 @@ perk_set_max_health_if_jugg(perk, set_premaxhealth, clamp_health_to_max_health)
 			max_total_health -= 100;
 		}
 
-		missinghealth = self.maxhealth - self.health;
-		self setmaxhealth(max_total_health);
-		self.health -= missinghealth;
+		// PERK BUFFS. The fork carries your missing health across the change in maximum, so buying
+		// Jugger-Nog while hurt leaves you just as hurt. Stock lets setmaxhealth top you up to the
+		// new maximum instead, which amounts to a free heal on purchase.
+		if (scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1))
+		{
+			missinghealth = self.maxhealth - self.health;
+			self setmaxhealth(max_total_health);
+			self.health -= missinghealth;
+		}
+		else
+		{
+			self setmaxhealth(max_total_health);
+		}
 
 		if (isDefined(clamp_health_to_max_health) && clamp_health_to_max_health == 1)
 		{

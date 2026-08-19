@@ -570,6 +570,13 @@ CoD.OptionsSettings.CreateModTab = function(ModTab, LocalClientIndex)
 	HealthBarSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	HealthBarSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
+	-- Mapping aid: prints the player's position and angles every three seconds, formatted to
+	-- paste straight into an add_buildable_piece_spawn call. Read by the game rather than the
+	-- client, so in co-op it is the host's setting that decides, unlike the rest of this tab.
+	local CoordDisplaySelector = ModTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_COORD_DISPLAY_CAPS"), "zmr_coord_display")
+	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
 	local ZoneNameSelector = ModTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_ZONE_NAME_CAPS"), "ui_hud_zone_name")
 	ZoneNameSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	ZoneNameSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
@@ -602,10 +609,6 @@ CoD.OptionsSettings.CreateModTab = function(ModTab, LocalClientIndex)
 
 	ModTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
-	local FogSelector = ModTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FOG_CAPS"), "r_fog_settings")
-	FogSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
-	FogSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
-
 	local DofSelector = ModTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("PLATFORM_DEPTH_OF_FIELD_CAPS"), "r_dof_enable_settings")
 	DofSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
 	DofSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
@@ -629,59 +632,44 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	RulesTabContainer.buttonList = RulesTabButtonList
 	RulesTabContainer:addElement(RulesTabButtonList)
 
-	local StartRoundSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_START_ROUND_CAPS"), "zmr_start_round")
-	StartRoundSelector:addChoice(LocalClientIndex, "1", 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartRoundSelector:addChoice(LocalClientIndex, "5", 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartRoundSelector:addChoice(LocalClientIndex, "10", 10, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartRoundSelector:addChoice(LocalClientIndex, "20", 20, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-
-	local StartingPointsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_STARTING_POINTS_CAPS"), "zmr_starting_points")
-	StartingPointsSelector:addChoice(LocalClientIndex, "0", 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartingPointsSelector:addChoice(LocalClientIndex, "500", 500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartingPointsSelector:addChoice(LocalClientIndex, "1000", 1000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	StartingPointsSelector:addChoice(LocalClientIndex, "5000", 5000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	-- Unlike everything below it, this one is a client dvar: it applies the moment it is
+	-- changed and only for the player who changed it.
+	local FogSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FOG_CAPS"), "r_fog_settings")
+	FogSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
+	FogSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChangedSendMenuResponse)
 
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
-	local FreePerkSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FREE_PERK_CAPS"), "zmr_free_perk")
-	FreePerkSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	FreePerkSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-
 	local FreePerkRaritySelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FREE_PERK_RARITY_CAPS"), "zmr_free_perk_rarity")
-	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NORMAL_CAPS"), 2, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_NONE_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_RARE_CAPS"), 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_NORMAL_CAPS"), 2, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_EXTRA_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FreePerkRaritySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_CRAZY_CAPS"), 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
-	local PerkLimitSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_PERK_LIMIT_CAPS"), "zmr_perk_limit")
-	PerkLimitSelector:addChoice(LocalClientIndex, "4", 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	PerkLimitSelector:addChoice(LocalClientIndex, "6", 6, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	PerkLimitSelector:addChoice(LocalClientIndex, "8", 8, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_UNLIMITED_CAPS"), 12, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	local PerkBuffsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_PERK_BUFFS_CAPS"), "zmr_perk_buffs")
+	PerkBuffsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkBuffsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_ENHANCED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
 	local ShieldHealthSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_SHIELD_HEALTH_CAPS"), "zmr_shield_health")
-	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_REBALANCED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_SHIELD_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	ShieldHealthSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_REBALANCED_250_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	local CarpenterShieldSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_CARPENTER_SHIELD_CAPS"), "zmr_carpenter_shield")
-	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	CarpenterShieldSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_BO4_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	local MaxAmmoMagazineSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_MAX_AMMO_MAGAZINE_CAPS"), "zmr_max_ammo_magazine")
-	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	MaxAmmoMagazineSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_BO4_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
-	-- Mapping aid rather than a gameplay rule: prints the player's position and angles on the HUD
-	-- every three seconds, formatted to paste straight into an add_buildable_piece_spawn call.
-	local CoordDisplaySelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_COORD_DISPLAY_CAPS"), "zmr_coord_display")
-	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	CoordDisplaySelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-
 	local LegacyBoxGunsSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_LEGACY_BOX_GUNS_CAPS"), "zmr_legacy_box_guns")
-	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_DISABLED_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	LegacyBoxGunsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_ENABLED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	RulesTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
 
@@ -689,10 +677,67 @@ CoD.OptionsSettings.CreateRulesTab = function(RulesTab, LocalClientIndex)
 	-- whichever announcer the game is running. RANDOMIZED draws from the fork's track list in
 	-- _zm_powerups::init instead.
 	local FiresaleMusicSelector = RulesTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_FIRESALE_MUSIC_CAPS"), "zmr_firesale_music")
-	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
-	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_RANDOMIZED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_STOCK_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	FiresaleMusicSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_RANDOMIZED_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
 
 	return RulesTabContainer
+end
+
+-- The four settings the lobby carries under Change Game Mode. They are only reachable there
+-- before a match starts, which leaves no way to check what the current game was actually
+-- started with, so the same four are repeated here. Like the MOD RULES tab these are read by
+-- the game at map load, so changing one mid-match does nothing until the level restarts -
+-- which is the point: set it here, restart, and the new value is picked up. init_mod_setting
+-- only fills a dvar in when it is empty, so a value chosen here is never overwritten on the
+-- way into the next game.
+--
+-- Host only in co-op, again like MOD RULES: the game reads the host's dvars, not each client's.
+CoD.OptionsSettings.CreateMatchTab = function(MatchTab, LocalClientIndex)
+	local MatchTabContainer = LUI.UIContainer.new()
+	local MatchTabButtonList = CoD.Options.CreateButtonList()
+	MatchTab.buttonList = MatchTabButtonList
+	MatchTabContainer.buttonList = MatchTabButtonList
+	MatchTabContainer:addElement(MatchTabButtonList)
+
+	local StartRoundSelector = MatchTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_START_ROUND_CAPS"), "zmr_start_round", Engine.Localize("MENU_ZMR_START_ROUND_DESC"))
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_1_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_5_CAPS"), 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_10_CAPS"), 10, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_15_CAPS"), 15, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_20_CAPS"), 20, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartRoundSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_25_CAPS"), 25, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	-- 500 means "leave the stock score alone" rather than "force 500", which is why it is the
+	-- default rather than a value in its own right. See _zm_reimagined::give_starting_points.
+	local StartPointsSelector = MatchTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_STARTING_POINTS_CAPS"), "zmr_starting_points", Engine.Localize("MENU_ZMR_START_POINTS_DESC"))
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_0_CAPS"), 0, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_500_CAPS"), 500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_1000_CAPS"), 1000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_1500_CAPS"), 1500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_2000_CAPS"), 2000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_2500_CAPS"), 2500, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_5000_CAPS"), 5000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	StartPointsSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_10000_CAPS"), 10000, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	MatchTabButtonList:addSpacer(CoD.CoD9Button.Height / 2)
+
+	-- Unlimited is 12 rather than a flag: it is the number of perks in the game, so the cap can
+	-- never be reached. level.perk_purchase_limit takes the value straight off this dvar.
+	local PerkLimitSelector = MatchTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_PERK_LIMIT_CAPS"), "zmr_perk_limit", Engine.Localize("MENU_ZMR_PERK_LIMIT_DESC"))
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_1_CAPS"), 1, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_4_CAPS"), 4, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_5_CAPS"), 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_6_CAPS"), 6, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	PerkLimitSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_UNLIMITED_CAPS"), 12, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	-- Health is 50 per hit, so this also decides whether Jugger-Nog is worth buying: its flat 160
+	-- beats two and three hits, but not five, where it is floored at base health instead.
+	local HitDownSelector = MatchTabButtonList:addDvarLeftRightSelector(LocalClientIndex, Engine.Localize("MENU_HIT_DOWN_CAPS"), "zmr_hit_down", Engine.Localize("MENU_ZMR_HIT_DOWN_DESC"))
+	HitDownSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_VANILLA_2_CAPS"), 2, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	HitDownSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_DEFAULT_3_CAPS"), 3, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+	HitDownSelector:addChoice(LocalClientIndex, Engine.Localize("MENU_ZMR_NUM_5_CAPS"), 5, nil, CoD.OptionsSettings.Button_ApplyDvarChanged)
+
+	return MatchTabContainer
 end
 
 LUI.createMenu.OptionsSettingsMenu = function(LocalClientIndex)
@@ -740,8 +785,24 @@ LUI.createMenu.OptionsSettingsMenu = function(LocalClientIndex)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_SOUND_CAPS", CoD.OptionsSettings.CreateSoundTab)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_VOICECHAT_CAPS", CoD.OptionsSettings.CreateVoiceChatTab)
 	SettingsTabs:addTab(LocalClientIndex, "MENU_GAME_CAPS", CoD.OptionsSettings.CreateGameTab)
-	SettingsTabs:addTab(LocalClientIndex, "MENU_MOD_CAPS", CoD.OptionsSettings.CreateModTab)
-	SettingsTabs:addTab(LocalClientIndex, "MENU_RULES_CAPS", CoD.OptionsSettings.CreateRulesTab)
+	SettingsTabs:addTab(LocalClientIndex, "MENU_ZMR_HUD_TAB_CAPS", CoD.OptionsSettings.CreateModTab)
+	SettingsTabs:addTab(LocalClientIndex, "MENU_ZMR_MOD_RULES_TAB_CAPS", CoD.OptionsSettings.CreateRulesTab)
+
+	-- Added last so every tab before it keeps the same index in both menus. In the front end the
+	-- lobby already carries these four and is one button away, so the tab would only duplicate it.
+	local TabCount = 7
+	if InGame then
+		SettingsTabs:addTab(LocalClientIndex, "MENU_ZMR_MATCH_TAB_CAPS", CoD.OptionsSettings.CreateMatchTab)
+		TabCount = 8
+	end
+
+	-- The remembered tab index is shared between the in-game menu and the front end, and MATCH only
+	-- exists in one of them, so leaving on it and reopening from the main menu would otherwise ask
+	-- for a tab that is not there.
+	if CoD.OptionsSettings.CurrentTabIndex and CoD.OptionsSettings.CurrentTabIndex > TabCount then
+		CoD.OptionsSettings.CurrentTabIndex = nil
+	end
+
 	if CoD.OptionsSettings.CurrentTabIndex then
 		SettingsTabs:loadTab(LocalClientIndex, CoD.OptionsSettings.CurrentTabIndex)
 	else

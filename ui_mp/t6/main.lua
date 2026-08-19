@@ -232,12 +232,16 @@ CoD.InitArchiveDvars = function()
 		Engine.Exec(nil, "seta zmr_carpenter_shield 1")
 	end
 
-	if UIExpression.DvarString(nil, "zmr_free_perk") == "" then
-		Engine.Exec(nil, "seta zmr_free_perk 1")
-	end
-
 	if UIExpression.DvarString(nil, "zmr_free_perk_rarity") == "" then
 		Engine.Exec(nil, "seta zmr_free_perk_rarity 2")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_hit_down") == "" then
+		Engine.Exec(nil, "seta zmr_hit_down 3")
+	end
+
+	if UIExpression.DvarString(nil, "zmr_perk_buffs") == "" then
+		Engine.Exec(nil, "seta zmr_perk_buffs 1")
 	end
 
 	if UIExpression.DvarString(nil, "zmr_shield_health") == "" then

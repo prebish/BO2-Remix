@@ -1213,7 +1213,6 @@ check_for_team_change()
 last_stand_pistol_rank_init()
 {
 	level.pistol_values = [];
-	level.pistol_values[level.pistol_values.size] = "fnp45_zm";
 	level.pistol_values[level.pistol_values.size] = "m1911_zm";
 	level.pistol_values[level.pistol_values.size] = "c96_zm";
 	level.pistol_values[level.pistol_values.size] = "cz75_zm";
@@ -1239,7 +1238,6 @@ last_stand_pistol_rank_init()
 	level.pistol_values[level.pistol_values.size] = "ray_gun_zm";
 	level.pistol_values[level.pistol_values.size] = "ray_gun_upgraded_zm";
 	level.pistol_value_solo_replace_below = level.pistol_values.size - 1;
-	level.pistol_values[level.pistol_values.size] = "fnp45_upgraded_zm";
 	level.pistol_values[level.pistol_values.size] = "m1911_upgraded_zm";
 	level.pistol_values[level.pistol_values.size] = "c96_upgraded_zm";
 	level.pistol_values[level.pistol_values.size] = "raygun_mark2_zm";
@@ -1740,26 +1738,6 @@ actor_damage_override(inflictor, attacker, damage, flags, meansofdeath, weapon, 
 		}
 	}
 
-	if (weapon == "titus6_explosive_dart_zm")
-	{
-		final_damage = self scale_damage(final_damage, 3000);
-	}
-
-	if (weapon == "titus6_explosive_dart_upgraded_zm")
-	{
-		final_damage = self scale_damage(final_damage, 6000);
-	}
-
-	if (weapon == "mk_titus6_zm")
-	{
-		final_damage = self scale_damage(final_damage, 1000);
-	}
-
-	if (weapon == "mk_titus6_upgraded_zm")
-	{
-		final_damage = self scale_damage(final_damage, 2000);
-	}
-
 	if (weapon == "staff_revive_zm")
 	{
 		final_damage = self scale_damage(final_damage);
@@ -1767,7 +1745,7 @@ actor_damage_override(inflictor, attacker, damage, flags, meansofdeath, weapon, 
 
 	if (isplayer(attacker))
 	{
-		if (attacker HasPerk("specialty_deadshot"))
+		if (attacker HasPerk("specialty_deadshot") && scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1))
 		{
 			if (is_headshot(weapon, shitloc, meansofdeath))
 			{
@@ -2302,7 +2280,9 @@ player_damage_override(einflictor, eattacker, idamage, idflags, smeansofdeath, s
 	{
 		self.use_adjusted_grenade_damage = undefined;
 
-		if (self hasperk("specialty_flakjacket"))
+		// PERK BUFFS. Stock has no PHD check here, so a fire zombie going up still hurts
+		// you through the perk. The fork makes it free.
+		if (self hasperk("specialty_flakjacket") && scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1))
 		{
 			return 0;
 		}
@@ -2406,7 +2386,10 @@ player_damage_override(einflictor, eattacker, idamage, idflags, smeansofdeath, s
 
 	if (smeansofdeath == "MOD_FALLING")
 	{
-		if (self hasperk("specialty_flakjacket"))
+		// PERK BUFFS. Stock only cancels fall damage on an actual dive, which is where the
+		// single point of chip damage from an ordinary drop comes from. The fork cancels it
+		// either way, so VANILLA puts the dive requirement back.
+		if (self hasperk("specialty_flakjacket") && (scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1) || is_true(self.divetoprone)))
 		{
 			if (is_true(self.divetoprone))
 			{
@@ -2454,11 +2437,6 @@ player_damage_override(einflictor, eattacker, idamage, idflags, smeansofdeath, s
 		}
 
 		idamage = 75;
-
-		if (sweapon == "titus6_explosive_dart_zm" || sweapon == "titus6_explosive_dart_upgraded_zm")
-		{
-			idamage = 15;
-		}
 	}
 
 	finaldamage = idamage;
