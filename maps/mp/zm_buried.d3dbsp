@@ -11714,6 +11714,15 @@
 "guid" "D9663C8A"
 }
 {
+"angles" "0 1.00179e-005 0"
+"script_noteworthy" "870mcs_zm"
+"targetname" "chalk_p6_zm_bu_chalk"
+"origin" "-805 -470.7 341"
+"classname" "script_struct"
+"model" "p6_zm_bu_chalk"
+"guid" "688A8E97"
+}
+{
 "angles" "0 2.50448e-006 0"
 "script_noteworthy" "an94_zm"
 "targetname" "chalk_p6_zm_bu_chalk"
