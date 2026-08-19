@@ -4,6 +4,12 @@
 
 main()
 {
+	// The weapon locker only exists on Tranzit, Die Rise and Buried. Referencing its stock
+	// script from the shared file made every other map fail to load with an unresolved
+	// external, because that reference is resolved when the file is linked and a runtime
+	// map check would never have been reached. It lives with the three maps that have one.
+	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweapon, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweapon);
+
 	replaceFunc(maps\mp\zm_highrise_sq::navcomputer_waitfor_navcard, scripts\zm\reimagined\_zm_sq::navcomputer_waitfor_navcard);
 	replaceFunc(maps\mp\zm_highrise::zclassic_preinit, scripts\zm\replaced\zm_highrise::zclassic_preinit);
 	replaceFunc(maps\mp\zm_highrise::custom_vending_precaching, scripts\zm\replaced\zm_highrise::custom_vending_precaching);

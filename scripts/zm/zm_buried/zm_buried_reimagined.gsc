@@ -4,6 +4,12 @@
 
 main()
 {
+	// The weapon locker only exists on Tranzit, Die Rise and Buried. Referencing its stock
+	// script from the shared file made every other map fail to load with an unresolved
+	// external, because that reference is resolved when the file is linked and a runtime
+	// map check would never have been reached. It lives with the three maps that have one.
+	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweapon, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweapon);
+
 	replaceFunc(character\c_transit_player_farmgirl::precache, character\c_highrise_player_farmgirl::precache);
 	replaceFunc(character\c_transit_player_oldman::precache, character\c_highrise_player_oldman::precache);
 	replaceFunc(character\c_transit_player_engineer::precache, character\c_highrise_player_engineer::precache);
@@ -37,13 +43,6 @@ main()
 	replaceFunc(maps\mp\zm_buried_distance_tracking::escaped_zombies_cleanup_init, scripts\zm\replaced\zm_buried_distance_tracking::escaped_zombies_cleanup_init);
 	replaceFunc(maps\mp\zm_buried_distance_tracking::delete_zombie_noone_looking, scripts\zm\replaced\zm_buried_distance_tracking::delete_zombie_noone_looking);
 	replaceFunc(maps\mp\zombies\_zm_ai_ghost::prespawn, scripts\zm\replaced\_zm_ai_ghost::prespawn);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::start_jail_run, scripts\zm\replaced\_zm_ai_sloth::start_jail_run);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::start_jail_wait, scripts\zm\replaced\_zm_ai_sloth::start_jail_wait);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::update_jail_idle, scripts\zm\replaced\_zm_ai_sloth::update_jail_idle);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::update_jail_wait, scripts\zm\replaced\_zm_ai_sloth::update_jail_wait);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::update_eat, scripts\zm\replaced\_zm_ai_sloth::update_eat);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::sloth_check_ragdolls, scripts\zm\replaced\_zm_ai_sloth::sloth_check_ragdolls);
-	replaceFunc(maps\mp\zombies\_zm_ai_sloth::sloth_ragdoll_zombie, scripts\zm\replaced\_zm_ai_sloth::sloth_ragdoll_zombie);
 	replaceFunc(maps\mp\zombies\_zm_equip_subwoofer::hit_player, scripts\zm\replaced\_zm_equip_subwoofer::hit_player);
 	replaceFunc(maps\mp\zombies\_zm_equip_subwoofer::startsubwooferdecay, scripts\zm\replaced\_zm_equip_subwoofer::startsubwooferdecay);
 	replaceFunc(maps\mp\zombies\_zm_equip_subwoofer::subwoofer_network_choke, scripts\zm\replaced\_zm_equip_subwoofer::subwoofer_network_choke);
@@ -51,7 +50,12 @@ main()
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::init_anim_slice_times, scripts\zm\replaced\_zm_equip_headchopper::init_anim_slice_times);
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::headchopperthink, scripts\zm\replaced\_zm_equip_headchopper::headchopperthink);
 	replaceFunc(maps\mp\zombies\_zm_equip_headchopper::setupwatchers, scripts\zm\replaced\_zm_equip_headchopper::setupwatchers);
-	replaceFunc(maps\mp\zombies\_zm_perk_vulture::_vulture_perk_think, scripts\zm\replaced\_zm_perk_vulture::_vulture_perk_think);
+	// The only change in this replacement is stink areas no longer hiding a moving player, so
+	// PERK BUFFS on VANILLA leaves the stock think in place.
+	if (scripts\zm\_zm_reimagined::mod_setting("zmr_perk_buffs", 1))
+	{
+		replaceFunc(maps\mp\zombies\_zm_perk_vulture::_vulture_perk_think, scripts\zm\replaced\_zm_perk_vulture::_vulture_perk_think);
+	}
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::slowgun_zombie_damage_response, scripts\zm\replaced\_zm_weap_slowgun::slowgun_zombie_damage_response);
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::slowgun_fired, scripts\zm\replaced\_zm_weap_slowgun::slowgun_fired);
 	replaceFunc(maps\mp\zombies\_zm_weap_slowgun::zombie_paralyzed, scripts\zm\replaced\_zm_weap_slowgun::zombie_paralyzed);

@@ -4,6 +4,12 @@
 
 main()
 {
+	// The weapon locker only exists on Tranzit, Die Rise and Buried. Referencing its stock
+	// script from the shared file made every other map fail to load with an unresolved
+	// external, because that reference is resolved when the file is linked and a runtime
+	// map check would never have been reached. It lives with the three maps that have one.
+	replaceFunc(maps\mp\zombies\_zm_weapon_locker::triggerweaponslockerisvalidweapon, scripts\zm\replaced\_zm_weapon_locker::triggerweaponslockerisvalidweapon);
+
 	replaceFunc(character\c_transit_player_farmgirl::precache, character\c_highrise_player_farmgirl::precache);
 	replaceFunc(character\c_transit_player_oldman::precache, character\c_highrise_player_oldman::precache);
 	replaceFunc(character\c_transit_player_engineer::precache, character\c_highrise_player_engineer::precache);
@@ -45,7 +51,6 @@ main()
 	replaceFunc(maps\mp\zm_transit_distance_tracking::delete_zombie_noone_looking, scripts\zm\replaced\zm_transit_distance_tracking::delete_zombie_noone_looking);
 	replaceFunc(maps\mp\zm_transit_lava::player_lava_damage, scripts\zm\replaced\zm_transit_lava::player_lava_damage);
 	replaceFunc(maps\mp\zm_transit_lava::zombie_exploding_death, scripts\zm\replaced\zm_transit_lava::zombie_exploding_death);
-	replaceFunc(maps\mp\zombies\_zm_ai_screecher::screecher_spawning_logic, scripts\zm\replaced\_zm_ai_screecher::screecher_spawning_logic);
 	replaceFunc(maps\mp\zombies\_zm_ai_screecher::screecher_attacking, scripts\zm\replaced\_zm_ai_screecher::screecher_attacking);
 	replaceFunc(maps\mp\zombies\_zm_ai_screecher::screecher_melee_damage, scripts\zm\replaced\_zm_ai_screecher::screecher_melee_damage);
 	replaceFunc(maps\mp\zombies\_zm_ai_screecher::screecher_detach, scripts\zm\replaced\_zm_ai_screecher::screecher_detach);
@@ -96,6 +101,7 @@ init()
 	busdepot_remove_lava_collision();
 	cornfield_add_collision();
 	path_exploit_fixes();
+	remove_powerswitch_spawn_at_whoswho();
 
 	level thread power_local_electric_doors_globally();
 	level thread power_station_exposure_change();
@@ -622,6 +628,74 @@ path_exploit_fixes()
 	player_trigger_radius = 72;
 	zombie_goto_point = (1098, -1521, 128);
 	level thread maps\mp\zombies\_zm_ffotd::path_exploit_fix(zombie_trigger_origin, zombie_trigger_radius, zombie_trigger_height, player_trigger_origin, player_trigger_radius, zombie_goto_point);
+}
+
+// The Who's Who machine at the Power Station is an addition on top of the stock map, and one of the
+// power switch part spawn points sits where it now stands, so a part can spawn inside the machine.
+// The machine wins the spot and that spawn point is dropped.
+//
+// Edits piece.spawns rather than removing the struct. Stock zm_transit_classic::precache calls
+// include_buildables, which copies each part's spawn structs out of the struct pool with
+// getstructarray and never reads that pool again, and precache runs before this - so removing the
+// struct here would be too late. piece.spawns is not consulted until generate_piece picks a spot
+// around start_zombie_round_logic, which leaves init the right window to edit the array in place.
+//
+// The three parts each keep their own pool here: Tranzit's power switch does not call
+// combine_buildable_pieces, so every part is checked rather than assuming which one owns the spot.
+//
+// Measured in game: the machine sits at (11571, 7707, -757) and it was the panel,
+// p6_zm_buildable_pswitch_body, that spawned at (11567, 7731, -756) - 24 units away, inside it. The
+// panel keeps two other spots. Nothing else came close: the next nearest spawn of any part is 353
+// units out, so the 72 unit radius has a wide margin either side and matches only the one spot.
+remove_powerswitch_spawn_at_whoswho()
+{
+	if (!isdefined(level.zombie_include_buildables) || !isdefined(level.zombie_include_buildables["powerswitch"]))
+	{
+		return;
+	}
+
+	s_machine = undefined;
+
+	foreach (s_struct in getstructarray("zm_perk_machine", "targetname"))
+	{
+		if (isdefined(s_struct.script_noteworthy) && s_struct.script_noteworthy == "specialty_finalstand")
+		{
+			s_machine = s_struct;
+			break;
+		}
+	}
+
+	if (!isdefined(s_machine))
+	{
+		return;
+	}
+
+	foreach (piece in level.zombie_include_buildables["powerswitch"].buildablepieces)
+	{
+		// Never take a part's last spot. An empty pool reads as a missing buildable piece and the
+		// power switch would stop being buildable at all.
+		if (!isdefined(piece.spawns) || piece.spawns.size < 2)
+		{
+			continue;
+		}
+
+		a_kept = [];
+
+		foreach (s_spawn in piece.spawns)
+		{
+			if (distance(s_spawn.origin, s_machine.origin) < 72)
+			{
+				continue;
+			}
+
+			a_kept[a_kept.size] = s_spawn;
+		}
+
+		if (a_kept.size > 0 && a_kept.size < piece.spawns.size)
+		{
+			piece.spawns = a_kept;
+		}
+	}
 }
 
 power_station_exposure_change()
