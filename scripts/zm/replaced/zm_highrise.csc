@@ -28,9 +28,7 @@ init_gamemodes()
 
 	add_map_location_gamemode("zstandard", "shopping_mall", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
 	add_map_location_gamemode("zstandard", "dragon_rooftop", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
-	add_map_location_gamemode("zstandard", "sweatshop", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
 
 	add_map_location_gamemode("zgrief", "shopping_mall", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
 	add_map_location_gamemode("zgrief", "dragon_rooftop", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
-	add_map_location_gamemode("zgrief", "sweatshop", clientscripts\mp\zm_highrise_classic::precache, clientscripts\mp\zm_highrise_classic::premain, clientscripts\mp\zm_highrise_classic::main);
 }

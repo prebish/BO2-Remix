@@ -39,20 +39,11 @@ precache_shaders()
 	precacheshader("menu_zm_transit_zsurvival_farm");
 	precacheshader("menu_zm_transit_zsurvival_power");
 	precacheshader("menu_zm_transit_zsurvival_town");
-	precacheshader("menu_zm_transit_zsurvival_tunnel");
-	precacheshader("menu_zm_transit_zsurvival_cornfield");
 	precacheshader("menu_zm_highrise_zsurvival_shopping_mall");
 	precacheshader("menu_zm_highrise_zsurvival_dragon_rooftop");
-	precacheshader("menu_zm_highrise_zsurvival_sweatshop");
 	precacheshader("menu_zm_nuked_zsurvival_nuked");
 	precacheshader("menu_zm_prison_zsurvival_cellblock");
-	precacheshader("menu_zm_prison_zsurvival_docks");
-	precacheshader("menu_zm_buried_zsurvival_street");
-	precacheshader("menu_zm_buried_zsurvival_maze");
-	precacheshader("menu_zm_tomb_zsurvival_trenches");
-	precacheshader("menu_zm_tomb_zsurvival_excavation_site");
 	precacheshader("menu_zm_tomb_zsurvival_church");
-	precacheshader("menu_zm_tomb_zsurvival_crazy_place");
 }
 
 set_dvars()

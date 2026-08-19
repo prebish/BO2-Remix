@@ -16,18 +16,14 @@ init()
 
 	add_map_location_gamemode("zstandard", "shopping_mall", scripts\zm\locs\zm_highrise_loc_shopping_mall::precache, scripts\zm\locs\zm_highrise_loc_shopping_mall::main);
 	add_map_location_gamemode("zstandard", "dragon_rooftop", scripts\zm\locs\zm_highrise_loc_dragon_rooftop::precache, scripts\zm\locs\zm_highrise_loc_dragon_rooftop::main);
-	add_map_location_gamemode("zstandard", "sweatshop", scripts\zm\locs\zm_highrise_loc_sweatshop::precache, scripts\zm\locs\zm_highrise_loc_sweatshop::main);
 
 	add_map_location_gamemode("zgrief", "shopping_mall", scripts\zm\locs\zm_highrise_loc_shopping_mall::precache, scripts\zm\locs\zm_highrise_loc_shopping_mall::main);
 	add_map_location_gamemode("zgrief", "dragon_rooftop", scripts\zm\locs\zm_highrise_loc_dragon_rooftop::precache, scripts\zm\locs\zm_highrise_loc_dragon_rooftop::main);
-	add_map_location_gamemode("zgrief", "sweatshop", scripts\zm\locs\zm_highrise_loc_sweatshop::precache, scripts\zm\locs\zm_highrise_loc_sweatshop::main);
 
 	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zstandard", "shopping_mall", scripts\zm\locs\zm_highrise_loc_shopping_mall::struct_init);
 	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zgrief", "shopping_mall", scripts\zm\locs\zm_highrise_loc_shopping_mall::struct_init);
 	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zstandard", "dragon_rooftop", scripts\zm\locs\zm_highrise_loc_dragon_rooftop::struct_init);
 	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zgrief", "dragon_rooftop", scripts\zm\locs\zm_highrise_loc_dragon_rooftop::struct_init);
-	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zstandard", "sweatshop", scripts\zm\locs\zm_highrise_loc_sweatshop::struct_init);
-	scripts\zm\replaced\utility::add_struct_location_gamemode_func("zgrief", "sweatshop", scripts\zm\locs\zm_highrise_loc_sweatshop::struct_init);
 }
 
 zstandard_preinit()

@@ -15,6 +15,12 @@ image,~-gfxt_zmb_wep_wallbuy_ballista_tomb
 image,~-gfxt_zmb_wep_wallbuy_five_seven_tomb
 image,~-gfxt_zmb_wep_wallbuy_mp40_tomb
 image,~-gfxt_zmb_wep_wallbuy_stg44_tomb
+image,specialty_quickrevive_zombies
+image,minimap_icon_electric_cherry
+image,specialty_doubletap_zombies
+image,specialty_fastreload_zombies
+image,specialty_juggernaut_zombies
+image,specialty_vulture_zombies
 image,specialty_ads_zombies
 image,specialty_divetonuke_zombies
 image,specialty_marathon_zombies
@@ -36,7 +42,7 @@ image,distfont
 image,hud_dpad_blood
 
 // Genuine BO1 perk and powerup icons, selected on Nuketown only by the LUI. Art from mjmodz's
-// "Black Ops 1 HUD for BO2" v1.0.0 (BO1 images by Kingslayer Kyle) - see Credits in FORK.md.
+// "Black Ops 1 HUD for BO2" v1.0.0 (BO1 images by Kingslayer Kyle) - see Credits in README.md.
 // Kept under the pack's own uie_* names with the pack's own materials rather than renamed into
 // the old _bo1 scheme, because the art is 128x128 with mipmaps where the retired set was 256x256
 // without, and repacking it would have meant transcoding and hand-authoring 18 materials.
@@ -131,35 +137,17 @@ material,menu_zm_weapons_item_meat
 material,menu_zm_weapons_item_head
 material,menu_zm_transit_zsurvival_diner
 material,menu_zm_transit_zsurvival_power
-material,menu_zm_transit_zsurvival_tunnel
-material,menu_zm_transit_zsurvival_cornfield
 material,menu_zm_highrise_zsurvival_shopping_mall
 material,menu_zm_highrise_zsurvival_dragon_rooftop
-material,menu_zm_highrise_zsurvival_sweatshop
 material,menu_zm_prison_zsurvival_cellblock
-material,menu_zm_prison_zsurvival_docks
-material,menu_zm_buried_zsurvival_street
-material,menu_zm_buried_zsurvival_maze
-material,menu_zm_tomb_zsurvival_trenches
-material,menu_zm_tomb_zsurvival_excavation_site
 material,menu_zm_tomb_zsurvival_church
-material,menu_zm_tomb_zsurvival_crazy_place
 material,loadscreen_zm_transit_zstandard_diner
 material,loadscreen_zm_transit_zstandard_power
-material,loadscreen_zm_transit_zstandard_tunnel
-material,loadscreen_zm_transit_zstandard_cornfield
 material,loadscreen_zm_highrise_zstandard_shopping_mall
 material,loadscreen_zm_highrise_zstandard_dragon_rooftop
-material,loadscreen_zm_highrise_zstandard_sweatshop
 material,loadscreen_zm_prison_zclassic_prison
 material,loadscreen_zm_prison_zstandard_cellblock
-material,loadscreen_zm_prison_zstandard_docks
-material,loadscreen_zm_buried_zstandard_street
-material,loadscreen_zm_buried_zstandard_maze
-material,loadscreen_zm_tomb_zstandard_trenches
-material,loadscreen_zm_tomb_zstandard_excavation_site
 material,loadscreen_zm_tomb_zstandard_church
-material,loadscreen_zm_tomb_zstandard_crazy_place
 material,hud_zm_transit_dpad
 material,hud_zm_transit_dpad_bar
 material,hud_zm_num_transit_0
@@ -236,7 +224,6 @@ script,scripts/zm/zencounter/zencounter_reimagined.csc
 script,scripts/zm/replaced/_explosive_bolt.csc
 script,scripts/zm/replaced/_sticky_grenade.csc
 script,scripts/zm/replaced/_zm.csc
-script,scripts/zm/replaced/_zm_ai_brutus.csc
 script,scripts/zm/replaced/_zm_audio.csc
 script,scripts/zm/replaced/_zm_gump.csc
 script,scripts/zm/replaced/_zm_perks.csc
