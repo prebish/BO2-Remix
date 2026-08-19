@@ -21,9 +21,7 @@ include,includes/code_post_gfx_mp
 include,includes/common_mp
 include,includes/afghanistan
 include,includes/frontend
-include,includes/code_post_gfx
 include,includes/common
-include,includes/weapons!exptitus6_sp
 include,includes/weapons!metalstorm_mms_sp
 
 include,reimagined

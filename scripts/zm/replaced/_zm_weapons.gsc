@@ -1245,18 +1245,6 @@ get_nonalternate_weapon(altweapon)
 		return alt;
 	}
 
-	if (issubstr(altweapon, "titus6"))
-	{
-		alt = "titus6_zm";
-
-		if (issubstr(altweapon, "upgraded"))
-		{
-			alt = "titus6_upgraded_zm";
-		}
-
-		return alt;
-	}
-
 	if (issubstr(altweapon, "slip"))
 	{
 		alt = "slipgun_zm";

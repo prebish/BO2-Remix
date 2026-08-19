@@ -71,17 +71,6 @@ weapons!metalstorm_mms_sp
 if %ERRORLEVEL% neq 0 pause & exit
 
 "%OAT_BASE%\Linker.exe" ^
---load "%CD%\zone_source\dependencies\camo_materials.ff" ^
---load "%CD%\zone\all\weapons!exptitus6_sp.ff" ^
---base-folder "%OAT_BASE%" ^
---add-asset-search-path "%CD%" ^
---add-source-search-path "%CD%\zone_source\includes" ^
---output-folder "%CD%\zone_source\includes" ^
-weapons!exptitus6_sp
-
-if %ERRORLEVEL% neq 0 pause & exit
-
-"%OAT_BASE%\Linker.exe" ^
 --load "%OAT_GAME%\zone\all\patch.ff" ^
 --load "%OAT_GAME%\zone\all\common.ff" ^
 --base-folder "%OAT_BASE%" ^
@@ -89,16 +78,6 @@ if %ERRORLEVEL% neq 0 pause & exit
 --add-source-search-path "%CD%\zone_source\includes" ^
 --output-folder "%CD%\zone_source\includes" ^
 common
-
-if %ERRORLEVEL% neq 0 pause & exit
-
-"%OAT_BASE%\Linker.exe" ^
---load "%OAT_GAME%\zone\all\code_post_gfx.ff" ^
---base-folder "%OAT_BASE%" ^
---add-asset-search-path "%CD%" ^
---add-source-search-path "%CD%\zone_source\includes" ^
---output-folder "%CD%\zone_source\includes" ^
-code_post_gfx
 
 if %ERRORLEVEL% neq 0 pause & exit
 
@@ -241,6 +220,8 @@ if %ERRORLEVEL% neq 0 pause & exit
 
 "%OAT_BASE%\Linker.exe" ^
 --load "%CD%\zone_source\dependencies\camo_materials.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit_patch.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit.ff" ^
 --load "%OAT_GAME%\zone\all\zm_prison_patch.ff" ^
 --load "%OAT_GAME%\zone\all\zm_prison.ff" ^
 --load "%OAT_GAME%\zone\all\so_zencounter_zm_prison.ff" ^
@@ -269,6 +250,8 @@ if %ERRORLEVEL% neq 0 pause & exit
 
 "%OAT_BASE%\Linker.exe" ^
 --load "%CD%\zone_source\dependencies\camo_materials.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit_patch.ff" ^
+--load "%OAT_GAME%\zone\all\zm_transit.ff" ^
 --load "%OAT_GAME%\zone\all\zm_tomb_patch.ff" ^
 --load "%OAT_GAME%\zone\all\zm_tomb.ff" ^
 --base-folder "%OAT_BASE%" ^
@@ -283,9 +266,7 @@ if %ERRORLEVEL% neq 0 pause & exit
 --load "%CD%\zone_source\dependencies\camo_materials.ff" ^
 --load "%CD%\zone_source\dependencies\outline_techniquesets.ff" ^
 --load "%CD%\zone_source\includes\weapons!metalstorm_mms_sp.ff" ^
---load "%CD%\zone_source\includes\weapons!exptitus6_sp.ff" ^
 --load "%CD%\zone_source\includes\common.ff" ^
---load "%CD%\zone_source\includes\code_post_gfx.ff" ^
 --load "%CD%\zone_source\includes\frontend.ff" ^
 --load "%CD%\zone_source\includes\afghanistan.ff" ^
 --load "%CD%\zone_source\includes\common_mp.ff" ^
@@ -314,6 +295,6 @@ pwsh -Command "Compress-Archive -Force -Path attachmentunique,images,maps,script
 
 if %ERRORLEVEL% neq 0 pause & exit
 
-for %%f in (ff,iwd,sabs,sabl,json) do xcopy /i /y *.%%f ..\zm_reimagined
+for %%f in (ff,iwd,sabs,sabl,json) do xcopy /i /y *.%%f ..\zm_zombiesplusplus
 
 del *.iwd

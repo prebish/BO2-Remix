@@ -260,11 +260,6 @@ entityspawned(localclientnum)
 			case "sticky_grenade_zm":
 				self thread clientscripts\mp\_sticky_grenade::spawned(localclientnum);
 				break;
-
-			case "titus6_explosive_dart_zm":
-			case "titus6_explosive_dart_upgraded_zm":
-				self thread clientscripts\_explosive_dart::spawned(localclientnum);
-				break;
 		}
 	}
 }
