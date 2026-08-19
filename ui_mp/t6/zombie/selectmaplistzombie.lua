@@ -45,83 +45,104 @@ CoD.SelectMapListZombie.Maps[5] = {
 	ui_mapname = "zm_tomb",
 	ui_zm_mapstartlocation = "tomb",
 }
+-- Which game modes each start location actually supports. Taken from the
+-- add_map_location_gamemode calls in scripts/zm/replaced/*_gamemodes.gsc,
+-- which are what decide at runtime whether a location will load at all.
+--
+-- Meat registers nothing of its own: zencounter_reimagined redirects
+-- zmeat::main to zgrief::main, so Meat runs exactly where Grief runs.
+-- Turned is the reverse - Buried Street is the only place it is wired up.
+local SurvivalModes = {
+	zstandard = true,
+	zgrief = true,
+	zmeat = true,
+}
+local EncounterModes = {
+	zgrief = true,
+	zmeat = true,
+	zturned = true,
+}
 CoD.SelectMapListZombie.Locations = {}
 CoD.SelectMapListZombie.Locations[1] = {
 	ui_mapname = "zm_nuked",
 	ui_zm_mapstartlocation = "nuked",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[2] = {
 	ui_mapname = "zm_transit",
 	ui_zm_mapstartlocation = "transit",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[3] = {
 	ui_mapname = "zm_transit",
 	ui_zm_mapstartlocation = "diner",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[4] = {
 	ui_mapname = "zm_transit",
 	ui_zm_mapstartlocation = "farm",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[5] = {
 	ui_mapname = "zm_transit",
 	ui_zm_mapstartlocation = "power",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[6] = {
 	ui_mapname = "zm_transit",
 	ui_zm_mapstartlocation = "town",
+	gametypes = SurvivalModes,
 }
 CoD.SelectMapListZombie.Locations[7] = {
-	ui_mapname = "zm_transit",
-	ui_zm_mapstartlocation = "tunnel",
-}
-CoD.SelectMapListZombie.Locations[8] = {
-	ui_mapname = "zm_transit",
-	ui_zm_mapstartlocation = "cornfield",
-}
-CoD.SelectMapListZombie.Locations[9] = {
 	ui_mapname = "zm_highrise",
 	ui_zm_mapstartlocation = "shopping_mall",
+	gametypes = SurvivalModes,
 }
-CoD.SelectMapListZombie.Locations[10] = {
+CoD.SelectMapListZombie.Locations[8] = {
 	ui_mapname = "zm_highrise",
 	ui_zm_mapstartlocation = "dragon_rooftop",
+	gametypes = SurvivalModes,
 }
-CoD.SelectMapListZombie.Locations[11] = {
-	ui_mapname = "zm_highrise",
-	ui_zm_mapstartlocation = "sweatshop",
-}
-CoD.SelectMapListZombie.Locations[12] = {
+CoD.SelectMapListZombie.Locations[9] = {
 	ui_mapname = "zm_buried",
 	ui_zm_mapstartlocation = "street",
+	gametypes = EncounterModes,
 }
-CoD.SelectMapListZombie.Locations[13] = {
-	ui_mapname = "zm_buried",
-	ui_zm_mapstartlocation = "maze",
-}
-CoD.SelectMapListZombie.Locations[14] = {
+CoD.SelectMapListZombie.Locations[10] = {
 	ui_mapname = "zm_prison",
 	ui_zm_mapstartlocation = "cellblock",
+	gametypes = SurvivalModes,
 }
-CoD.SelectMapListZombie.Locations[15] = {
-	ui_mapname = "zm_prison",
-	ui_zm_mapstartlocation = "docks",
-}
-CoD.SelectMapListZombie.Locations[16] = {
-	ui_mapname = "zm_tomb",
-	ui_zm_mapstartlocation = "trenches",
-}
-CoD.SelectMapListZombie.Locations[17] = {
-	ui_mapname = "zm_tomb",
-	ui_zm_mapstartlocation = "excavation_site",
-}
-CoD.SelectMapListZombie.Locations[18] = {
+CoD.SelectMapListZombie.Locations[11] = {
 	ui_mapname = "zm_tomb",
 	ui_zm_mapstartlocation = "church",
+	gametypes = SurvivalModes,
 }
-CoD.SelectMapListZombie.Locations[19] = {
-	ui_mapname = "zm_tomb",
-	ui_zm_mapstartlocation = "crazy_place",
-}
+
+CoD.SelectMapListZombie.locationsByGametype = {}
+
+CoD.SelectMapListZombie.GetLocationsForGametype = function(gametype)
+	local cached = CoD.SelectMapListZombie.locationsByGametype[gametype]
+	if cached ~= nil then
+		return cached
+	end
+
+	local list = {}
+
+	for i, v in ipairs(CoD.SelectMapListZombie.Locations) do
+		if v.gametypes[gametype] == true then
+			list[#list + 1] = v
+		end
+	end
+
+	if #list == 0 then
+		list = CoD.SelectMapListZombie.Locations
+	end
+
+	CoD.SelectMapListZombie.locationsByGametype[gametype] = list
+
+	return list
+end
 
 CoD.SelectMapListZombie.GetKeyValueIndex = function(table, key, value)
 	for i, v in ipairs(table) do
@@ -148,7 +169,16 @@ local function gameModeListSelectionClickedEventHandler(self, event)
 			Engine.SetDvar("ui_gametype_pro", 0)
 		end
 
-		local map, location = string.match(UIExpression.ProfileValueAsString(controller, CoD.profileKey_map), "(.*) (.*)")
+		-- Nothing is written to this profile key until a map has been picked at
+		-- least once, so it can come back empty. Both lookups below treat a nil
+		-- as "not in the list" and fall through to the first entry.
+		local profileMap = UIExpression.ProfileValueAsString(self.controller, CoD.profileKey_map)
+		local map, location
+
+		if type(profileMap) == "string" then
+			map, location = string.match(profileMap, "(.*) (.*)")
+		end
+
 		local mapTable = {}
 		local mapIndex = 1
 
@@ -156,7 +186,9 @@ local function gameModeListSelectionClickedEventHandler(self, event)
 			mapTable = CoD.SelectMapListZombie.Maps
 			mapIndex = CoD.SelectMapListZombie.GetKeyValueIndex(mapTable, "ui_mapname", map)
 		else
-			mapTable = CoD.SelectMapListZombie.Locations
+			-- The new mode may not support the location that was selected under the
+			-- old one, in which case GetKeyValueIndex drops us on its first entry.
+			mapTable = CoD.SelectMapListZombie.GetLocationsForGametype(gameTable[index].ui_gametype)
 			mapIndex = CoD.SelectMapListZombie.GetKeyValueIndex(mapTable, "ui_zm_mapstartlocation", location)
 		end
 
@@ -215,11 +247,7 @@ function LUI.createMenu.SelectGameModeListZM(controller)
 
 	local index = CoD.SelectMapListZombie.GetKeyValueIndex(CoD.SelectMapListZombie.GameModes, "ui_gametype", UIExpression.DvarString(nil, "ui_gametype"))
 
-	if UIExpression.DvarBool(nil, "party_solo") == 1 then
-		listBox:setTotalItems(2, index)
-	else
-		listBox:setTotalItems(#CoD.SelectMapListZombie.GameModes, index)
-	end
+	listBox:setTotalItems(#CoD.SelectMapListZombie.GameModes, index)
 
 	self:addElement(listBox)
 	self.listBox = listBox
@@ -236,19 +264,13 @@ local function mapListSelectionClickedEventHandler(self, event)
 		local mapTable = CoD.SelectMapListZombie.Maps
 
 		if UIExpression.DvarString(nil, "ui_gametype") ~= "zclassic" then
-			mapTable = CoD.SelectMapListZombie.Locations
+			mapTable = CoD.SelectMapListZombie.GetLocationsForGametype(UIExpression.DvarString(nil, "ui_gametype"))
 		end
 
 		Engine.SetDvar("ui_mapname", mapTable[index].ui_mapname)
 		Engine.SetDvar("ui_zm_mapstartlocation", mapTable[index].ui_zm_mapstartlocation)
 
-		local map, location = string.match(UIExpression.ProfileValueAsString(controller, CoD.profileKey_map), "(.*) (.*)")
-
-		if UIExpression.DvarString(nil, "ui_gametype") == "zclassic" then
-			Engine.SetProfileVar(self.controller, CoD.profileKey_map, mapTable[index].ui_mapname .. " " .. location)
-		else
-			Engine.SetProfileVar(self.controller, CoD.profileKey_map, map .. " " .. mapTable[index].ui_zm_mapstartlocation)
-		end
+		Engine.SetProfileVar(self.controller, CoD.profileKey_map, mapTable[index].ui_mapname .. " " .. mapTable[index].ui_zm_mapstartlocation)
 
 		Engine.CommitProfileChanges(self.controller)
 	end
@@ -273,7 +295,8 @@ local function mapListGetButtonData(controller, index, mutables, self)
 	if UIExpression.DvarString(nil, "ui_gametype") == "zclassic" then
 		mutables.text:setText(CoD.GetZombieGameTypeDescription(CoD.Zombie.GAMETYPE_ZCLASSIC, CoD.SelectMapListZombie.Maps[index].ui_mapname))
 	else
-		mutables.text:setText(Engine.Localize(UIExpression.TableLookup(nil, CoD.gametypesTable, 0, 5, 3, CoD.SelectMapListZombie.Locations[index].ui_zm_mapstartlocation, 4)))
+		local locations = CoD.SelectMapListZombie.GetLocationsForGametype(UIExpression.DvarString(nil, "ui_gametype"))
+		mutables.text:setText(Engine.Localize(UIExpression.TableLookup(nil, CoD.gametypesTable, 0, 5, 3, locations[index].ui_zm_mapstartlocation, 4)))
 	end
 end
 
@@ -296,8 +319,9 @@ function LUI.createMenu.SelectMapListZM(controller)
 		local index = CoD.SelectMapListZombie.GetKeyValueIndex(CoD.SelectMapListZombie.Maps, "ui_mapname", UIExpression.DvarString(nil, "ui_mapname"))
 		listBox:setTotalItems(#CoD.SelectMapListZombie.Maps, index)
 	else
-		local index = CoD.SelectMapListZombie.GetKeyValueIndex(CoD.SelectMapListZombie.Locations, "ui_zm_mapstartlocation", UIExpression.DvarString(nil, "ui_zm_mapstartlocation"))
-		listBox:setTotalItems(#CoD.SelectMapListZombie.Locations, index)
+		local locations = CoD.SelectMapListZombie.GetLocationsForGametype(UIExpression.DvarString(nil, "ui_gametype"))
+		local index = CoD.SelectMapListZombie.GetKeyValueIndex(locations, "ui_zm_mapstartlocation", UIExpression.DvarString(nil, "ui_zm_mapstartlocation"))
+		listBox:setTotalItems(#locations, index)
 	end
 
 	self:addElement(listBox)
