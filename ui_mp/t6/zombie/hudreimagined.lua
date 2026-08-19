@@ -113,18 +113,20 @@ LUI.createMenu.ReimaginedArea = function(LocalClientIndex)
 
 	local healthBar = LUI.UIImage.new()
 	healthBar:setLeftRight(true, false, healthBarWidget.bgDiff, healthBarWidget.width - healthBarWidget.bgDiff)
-	healthBar:setTopBottom(true, false, healthBarWidget.bgDiff, healthBarWidget.height - healthBarWidget.bgDiff)
+	healthBar:setTopBottom(true, false, (healthBarWidget.height + healthBarWidget.bgDiff) / 2, healthBarWidget.height - healthBarWidget.bgDiff)
 	healthBar:setImage(RegisterMaterial("white"))
 	healthBar:setAlpha(1)
 	healthBarWidget:addElement(healthBar)
 	healthBarWidget.healthBar = healthBar
 
 	local shieldBar = LUI.UIImage.new()
-	shieldBar:setLeftRight(true, false, healthBarWidget.bgDiff, healthBarWidget.width - healthBarWidget.bgDiff)
+	shieldBar:setLeftRight(true, false, healthBarWidget.bgDiff, healthBarWidget.bgDiff)
 	shieldBar:setTopBottom(true, false, healthBarWidget.bgDiff, (healthBarWidget.height - healthBarWidget.bgDiff) / 2)
 	shieldBar:setImage(RegisterMaterial("white"))
-	shieldBar:setRGB(0.5, 0.5, 0.5)
-	shieldBar:setAlpha(0)
+	-- Armour blue, so the shield track reads as a separate resource at a glance rather
+	-- than as a dimmer copy of the white health bar underneath it.
+	shieldBar:setRGB(0.48, 0.8, 0.94)
+	shieldBar:setAlpha(1)
 	healthBarWidget:addElement(shieldBar)
 	healthBarWidget.shieldBar = shieldBar
 
@@ -491,27 +493,38 @@ CoD.Reimagined.HealthBarArea.UpdateHealthBar = function(Menu, ClientInstance)
 	local health = ClientInstance.data[1]
 	local maxHealth = ClientInstance.data[2]
 	local shieldHealth = ClientInstance.data[3]
+	local shieldMax = ClientInstance.data[4]
 	local healthPercent = health / maxHealth
-	local shieldHealthPercent = shieldHealth / 100
+
+	-- The shield arrives as a real value with its own maximum rather than a 0-100 percentage, so
+	-- the readout can show the map's actual figure. Guarded because the maximum is zero whenever
+	-- no shield is carried.
+	local shieldHealthPercent = 0
+
+	if shieldMax ~= nil and shieldMax > 0 then
+		shieldHealthPercent = shieldHealth / shieldMax
+	end
 
 	local healthWidth = math.max(3, (Menu.width * healthPercent) - Menu.bgDiff)
 
+	-- The bar keeps the split layout at all times rather than restyling itself the moment a shield
+	-- is picked up. Health always sits in the lower half with the shield track above it; carrying
+	-- no shield just leaves that upper track empty, which is accurate rather than the bar changing
+	-- shape underneath the player. Collapsing to the left edge instead of the 3px minimum used for
+	-- a live shield is what makes empty read as empty.
+	local shieldHealthWidth = Menu.bgDiff
+
 	if shieldHealthPercent > 0 then
-		local shieldHealthWidth = math.max(3, (Menu.width * shieldHealthPercent) - Menu.bgDiff)
-
-		Menu.shieldBar:setAlpha(1)
-
-		Menu.shieldBar:beginAnimation("slide", 50, true, true)
-		Menu.shieldBar:setLeftRight(true, false, Menu.bgDiff, shieldHealthWidth)
-
-		Menu.healthBar:setTopBottom(true, false, (Menu.height + Menu.bgDiff) / 2, Menu.height - Menu.bgDiff)
-		Menu.healthText:setText(health .. " | " .. shieldHealth)
-	else
-		Menu.shieldBar:setAlpha(0)
-
-		Menu.healthBar:setTopBottom(true, false, Menu.bgDiff, Menu.height - Menu.bgDiff)
-		Menu.healthText:setText(health)
+		shieldHealthWidth = math.max(3, (Menu.width * shieldHealthPercent) - Menu.bgDiff)
 	end
+
+	Menu.shieldBar:setAlpha(1)
+
+	Menu.shieldBar:beginAnimation("slide", 50, true, true)
+	Menu.shieldBar:setLeftRight(true, false, Menu.bgDiff, shieldHealthWidth)
+
+	Menu.healthBar:setTopBottom(true, false, (Menu.height + Menu.bgDiff) / 2, Menu.height - Menu.bgDiff)
+	Menu.healthText:setText(health .. " | " .. shieldHealth)
 
 	Menu.healthBar:beginAnimation("slide", 50, true, true)
 	Menu.healthBar:setLeftRight(true, false, Menu.bgDiff, healthWidth)
