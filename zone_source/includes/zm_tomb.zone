@@ -18,6 +18,24 @@ weapon,sf_qcw05_upgraded_zm
 weapon,type95_zm
 weapon,type95_upgraded_zm
 
+// Legacy Mystery Box guns Origins never shipped. Registered by
+// _zm_reimagined::add_missing_legacy_weapons and only offered when LEGACY BOX GUNS is on, but the
+// assets have to be linked in either way. Unlike the Ballista and QCW-05 above, which Origins
+// already carries, none of these are in this map's own fastfile - build.bat loads zm_transit.ff on
+// this pass to resolve them. The M16A1 upgrades to the grenade launcher variant.
+weapon,rpd_zm
+weapon,rpd_upgraded_zm
+weapon,barretm82_zm
+weapon,barretm82_upgraded_zm
+weapon,mp5k_zm
+weapon,mp5k_upgraded_zm
+weapon,m16_zm
+weapon,m16_gl_upgraded_zm
+weapon,m1911_zm
+weapon,m1911_upgraded_zm
+weapon,rottweil72_zm
+weapon,rottweil72_upgraded_zm
+
 xmodel,p6_zm_tm_vending_three_gun
 xmodel,p6_zm_tm_wallbuy_ballista
 xmodel,p6_zm_tm_wallbuy_five_seven

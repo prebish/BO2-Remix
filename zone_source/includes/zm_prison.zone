@@ -103,6 +103,19 @@ weapon,spoon_zm_alcatraz
 weapon,spork_zm_alcatraz
 weapon,item_head_zm
 
+// Legacy Mystery Box guns Mob of the Dead never shipped. Registered by
+// _zm_reimagined::add_missing_legacy_weapons and only offered when LEGACY BOX GUNS is on, but the
+// assets have to be linked in either way. None are in this map's own fastfile, so build.bat loads
+// zm_transit.ff on this pass to resolve them. The M16A1 upgrades to the grenade launcher variant.
+weapon,rpd_zm
+weapon,rpd_upgraded_zm
+weapon,python_zm
+weapon,python_upgraded_zm
+weapon,ak74u_zm
+weapon,ak74u_upgraded_zm
+weapon,m16_zm
+weapon,m16_gl_upgraded_zm
+
 xmodel,p6_zm_al_vending_nuke_on
 xmodel,p6_zm_al_vending_ads_on
 xmodel,p6_zm_al_vending_three_gun_on
